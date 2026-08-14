@@ -6,6 +6,7 @@ stdout 은 JSON 한 덩어리로 끝난다 (로그는 stderr).
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from datetime import date
 from pathlib import Path
@@ -54,15 +55,19 @@ def default_sources(include_handoff: bool = False) -> list[tuple[Path, str, bool
     `##` 헤딩이 사례 경계와 일치하지 않는다 — 실측에서 `pytest`, `diff`, `조치` 같은
     슬러그가 만들어졌다. 그래서 옵트인으로 내렸다.
     """
-    vault = Path(r"C:\Users\admin\Documents\Obsidian\포트폴리오")
+    vault = Path(
+        os.environ.get("PORTFOLIO_VAULT")
+        or Path.home() / "Documents" / "Obsidian" / "포트폴리오"
+    )
+    notes = Path(os.environ.get("PORTFOLIO_NOTES") or Path.home())
     sources = [
         (vault / "사례", SOURCE_VAULT, False),
         (vault / "방법론", SOURCE_VAULT, True),   # category: applied 후보, draft 유지
     ]
     if include_handoff:
         sources += [
-            (Path(r"C:\Users\admin\handoff"), SOURCE_ARCHIVE, False),
-            (Path(r"C:\Users\admin\HANDOFF.md"), SOURCE_HANDOFF, False),
+            (notes / "handoff", SOURCE_ARCHIVE, False),
+            (notes / "HANDOFF.md", SOURCE_HANDOFF, False),
         ]
     return sources
 

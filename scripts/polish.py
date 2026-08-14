@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -26,10 +27,16 @@ from pathlib import Path
 import yaml
 
 REPO = Path(__file__).resolve().parent.parent
-CASES = REPO / "src" / "content" / "cases"
+# 초안은 추적되지 않는 drafts/ 에 산다. 이 저장소는 공개라, 기계가 작업 노트에서
+# 뽑아낸 글이 사람 확인 전에 저장소로 새어 나가면 안 된다.
+# 사람이 확인해 src/content/cases/ 로 옮기는 순간부터 공개 대상이 된다.
+CASES = Path(os.environ.get("PORTFOLIO_DRAFTS") or REPO / "drafts")
 
 # 공용 LLM 클라이언트 (키는 Hermes .env 우선)
-sys.path.insert(0, r"C:\Users\admin\Projects\clawview\automation")
+_llm_dir = os.environ.get("LLM_CLIENT_DIR") or str(
+    Path.home() / "Projects" / "clawview" / "automation"
+)
+sys.path.insert(0, _llm_dir)
 try:
     from llm_client import chat  # type: ignore
 except Exception as exc:  # pragma: no cover - 환경 의존
@@ -184,6 +191,10 @@ def main() -> int:
     ap.add_argument("--apply", action="store_true", help="실제로 파일에 쓴다 (없으면 미리보기)")
     ap.add_argument("--limit", type=int, default=0, help="처리할 최대 건수 (0=전부)")
     args = ap.parse_args()
+
+    if not CASES.exists():
+        print(json.dumps({"drafts": 0, "note": f"초안 폴더 없음: {CASES}"}, ensure_ascii=False))
+        return 0
 
     drafts = []
     for p in sorted(CASES.glob("*.md")):

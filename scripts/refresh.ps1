@@ -22,7 +22,8 @@ $OutputEncoding = [Text.Encoding]::UTF8
 $env:PYTHONIOENCODING = 'utf-8'
 
 $root  = Split-Path -Parent $PSScriptRoot
-$vault = 'C:\Users\admin\Documents\Obsidian\포트폴리오'
+$vault = if ($env:PORTFOLIO_VAULT) { $env:PORTFOLIO_VAULT }
+         else { Join-Path $HOME 'Documents\Obsidian\포트폴리오' }
 $stamp = Join-Path $root '.astro\last-refresh'
 
 # ── 게이트: 볼트가 바뀌지 않았으면 LLM 을 부르지 않는다 ──────────────
@@ -49,7 +50,8 @@ if (-not $Force -and (Test-Path $stamp)) {
 Push-Location $root
 try {
     Write-Host "[1/3] 볼트 → 초안 변환"
-    $ingest = & python scripts\ingest\ingest.py --out src\content\cases 2>$null | ConvertFrom-Json
+    # 초안은 drafts\ 로. 추적되지 않는 자리다 — 공개 저장소로 새지 않게.
+    $ingest = & python scripts\ingest\ingest.py --out drafts 2>$null | ConvertFrom-Json
     Write-Host "  새 초안 $($ingest.written)건 · 기존 유지 $($ingest.skipped)건"
 
     if (-not $NoLlm) {
@@ -76,14 +78,17 @@ try {
     $newest.ToString('o') | Set-Content $stamp -Encoding utf8
 
     # ── 사람이 할 일 안내 ──────────────────────────────────────
-    $drafts = Get-ChildItem "$root\src\content\cases\*.md" |
-              Where-Object { (Get-Content $_ -Raw -Encoding utf8) -match '(?m)^draft:\s*true' }
+    $drafts = @(Get-ChildItem "$root\drafts\*.md" -ErrorAction SilentlyContinue)
     Write-Host ""
-    if ($drafts) {
-        Write-Host "확인 대기 중인 초안 $($drafts.Count)건 — 열어서 다듬고 draft: false 로 내리면 공개됩니다:"
+    if ($drafts.Count -gt 0) {
+        Write-Host "확인 대기 중인 초안 $($drafts.Count)건:"
         $drafts | Select-Object -First 10 | ForEach-Object { Write-Host "  $($_.FullName)" }
         Write-Host ""
-        Write-Host "공개는 별도 명령: pwsh scripts\deploy.ps1"
+        Write-Host "공개하려면 — 내용을 다듬은 뒤"
+        Write-Host "  1) draft: false 로 바꾸고"
+        Write-Host "  2) src\content\cases\ 로 옮긴 다음"
+        Write-Host "  3) pwsh scripts\deploy.ps1"
+        Write-Host "drafts\ 는 추적되지 않습니다 — 옮기기 전에는 공개 저장소에 들어가지 않습니다."
     } else {
         Write-Host "확인 대기 초안 없음 — 최신 상태입니다."
     }

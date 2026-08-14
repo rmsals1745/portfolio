@@ -1,11 +1,18 @@
 # 포트폴리오 배포 — 빌드 → Cloudflare Pages → 실측 검증
-# 사용법:  pwsh C:\Users\admin\Projects\portfolio\scripts\deploy.ps1
+# 사용법:  pwsh scripts\deploy.ps1
 $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
 $OutputEncoding = [Text.Encoding]::UTF8
 
 $root     = Split-Path -Parent $PSScriptRoot
-$wrangler = 'C:\Users\admin\Projects\devtutor\cloud\node_modules\.bin\wrangler.cmd'
+# wrangler 는 전역에 없으므로 경로를 잡아준다. 환경변수로 덮어쓸 수 있다.
+$wrangler = if ($env:WRANGLER_CMD) { $env:WRANGLER_CMD }
+            else { Join-Path $HOME 'Projects\devtutor\cloud\node_modules\.bin\wrangler.cmd' }
+if (-not (Test-Path $wrangler)) {
+    $g = Get-Command wrangler -ErrorAction SilentlyContinue
+    if ($g) { $wrangler = $g.Source }
+    else { throw "wrangler 를 찾지 못했습니다. `$env:WRANGLER_CMD 로 경로를 지정하세요." }
+}
 $project  = 'parkgeunmin'
 $url      = "https://$project.pages.dev"
 
