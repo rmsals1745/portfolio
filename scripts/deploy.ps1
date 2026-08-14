@@ -1,6 +1,8 @@
 # 포트폴리오 배포 — 빌드 → Cloudflare Pages → 실측 검증
 # 사용법:  pwsh C:\Users\admin\Projects\portfolio\scripts\deploy.ps1
 $ErrorActionPreference = 'Stop'
+[Console]::OutputEncoding = [Text.Encoding]::UTF8
+$OutputEncoding = [Text.Encoding]::UTF8
 
 $root     = Split-Path -Parent $PSScriptRoot
 $wrangler = 'C:\Users\admin\Projects\devtutor\cloud\node_modules\.bin\wrangler.cmd'
