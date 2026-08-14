@@ -1,0 +1,24 @@
+---
+// 원본 portfolio.html 의 .pull 을 계승. 섹션 사이의 호흡.
+---
+
+<blockquote class="pull">
+  <p><slot /></p>
+</blockquote>
+
+<style>
+  .pull {
+    background: var(--paper2);
+    padding: 52px 44px;
+    border-radius: var(--r-sm);
+  }
+  .pull p {
+    font-family: var(--serif);
+    font-size: clamp(19px, 2.6vw, 25px);
+    line-height: 1.55;
+    letter-spacing: -.01em;
+  }
+  @media (max-width: 720px) {
+    .pull { padding: 34px 24px; }
+  }
+</style>

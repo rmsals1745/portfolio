@@ -1,0 +1,192 @@
+/* ============================================================
+   디자인 토큰 — Career/portfolio.html 의 디자인 언어를 계승한다.
+   팔레트·서체 위계·한글 조판 규칙은 그대로 두고, 원본이 갖지 못한
+   것(실제 웹폰트 로드 · 카드 레이어 · 카테고리 축)만 보탠다.
+   ============================================================ */
+
+:root {
+  /* ── 지면 (어두운 종이) */
+  --paper:      #12100e;
+  --paper2:     #1a1714;
+  --paper3:     #221d19;
+  --paper-lift: #262019;  /* 카드 hover — 원본에 없던 레이어 */
+
+  /* ── 잉크 */
+  --ink:       #f2ece3;
+  --ink-dim:   #a89d8f;
+  --ink-faint: #6f665b;
+
+  /* ── 액센트 */
+  --accent:      #e0723a;  /* 주황 — 강조·현재상태 */
+  --accent-soft: rgba(224, 114, 58, .13);
+  --accent2:     #c9a227;  /* 금 — 수치·라벨 */
+  --cool:        #5c9ead;  /* 청 — 보조 분류 */
+  --ok:          #7fb069;
+
+  --rule:      #2e2823;
+  --rule-soft: #241f1b;
+
+  /* ── 서체 */
+  --sans: "Pretendard Variable", Pretendard, "Apple SD Gothic Neo",
+          "Malgun Gothic", system-ui, sans-serif;
+  --serif: Georgia, "Times New Roman", "Nanum Myeongjo", serif;
+  --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  /* ── 리듬 */
+  --wrap: 940px;
+  --wrap-wide: 1180px;
+  --pad: 28px;
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 14px;
+
+  --t-fast: .16s cubic-bezier(.4, 0, .2, 1);
+  --t-mid:  .28s cubic-bezier(.4, 0, .2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  /* 앵커로 점프했을 때 제목이 상단에 딱 붙지 않게 */
+  scroll-padding-top: 88px;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* 한국어 어절 단위 줄바꿈 — "짓/고" 처럼 낱말이 쪼개지지 않게.
+     원본 portfolio.html 에서 가져온 규칙. 이게 없으면 한글이 뭉개진다. */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  hyphens: none;
+}
+
+/* 줄바꿈 금지 조각 (숫자+단위 등) */
+.nb { white-space: nowrap; }
+
+.wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 var(--pad); }
+.wrap-wide { max-width: var(--wrap-wide); margin: 0 auto; padding: 0 var(--pad); }
+
+code {
+  font-family: var(--mono);
+  font-size: .92em;
+  color: var(--accent2);
+}
+
+a { color: inherit; }
+
+img { max-width: 100%; display: block; }
+
+/* ── 서체 위계 ─────────────────────────────────────── */
+
+h1 {
+  font-family: var(--serif);
+  font-size: clamp(30px, 5.6vw, 64px);
+  line-height: 1.14;
+  font-weight: 400;
+  letter-spacing: -.02em;
+}
+h1 em { font-style: normal; color: var(--accent); }
+
+h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(25px, 3.2vw, 31px);
+  letter-spacing: -.01em;
+}
+
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  font-weight: 700;
+}
+
+.lede {
+  font-size: 19px;
+  color: var(--ink-dim);
+  max-width: 680px;
+}
+.lede strong { color: var(--ink); font-weight: 600; }
+
+/* ── 섹션 머리 ─────────────────────────────────────── */
+
+.sec-head {
+  margin-bottom: 14px;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+.sec-num {
+  font-family: var(--serif);
+  font-size: 14px;
+  color: var(--accent);
+  letter-spacing: .1em;
+}
+.sec-sub {
+  color: var(--ink-faint);
+  font-size: 15px;
+  margin-bottom: 44px;
+  max-width: 640px;
+}
+
+section { padding: 78px 0; }
+section.tight { padding-top: 0; }
+
+/* ── 태그 ─────────────────────────────────────────── */
+
+.tag {
+  font-size: 11px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--paper);
+  background: var(--accent2);
+  padding: 3px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.tag.live { background: var(--accent); color: #fff; }
+.tag.cool { background: var(--cool); color: #0d1416; }
+.tag.ghost {
+  background: transparent;
+  color: var(--ink-faint);
+  border: 1px solid var(--rule);
+}
+
+/* ── 접근성 ───────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+@media (max-width: 720px) {
+  section { padding: 56px 0; }
+  :root { --pad: 20px; }
+}

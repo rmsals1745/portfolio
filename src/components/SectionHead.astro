@@ -1,0 +1,20 @@
+---
+interface Props {
+  num?: string;
+  title: string;
+  sub?: string;
+  id?: string;
+}
+const { num, title, sub, id } = Astro.props;
+---
+
+<div class="sec-head" id={id}>
+  {num && <span class="sec-num">{num}</span>}
+  <h2>{title}</h2>
+</div>
+{sub && <p class="sec-sub"><slot name="sub">{sub}</slot></p>}
+{!sub && <slot name="sub" />}
+
+<style>
+  .sec-head { scroll-margin-top: 84px; }
+</style>

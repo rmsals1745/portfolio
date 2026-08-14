@@ -1,0 +1,141 @@
+---
+import { CATEGORIES } from '../content.config';
+
+const path = Astro.url.pathname;
+const isHome = path === '/' || path === '';
+---
+
+<header class="bar" data-bar>
+  <div class="wrap-wide inner">
+    <a href="/" class="mark" aria-label="박근민 포트폴리오 첫 화면">
+      <span class="mark-nm">박근민</span>
+      <span class="mark-role">AI 인프라 · 에이전트 시스템</span>
+    </a>
+
+    <nav aria-label="분야">
+      <ul>
+        {
+          CATEGORIES.map((c) => (
+            <li>
+              <a
+                href={`/category/${c.id}/`}
+                aria-current={path.startsWith(`/category/${c.id}`) ? 'page' : undefined}
+              >
+                {c.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <a class="cta" href={isHome ? '#contact' : '/#contact'}>연락</a>
+  </div>
+</header>
+
+<style>
+  .bar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(18, 16, 14, .72);
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    /* 스크롤 전에는 경계선을 그리지 않는다 — 얇은 균일 테두리가 화면을 싸구려로 만든다 */
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--t-mid), background var(--t-mid);
+  }
+  .bar[data-scrolled] {
+    border-bottom-color: var(--rule);
+    background: rgba(18, 16, 14, .92);
+  }
+
+  .inner {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    height: 62px;
+  }
+
+  .mark {
+    text-decoration: none;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex: 0 0 auto;
+  }
+  .mark-nm {
+    font-family: var(--serif);
+    font-size: 18px;
+    letter-spacing: -.01em;
+    color: var(--ink);
+  }
+  .mark-role {
+    font-size: 11.5px;
+    color: var(--ink-faint);
+    letter-spacing: .04em;
+  }
+
+  nav { margin-left: auto; overflow-x: auto; scrollbar-width: none; }
+  nav::-webkit-scrollbar { display: none; }
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 22px;
+    white-space: nowrap;
+  }
+  nav a {
+    font-size: 13.5px;
+    color: var(--ink-faint);
+    text-decoration: none;
+    padding: 4px 0;
+    position: relative;
+    transition: color var(--t-fast);
+  }
+  nav a::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -2px;
+    height: 1px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--t-fast);
+  }
+  nav a:hover { color: var(--ink); }
+  nav a:hover::after { transform: scaleX(1); }
+  nav a[aria-current='page'] { color: var(--ink); }
+  nav a[aria-current='page']::after { transform: scaleX(1); }
+
+  .cta {
+    flex: 0 0 auto;
+    font-size: 13px;
+    font-weight: 650;
+    color: var(--accent);
+    text-decoration: none;
+    border: 1px solid var(--rule);
+    padding: 6px 14px;
+    border-radius: 99px;
+    transition: border-color var(--t-fast), background var(--t-fast);
+  }
+  .cta:hover { border-color: var(--accent); background: var(--accent-soft); }
+
+  @media (max-width: 860px) {
+    .mark-role { display: none; }
+    .cta { display: none; }
+    .inner { gap: 18px; }
+  }
+</style>
+
+<script>
+  // 스크롤해서 내용이 바 밑으로 들어갔을 때만 경계선을 켠다.
+  const bar = document.querySelector('[data-bar]');
+  if (bar) {
+    const sync = () => {
+      if (window.scrollY > 8) bar.setAttribute('data-scrolled', '');
+      else bar.removeAttribute('data-scrolled');
+    };
+    sync();
+    window.addEventListener('scroll', sync, { passive: true });
+  }
+</script>

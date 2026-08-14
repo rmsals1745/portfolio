@@ -1,0 +1,145 @@
+---
+import { CATEGORIES, type CategoryId } from '../content.config';
+
+interface Props {
+  /** 카테고리별 사례 수 */
+  counts: Record<string, number>;
+}
+const { counts } = Astro.props;
+
+/**
+ * 층 순서 — 위로 갈수록 사용자에게 가깝고, 아래로 갈수록 토대다.
+ * 평면 그리드로 늘어놓지 않는 이유: 이 포트폴리오의 논지 자체가
+ * "인프라를 짓고 그 위에 제품을 올린다" 라서, 배치가 곧 주장이다.
+ */
+const ORDER: CategoryId[] = ['product', 'applied', 'agent-infra', 'ops', 'genai'];
+const byId = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
+const strata = ORDER.map((id) => ({ ...byId[id], count: counts[id] ?? 0 }));
+---
+
+<div class="diagram">
+  <div class="axis" aria-hidden="true">
+    <span class="axis-top">사용자에게 가까움</span>
+    <span class="axis-line"></span>
+    <span class="axis-bottom">토대</span>
+  </div>
+
+  <ul class="strata">
+    {
+      strata.map((s, i) => (
+        <li class="stratum" style={`--tint:${s.accent}; --depth:${i}`}>
+          <a href={`/category/${s.id}/`}>
+            <div class="line">
+              <span class="label">{s.label}</span>
+              <span class="en">{s.en}</span>
+              <span class="count">
+                {s.count}
+                <i>건</i>
+              </span>
+            </div>
+            <p class="blurb">{s.blurb}</p>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .diagram {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0 22px;
+    margin-top: 8px;
+  }
+
+  /* 왼쪽 세로 축 — 이 그림이 "쌓인 것"임을 말해주는 유일한 장치 */
+  .axis {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    justify-items: center;
+    padding: 4px 0;
+  }
+  .axis-top,
+  .axis-bottom {
+    writing-mode: vertical-rl;
+    font-size: 10.5px;
+    letter-spacing: .14em;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+  .axis-line {
+    width: 1px;
+    background: linear-gradient(to bottom, var(--accent), var(--rule) 45%, var(--cool));
+    margin: 10px 0;
+    justify-self: center;
+    align-self: stretch;
+  }
+
+  .strata { list-style: none; display: grid; gap: 3px; }
+
+  .stratum a {
+    display: block;
+    text-decoration: none;
+    padding: 20px 24px;
+    border-radius: var(--r-sm);
+    background: var(--paper2);
+    /* 층마다 아래로 갈수록 미세하게 어두워진다 — 깊이감 */
+    background-image: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--tint) 9%, transparent),
+      transparent 46%
+    );
+    border: 1px solid var(--rule-soft);
+    transition: transform var(--t-fast), border-color var(--t-fast), background-color var(--t-fast);
+  }
+  .stratum a:hover {
+    background-color: var(--paper-lift);
+    border-color: color-mix(in srgb, var(--tint) 42%, var(--rule));
+    transform: translateX(5px);
+  }
+
+  .line {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 5px;
+  }
+  .label {
+    font-size: 18px;
+    font-weight: 650;
+    color: var(--ink);
+    letter-spacing: -.01em;
+  }
+  .en {
+    font-family: var(--serif);
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    letter-spacing: .04em;
+  }
+  .count {
+    margin-left: auto;
+    font-family: var(--serif);
+    font-size: 22px;
+    color: var(--tint);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .count i { font-style: normal; font-size: 11.5px; color: var(--ink-faint); margin-left: 3px; }
+
+  .blurb {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--ink-dim);
+    max-width: 68ch;
+  }
+
+  @media (max-width: 640px) {
+    .diagram { grid-template-columns: 1fr; }
+    .axis { display: none; }
+    .stratum a { padding: 17px 16px; }
+    .label { font-size: 16.5px; }
+    .en { display: none; }
+    .blurb { font-size: 13.5px; }
+  }
+</style>

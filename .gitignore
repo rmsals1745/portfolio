@@ -1,0 +1,17 @@
+# 빌드 산출물
+dist/
+.astro/
+node_modules/
+
+# 환경
+.env
+.env.*
+!.env.example
+
+# OS
+Thumbs.db
+desktop.ini
+nul
+
+# 크론이 만든 초안 중 아직 확인 안 된 것은 커밋된다 (draft:true 라 빌드에서 빠짐).
+# 여기에 content 를 넣지 말 것 — 넣으면 서버가 만든 초안이 사장에게 도달하지 않는다.

@@ -1,0 +1,282 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import SectionHead from '../components/SectionHead.astro';
+import StatGrid from '../components/StatGrid.astro';
+import StackDiagram from '../components/StackDiagram.astro';
+import CaseCard from '../components/CaseCard.astro';
+import CapabilityRow from '../components/CapabilityRow.astro';
+import PullQuote from '../components/PullQuote.astro';
+import { CATEGORIES } from '../content.config';
+
+const all = (await getCollection('cases', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.weight - a.data.weight
+);
+
+const capabilities = (await getCollection('capabilities')).sort(
+  (a, b) => a.data.order - b.data.order
+);
+
+const counts: Record<string, number> = {};
+for (const c of all) counts[c.data.category] = (counts[c.data.category] ?? 0) + 1;
+
+/** 층마다 첫 화면에 세우는 대표 사례 수. 이 숫자가 화면 길이를 고정한다. */
+const PER_STRATUM = 2;
+
+const ORDER = ['product', 'applied', 'agent-infra', 'ops', 'genai'] as const;
+const byId = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
+
+const strata = ORDER.map((id) => {
+  const items = all.filter((c) => c.data.category === id);
+  return {
+    meta: byId[id],
+    shown: items.slice(0, PER_STRATUM),
+    rest: Math.max(0, items.length - PER_STRATUM),
+  };
+}).filter((s) => s.shown.length > 0);
+
+const stats = [
+  { value: '700+', label: '4개월간 생산한 커밋<br>(자작 스웜 파이프라인 경유)' },
+  { value: '5', label: '실전 운용 중인<br>LLM 프로바이더' },
+  { value: '40+', label: '자작 에이전트 스킬<br>설계 · 운영' },
+  { value: '1,464', label: '단일 모노레포<br>관리 파일 수' },
+];
+
+const skills = [
+  {
+    h: 'Agent Systems',
+    p: '멀티에이전트 오케스트레이션, 구현/검수 분리, tool-calling, 판정 프로토콜 설계, 프로바이더 폴백 체인, MCP 서버, Claude Agent SDK, LangGraph (체크포인트 · HITL 인터럽트)',
+  },
+  {
+    h: 'LLM Providers',
+    p: 'Claude · GLM(z.ai) · DeepSeek · Kimi(Moonshot) · MiMo · Gemini — 장애 / 안전필터 거부 / 인코딩 손상을 서로 다른 실패 모드로 분류해 운용',
+  },
+  { h: 'Full-stack', p: 'TypeScript, React, Node 24, pnpm 모노레포, Astro, Vite, Capacitor, Python 3.12' },
+  {
+    h: 'Infra & Ops',
+    p: 'Cloudflare Workers / Pages / D1 / KV, Hetzner + Docker(Caddy · CouchDB) + systemd + cron, Playwright, Vitest, 3중 백업 체계',
+  },
+  { h: 'Commerce', p: '포트원 V2, 빌링키 정기결제, 크레딧 원장, 환불 정산, 통신판매업 · PG 심사 요건' },
+  {
+    h: 'Generative Media',
+    p: 'ComfyUI 로컬 추론(Z-Image-Turbo · LoRA · ControlNet · VideoX-Fun), Whisper STT, TTS 파이프라인',
+  },
+];
+---
+
+<Base
+  title="박근민 — AI 인프라 / 에이전트 시스템 엔지니어"
+  description="에이전트를 굴리는 인프라를 짓고, 그 위에 제품을 올립니다. 멀티모델 오케스트레이션 엔진 · 컨트롤 플레인 · 결제 붙은 SaaS."
+>
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">AI Infrastructure · Agent Systems Engineer</p>
+      <h1>에이전트를 굴리는<br /><em>인프라</em>를 짓고,<br />그 위에 제품을 올립니다.</h1>
+      <p class="lede">
+        멀티모델 오케스트레이션 엔진, 컨트롤 플레인, 내구성 워크플로 —
+        <strong>에이전트를 실제 프로덕션으로 굴릴 때 필요한 것들</strong>을 직접 설계해 운영합니다.
+        그리고 그 인프라 위에서 <strong>결제까지 붙은 제품</strong>을 혼자 출시했습니다.
+        인프라만 만든 사람도, 제품만 만든 사람도 아닙니다.
+      </p>
+
+      <div class="contact">
+        <span class="nm">박근민 · Park Geunmin</span>
+        <a href="mailto:rmsals1745@gmail.com">rmsals1745@gmail.com</a>
+        <a href="https://github.com/rmsals1745" rel="me noopener">github.com/rmsals1745</a>
+        <span>인천 · 서울 (수도권) · 원격 가능</span>
+      </div>
+
+      <StatGrid stats={stats} />
+    </div>
+  </header>
+
+  <section>
+    <div class="wrap">
+      <SectionHead
+        num="01"
+        title="무엇을 어디까지 지었는가"
+        sub="분야를 나열한 게 아니라 쌓은 순서대로 놓았습니다. 아래층이 없으면 위층이 서지 않습니다 — 층을 누르면 그 층의 사례만 모아 봅니다."
+      />
+      <StackDiagram counts={counts} />
+    </div>
+  </section>
+
+  {
+    capabilities.length > 0 && (
+      <section class="tight">
+        <div class="wrap">
+          <SectionHead
+            num="02"
+            title="이 서비스들이 증명하는 것"
+            sub="기술 나열 대신, 만든 것에서 역산한 역량입니다. 각 항목마다 근거가 되는 실물이 아래에 있습니다."
+          />
+          <div class="caps">
+            {capabilities.map((c, i) => (
+              <CapabilityRow
+                num={String(i + 1).padStart(2, '0')}
+                claim={c.data.claim}
+                why={c.data.why}
+                evidenceLabel={c.data.evidenceLabel}
+                evidence={c.data.evidence}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="tight">
+    <div class="wrap">
+      <SectionHead
+        num="03"
+        title="사례"
+        sub="층마다 대표 사례만 세웠습니다. 각 카드의 숫자는 추정이 아니라 실측이고, 근거는 상세 문서 안에 있습니다."
+      />
+
+      {
+        strata.map((s) => (
+          <div class="stratum-block">
+            <div class="stratum-head">
+              <h3>{s.meta.label}</h3>
+              <span class="en">{s.meta.en}</span>
+              <a class="all" href={`/category/${s.meta.id}/`}>
+                {s.rest > 0 ? `이 층 ${s.rest}건 더 보기` : '이 층 전체 보기'}
+              </a>
+            </div>
+            <div class="cards">
+              {s.shown.map((entry) => (
+                <CaseCard entry={entry} />
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="tight">
+    <div class="wrap">
+      <PullQuote>
+        AI 시스템의 진짜 난이도는 모델을 부르는 데 있지 않습니다.<br />
+        <span class="hl">“이 결과를 믿어도 되는가”</span> 를 사람 없이 판정하는 구조를 짜는 데 있습니다.
+      </PullQuote>
+    </div>
+  </section>
+
+  <section class="tight">
+    <div class="wrap">
+      <SectionHead num="04" title="기술 스택" />
+      <div class="skills">
+        {
+          skills.map((s) => (
+            <div class="skill">
+              <h4>{s.h}</h4>
+              <p>{s.p}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="tight">
+    <div class="wrap">
+      <SectionHead num="05" title="배경" />
+      <p class="bg">
+        개발 이전에 <b>B2B 컨설팅 · 영업</b>을 했습니다. 니즈 발굴 → 문제 인식 → 해결책 제시 → 반론 처리 →
+        클로징 → 사후관리까지 현장에서 굴린 경험이 있습니다. 그래서
+        <b>고객 앞에 직접 설 수 있는 엔지니어</b>입니다 — 요구사항을 통역해서 받는 게 아니라 직접 캐내고,
+        만든 것을 직접 설명합니다. 지금은 그 상담 플레이북을 AI 에이전트의 대화 설계에 그대로 이식하고 있습니다.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero { padding: 92px 0 56px; position: relative; overflow: hidden; }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -180px;
+    width: 560px; height: 560px;
+    background: radial-gradient(circle, rgba(224, 114, 58, .20), transparent 62%);
+    pointer-events: none;
+  }
+  .hero .eyebrow { margin-bottom: 22px; }
+  .hero h1 { margin-bottom: 26px; }
+
+  .contact {
+    margin-top: 34px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    font-size: 14px;
+    color: var(--ink-faint);
+    align-items: center;
+  }
+  .contact .nm { color: var(--ink); font-weight: 700; font-size: 15px; letter-spacing: .02em; }
+  .contact a {
+    color: var(--ink-dim);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 2px;
+    transition: color var(--t-fast), border-color var(--t-fast);
+  }
+  .contact a:hover { color: var(--accent); border-color: var(--accent); }
+
+  .caps { border-top: 1px solid var(--rule); }
+
+  .stratum-block { margin-top: 44px; }
+  .stratum-block:first-of-type { margin-top: 0; }
+  .stratum-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 6px;
+  }
+  .stratum-head h3 { font-size: 15px; font-weight: 700; letter-spacing: .02em; color: var(--ink); }
+  .stratum-head .en {
+    font-family: var(--serif);
+    font-size: 12px;
+    color: var(--ink-faint);
+    letter-spacing: .05em;
+  }
+  .stratum-head .all {
+    margin-left: auto;
+    font-size: 13px;
+    color: var(--ink-faint);
+    text-decoration: none;
+    transition: color var(--t-fast);
+  }
+  .stratum-head .all:hover { color: var(--accent); }
+
+  .cards { display: grid; gap: 2px; }
+
+  .skills {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 34px;
+    margin-top: 30px;
+  }
+  .skill h4 {
+    font-size: 12px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 14px;
+    font-weight: 700;
+  }
+  .skill p { color: var(--ink-dim); font-size: 15px; }
+
+  .bg { color: var(--ink-dim); font-size: 16px; max-width: 700px; line-height: 1.85; }
+  .bg b { color: var(--ink); font-weight: 650; }
+
+  .hl { color: var(--accent); }
+
+  @media (max-width: 720px) {
+    .hero { padding: 60px 0 40px; }
+  }
+</style>

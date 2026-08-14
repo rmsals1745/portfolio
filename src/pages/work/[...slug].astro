@@ -1,0 +1,197 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { CATEGORIES } from '../../content.config';
+import '../../styles/prose.css';
+
+export const getStaticPaths = (async () => {
+  const items = await getCollection('cases', ({ data }) => !data.draft);
+  return items.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}) satisfies GetStaticPaths;
+
+const { entry } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+
+const meta = CATEGORIES.find((c) => c.id === d.category)!;
+
+// 같은 층의 다른 사례 — 막다른 길을 만들지 않는다
+const siblings = (
+  await getCollection('cases', ({ data, id }) => !data.draft && data.category === d.category)
+)
+  .filter((c) => c.id !== entry.id)
+  .sort((a, b) => b.data.weight - a.data.weight)
+  .slice(0, 3);
+---
+
+<Base title={`${d.title} — 박근민`} description={d.tagline}>
+  <article>
+    <header class="head">
+      <div class="wrap">
+        <nav class="crumb" aria-label="위치">
+          <a href="/">사례 전체</a>
+          <span aria-hidden="true">/</span>
+          <a href={`/category/${meta.id}/`}>{meta.label}</a>
+        </nav>
+
+        <h1>{d.title}</h1>
+        <p class="tagline">{d.tagline}</p>
+
+        <dl class="facts">
+          <div><dt>기간</dt><dd>{d.period}</dd></div>
+          {d.role && <div><dt>역할</dt><dd>{d.role}</dd></div>}
+          {d.badge && <div><dt>분류</dt><dd>{d.badge}</dd></div>}
+        </dl>
+
+        {
+          d.metrics.length > 0 && (
+            <dl class="metrics">
+              {d.metrics.map((m) => (
+                <div>
+                  <dd>{m.value}</dd>
+                  <dt>{m.label}</dt>
+                </div>
+              ))}
+            </dl>
+          )
+        }
+      </div>
+    </header>
+
+    <div class="wrap">
+      <div class="prose">
+        <Content />
+      </div>
+
+      {
+        d.stack.length > 0 && (
+          <div class="stackbox">
+            <p class="stackbox-h">기술 스택</p>
+            <p class="stackbox-b">{d.stack.join(' · ')}</p>
+          </div>
+        )
+      }
+    </div>
+  </article>
+
+  {
+    siblings.length > 0 && (
+      <section class="tight">
+        <div class="wrap">
+          <p class="sib-h">같은 층의 다른 사례 — {meta.label}</p>
+          <ul class="sib">
+            {siblings.map((s) => (
+              <li>
+                <a href={`/work/${s.id}/`}>
+                  <span class="sib-t">{s.data.title}</span>
+                  <span class="sib-d">{s.data.tagline}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+</Base>
+
+<style>
+  .head { padding: 56px 0 40px; }
+  .crumb {
+    display: flex;
+    gap: 9px;
+    font-size: 13px;
+    color: var(--ink-faint);
+    margin-bottom: 24px;
+  }
+  .crumb a { color: var(--ink-dim); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+
+  h1 {
+    font-size: clamp(28px, 4.6vw, 46px);
+    margin-bottom: 18px;
+  }
+  .tagline {
+    font-size: 18.5px;
+    color: var(--ink-dim);
+    max-width: 680px;
+    line-height: 1.7;
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 30px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule-soft);
+    font-size: 14px;
+  }
+  .facts div { display: flex; gap: 9px; align-items: baseline; }
+  .facts dt { color: var(--ink-faint); font-size: 12px; letter-spacing: .06em; }
+  .facts dd { color: var(--ink-dim); }
+
+  .metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 26px 46px;
+    margin-top: 30px;
+    padding: 24px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .metrics dd {
+    font-family: var(--serif);
+    font-size: 34px;
+    line-height: 1;
+    color: var(--accent2);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.02em;
+  }
+  .metrics dt { margin-top: 8px; font-size: 12.5px; color: var(--ink-faint); }
+
+  .stackbox {
+    margin-top: 48px;
+    padding: 22px 24px;
+    background: var(--paper2);
+    border-radius: var(--r-sm);
+    max-width: 720px;
+  }
+  .stackbox-h {
+    font-size: 11.5px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .stackbox-b { font-size: 14.5px; color: var(--ink-dim); line-height: 1.75; }
+
+  .sib-h {
+    font-size: 11.5px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 16px;
+  }
+  .sib { list-style: none; display: grid; gap: 2px; }
+  .sib a {
+    display: block;
+    padding: 18px 20px;
+    border-radius: var(--r-sm);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: background var(--t-fast), border-color var(--t-fast);
+  }
+  .sib a:hover { background: var(--paper2); border-color: var(--rule); }
+  .sib-t { display: block; font-size: 16.5px; font-weight: 650; color: var(--ink); margin-bottom: 4px; }
+  .sib a:hover .sib-t { color: var(--accent); }
+  .sib-d { display: block; font-size: 14px; color: var(--ink-faint); line-height: 1.6; }
+
+  @media (max-width: 640px) {
+    .head { padding: 38px 0 28px; }
+    .metrics { gap: 20px 32px; }
+    .metrics dd { font-size: 27px; }
+  }
+</style>

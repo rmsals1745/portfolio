@@ -1,0 +1,83 @@
+---
+import '../styles/tokens.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  /** og:image 경로 (public 기준). 없으면 기본 스크린샷. */
+  ogImage?: string;
+}
+
+const { title, description, ogImage = '/shots/statusline.png' } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://parkgeunmin.pages.dev');
+const ogUrl = new URL(ogImage, Astro.site ?? 'https://parkgeunmin.pages.dev');
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:image" content={ogUrl.href} />
+    <meta property="og:locale" content="ko_KR" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#12100e" />
+
+    {/*
+      원본 portfolio.html 은 Pretendard 를 font-family 로 "이름만" 불렀고 실제로 로드하지는
+      않았다. 그래서 대부분의 윈도우 기계에서 맑은고딕으로 렌더됐다. 여기서 실제로 싣는다.
+      dynamic-subset = 쓰인 글자만 받아가므로 한글이어도 가볍다.
+    */}
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+    {/* 국문 헤드라인용 명조 — 영문은 Georgia 가 받고 한글만 이쪽이 받는다 */}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&display=swap"
+    />
+
+    <slot name="head" />
+  </head>
+
+  <body>
+    <a href="#main" class="skip">본문으로 건너뛰기</a>
+    <SiteHeader />
+    <main id="main">
+      <slot />
+    </main>
+    <SiteFooter />
+
+    <style>
+      .skip {
+        position: absolute;
+        left: -9999px;
+        top: 0;
+        z-index: 100;
+        background: var(--accent);
+        color: #fff;
+        padding: 10px 18px;
+        border-radius: 0 0 var(--r-sm) 0;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .skip:focus { left: 0; }
+    </style>
+  </body>
+</html>

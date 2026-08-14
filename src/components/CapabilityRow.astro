@@ -1,0 +1,69 @@
+---
+interface Props {
+  num: string;
+  claim: string;
+  why: string;
+  evidenceLabel: string;
+  evidence: string;
+}
+const { num, claim, why, evidenceLabel, evidence } = Astro.props;
+---
+
+<div class="cap-row">
+  <div class="cap-n">{num}</div>
+  <div>
+    <p class="cap-claim" set:html={claim} />
+    <p class="cap-why" set:html={why} />
+    <p class="cap-ev"><b>{evidenceLabel}</b> · <span set:html={evidence} /></p>
+  </div>
+</div>
+
+<style>
+  .cap-row {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 0 20px;
+    padding: 30px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .cap-n {
+    font-family: var(--serif);
+    font-size: 15px;
+    color: var(--accent);
+    padding-top: 7px;
+    letter-spacing: .06em;
+  }
+  .cap-claim {
+    font-family: var(--serif);
+    font-size: clamp(20px, 2.6vw, 24px);
+    line-height: 1.4;
+    letter-spacing: -.01em;
+    margin-bottom: 11px;
+  }
+  .cap-why {
+    color: var(--ink-dim);
+    font-size: 15.5px;
+    margin-bottom: 15px;
+    max-width: 660px;
+  }
+  .cap-ev {
+    font-size: 14.5px;
+    color: var(--ink-dim);
+    background: var(--paper2);
+    padding: 14px 17px;
+    border-radius: var(--r-sm);
+    line-height: 1.7;
+  }
+  @media (max-width: 640px) {
+    .cap-row { grid-template-columns: 1fr; gap: 0; }
+    .cap-n { padding: 0 0 6px; }
+  }
+</style>
+
+<style is:global>
+  /* 역량 문장 안에서 쓰는 강조 — set:html 로 들어오므로 전역이어야 한다 */
+  .cap-claim em { font-style: normal; color: var(--accent); }
+  .cap-why b { color: var(--ink); font-weight: 650; }
+  .cap-ev b { color: var(--accent2); font-weight: 700; letter-spacing: .02em; }
+  .cap-ev em { font-style: normal; color: var(--ink); font-weight: 600; }
+</style>

@@ -1,0 +1,184 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'cases'>;
+  /** row = 첫 화면(층 단면 안). tile = 카테고리 목록(아카이브 성격). */
+  variant?: 'row' | 'tile';
+}
+
+const { entry, variant = 'row' } = Astro.props;
+const d = entry.data;
+const href = `/work/${entry.id}/`;
+
+const statusLabel: Record<string, string> = {
+  live: '운영 중',
+  active: '진행 중',
+  archived: '종료',
+};
+---
+
+<article class={`card ${variant}`}>
+  <a class="hit" href={href} aria-labelledby={`t-${entry.id}`}>
+    <span class="visually-hidden">{d.title} 자세히 보기</span>
+  </a>
+
+  <div class="head">
+    <h3 id={`t-${entry.id}`}>{d.title}</h3>
+    {d.badge && <span class={`tag ${d.status === 'live' ? 'live' : 'cool'}`}>{d.badge}</span>}
+    <span class="when">{d.period}</span>
+  </div>
+
+  <p class="tagline">{d.tagline}</p>
+
+  {
+    d.metrics.length > 0 && (
+      <dl class="metrics">
+        {d.metrics.map((m) => (
+          <div>
+            <dt>{m.label}</dt>
+            <dd>{m.value}</dd>
+          </div>
+        ))}
+      </dl>
+    )
+  }
+
+  <div class="foot">
+    {d.stack.length > 0 && <p class="stack">{d.stack.slice(0, 5).join(' · ')}</p>}
+    <span class="more" aria-hidden="true">
+      자세히 <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2.5 6.5h8M7 3l3.5 3.5L7 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+  </div>
+
+  {d.status !== 'active' && <span class="status">{statusLabel[d.status]}</span>}
+</article>
+
+<style>
+  .card {
+    position: relative;
+    padding: 28px 26px 24px;
+    border-radius: var(--r-md);
+    background: transparent;
+    border: 1px solid transparent;
+    transition: background var(--t-fast), border-color var(--t-fast), transform var(--t-fast);
+  }
+  .card:hover,
+  .card:focus-within {
+    background: var(--paper2);
+    border-color: var(--rule);
+  }
+
+  /* 카드 전체를 링크로 — 겉에 <a> 를 씌우면 내부 링크가 죽으므로 덮개를 쓴다 */
+  .hit {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+  }
+
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 11px;
+    margin-bottom: 9px;
+  }
+  h3 {
+    font-size: 21px;
+    font-weight: 650;
+    letter-spacing: -.01em;
+    line-height: 1.35;
+  }
+  .card:hover h3 { color: var(--accent); }
+  .when {
+    font-size: 13px;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+    margin-left: auto;
+  }
+
+  .tagline {
+    color: var(--ink-dim);
+    font-size: 15.5px;
+    line-height: 1.7;
+    max-width: 62ch;
+  }
+
+  /* 숫자 3개 — 카드에서 유일하게 눈에 먼저 박히는 요소 */
+  .metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 34px;
+    margin-top: 18px;
+  }
+  .metrics div { min-width: 0; }
+  .metrics dt {
+    font-size: 11.5px;
+    letter-spacing: .06em;
+    color: var(--ink-faint);
+    margin-bottom: 2px;
+  }
+  .metrics dd {
+    font-family: var(--serif);
+    font-size: 27px;
+    line-height: 1.1;
+    color: var(--accent2);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.01em;
+  }
+
+  .foot {
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+    margin-top: 20px;
+  }
+  .stack {
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    line-height: 1.6;
+    flex: 1 1 auto;
+  }
+  .more {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-faint);
+    flex: 0 0 auto;
+    transition: color var(--t-fast), gap var(--t-fast);
+  }
+  .card:hover .more { color: var(--accent); gap: 9px; }
+
+  .status {
+    position: absolute;
+    top: 28px;
+    right: 26px;
+    font-size: 11px;
+    letter-spacing: .08em;
+    color: var(--ink-faint);
+  }
+  .card:has(.when) .status { display: none; }
+
+  /* ── tile: 카테고리 페이지의 격자용 */
+  .card.tile {
+    background: var(--paper2);
+    border-color: var(--rule-soft);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .card.tile:hover { background: var(--paper-lift); border-color: var(--rule); }
+  .card.tile .foot { margin-top: auto; padding-top: 20px; }
+  .card.tile .when { margin-left: 0; }
+  .card.tile .metrics dd { font-size: 23px; }
+
+  @media (max-width: 640px) {
+    .card { padding: 22px 18px 20px; }
+    .when { margin-left: 0; }
+    .metrics { gap: 0 24px; }
+    .metrics dd { font-size: 23px; }
+  }
+</style>

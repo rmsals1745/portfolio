@@ -1,0 +1,65 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer id="contact">
+  <div class="wrap">
+    <p class="call">
+      만든 것을 <em>직접 설명할 수 있는</em> 엔지니어를 찾고 계시다면.
+    </p>
+
+    <div class="lines">
+      <a href="mailto:rmsals1745@gmail.com">rmsals1745@gmail.com</a>
+      <a href="https://github.com/rmsals1745" rel="me noopener">github.com/rmsals1745</a>
+      <span>인천 · 서울 (수도권) · 원격 가능</span>
+    </div>
+
+    <p class="fine">
+      수치는 로컬 git 및 GitHub API 실측 기준입니다. 각 사례의 숫자는 해당 사례 문서에 근거를 병기했습니다.<br />
+      © {year} 박근민 · Park Geunmin
+    </p>
+  </div>
+</footer>
+
+<style>
+  footer {
+    padding: 84px 0 96px;
+    border-top: 1px solid var(--rule);
+    scroll-margin-top: 70px;
+  }
+  .call {
+    font-family: var(--serif);
+    font-size: clamp(22px, 3.4vw, 30px);
+    line-height: 1.45;
+    letter-spacing: -.01em;
+    max-width: 620px;
+    margin-bottom: 30px;
+  }
+  .call em { font-style: normal; color: var(--accent); }
+
+  .lines {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 26px;
+    align-items: center;
+    font-size: 14.5px;
+    color: var(--ink-faint);
+    padding-bottom: 30px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .lines a {
+    color: var(--ink-dim);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 2px;
+    transition: color var(--t-fast), border-color var(--t-fast);
+  }
+  .lines a:hover { color: var(--accent); border-color: var(--accent); }
+
+  .fine {
+    margin-top: 26px;
+    font-size: 12.5px;
+    line-height: 1.8;
+    color: var(--ink-faint);
+  }
+</style>
