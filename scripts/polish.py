@@ -43,7 +43,7 @@ except Exception as exc:  # pragma: no cover - 환경 의존
     print(f"[error] llm_client 를 불러오지 못했습니다: {exc}", file=sys.stderr)
     raise SystemExit(3)
 
-VALID_CATEGORIES = {"agent-infra", "product", "applied", "ops", "genai"}
+VALID_CATEGORIES = {"agent-infra", "product", "applied", "ops"}
 
 SYSTEM = """너는 시니어 엔지니어의 포트폴리오 편집자다.
 작업 기록 원문을 받아 포트폴리오 사례 카드에 쓸 정보를 뽑는다.
@@ -65,7 +65,7 @@ SYSTEM = """너는 시니어 엔지니어의 포트폴리오 편집자다.
 JSON 만 출력한다. 설명 문장을 붙이지 마라.
 
 형식:
-{"tagline": "...", "category": "agent-infra|product|applied|ops|genai",
+{"tagline": "...", "category": "agent-infra|product|applied|ops",
  "stack": ["..."],
  "metrics": [{"value": "52", "label": "실행 런", "quote": "원문에서 그대로 복사한 문장"}]}
 """

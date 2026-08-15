@@ -1,11 +1,11 @@
 ---
 title: 로컬 확산모델 자산 생성 파이프라인
 tagline: 시안과 콘텐츠에 들어가는 이미지를 외부 SaaS 없이 로컬 추론으로 직접 생성합니다. 자산이 파이프라인 안에서 나옵니다.
-category: genai
+category: applied
 period: "2026.06 –"
 role: 배선 · 운용
 status: active
-badge: Generative Media
+badge: 로컬 추론
 metrics:
   - value: "10장"
     label: 시안용 상품 사진 생성

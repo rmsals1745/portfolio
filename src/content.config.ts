@@ -35,14 +35,11 @@ export const CATEGORIES = [
     blurb: '사람이 자리에 없어도 계속 도는 층 — 상시 런타임, 스케줄 분리, 환경 재현, 백업.',
     accent: 'var(--cool)',
   },
-  {
-    id: 'genai',
-    label: '생성 미디어',
-    en: 'Generative Media',
-    blurb: '로컬 추론으로 직접 자산을 만드는 층 — 확산모델, LoRA, 영상 파이프라인.',
-    accent: 'var(--accent2)',
-  },
 ] as const;
+// 생성 미디어(genai) 축은 2026-08-15 폐지.
+// 사례가 1건뿐이라 층 그림에서 그 칸만 비어 보였고, 축 이름이 "미디어"라
+// AI 인프라 엔지니어링이라는 초점을 흐렸다. 해당 사례는 성격상으로도
+// 창작물이 아니라 파이프라인 부품이라 `applied` 로 옮겼다.
 
 export type CategoryId = (typeof CATEGORIES)[number]['id'];
 

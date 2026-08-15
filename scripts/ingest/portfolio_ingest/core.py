@@ -25,7 +25,9 @@ SOURCE_VAULT = "vault"                # 사례/방법론 (볼트 디렉터리 �
 SOURCE_HANDOFF = "handoff"            # HANDOFF.md
 SOURCE_ARCHIVE = "handoff-archive"    # handoff\*.md 월별 아카이브
 
-CATEGORIES = ("agent-infra", "product", "applied", "ops", "genai")
+# 2026-08-15: genai(생성 미디어) 축 폐지 — 사례가 1건뿐이라 층 그림에서 그 칸만
+# 비었고, 축 이름이 AI 인프라라는 초점을 흐렸다. 관련 키워드는 applied 로 흡수.
+CATEGORIES = ("agent-infra", "product", "applied", "ops")
 
 # 카테고리 키워드 (결정론 분류) — 순서대로 첫 매칭.
 CATEGORY_KEYWORDS: list[tuple[str, tuple[str, ...]]] = [
@@ -38,12 +40,12 @@ CATEGORY_KEYWORDS: list[tuple[str, tuple[str, ...]]] = [
     )),
     ("applied", (
         "just design", "시안", "파이프라인", "컴플라이언스", "플러그인", "검수",
+        # 옛 genai 축에서 흡수 (2026-08-15). 로컬 추론은 창작물이 아니라
+        # 파이프라인 부품이라 여기가 맞다.
+        "comfyui", "lora", "확산", "시네마틱",
     )),
     ("ops", (
         "크론", "백업", "스케줄", "복원", "juststandby", "상시", "systemd",
-    )),
-    ("genai", (
-        "comfyui", "lora", "확산", "이미지", "영상", "시네마틱",
     )),
 ]
 

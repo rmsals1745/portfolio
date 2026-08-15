@@ -69,7 +69,7 @@ def parse_case(path: Path) -> tuple[dict, str]:
 RECENT = datetime.now() - timedelta(days=1)
 OLD = datetime.now() - timedelta(days=400)
 
-VALID_CATEGORIES = {"agent-infra", "product", "applied", "ops", "genai"}
+VALID_CATEGORIES = {"agent-infra", "product", "applied", "ops"}
 VALID_STATUS = {"live", "active", "archived"}
 VALID_SOURCES = {"vault", "handoff", "handoff-archive"}
 
@@ -289,8 +289,9 @@ class TestSourceKinds:
         # 한글 제목 → 파일명 폴백 (2026-08)
         korean_slug = make_slug("인생딸깍 결제 흐름 정리", "2026-08")
         assert byslug[korean_slug]["category"] == "product"
+        # genai 축 폐지(2026-08-15) — 로컬 추론 키워드는 applied 로 흡수됐다
         comfy_slug = make_slug("ComfyUI LoRA 파인튜닝", "2026-08")
-        assert byslug[comfy_slug]["category"] == "genai"
+        assert byslug[comfy_slug]["category"] == "applied"
 
     def test_handoff_md_splits_by_heading(self, tmp_path):
         write(

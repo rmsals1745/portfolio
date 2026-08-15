@@ -23,7 +23,7 @@ for (const c of all) counts[c.data.category] = (counts[c.data.category] ?? 0) + 
 /** 층마다 첫 화면에 세우는 대표 사례 수. 이 숫자가 화면 길이를 고정한다. */
 const PER_STRATUM = 2;
 
-const ORDER = ['product', 'applied', 'agent-infra', 'ops', 'genai'] as const;
+const ORDER = ['product', 'applied', 'agent-infra', 'ops'] as const;
 const byId = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
 
 const strata = ORDER.map((id) => {

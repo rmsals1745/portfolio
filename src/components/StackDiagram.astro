@@ -12,7 +12,7 @@ const { counts } = Astro.props;
  * 평면 그리드로 늘어놓지 않는 이유: 이 포트폴리오의 논지 자체가
  * "인프라를 짓고 그 위에 제품을 올린다" 라서, 배치가 곧 주장이다.
  */
-const ORDER: CategoryId[] = ['product', 'applied', 'agent-infra', 'ops', 'genai'];
+const ORDER: CategoryId[] = ['product', 'applied', 'agent-infra', 'ops'];
 const byId = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
 const strata = ORDER.map((id) => ({ ...byId[id], count: counts[id] ?? 0 }));
 ---
