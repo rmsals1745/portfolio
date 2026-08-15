@@ -1,62 +1,74 @@
 ---
 /**
- * 히어로 — 한 화면에 한 덩어리.
+ * 히어로 — 고정 후 조립 (방향 A, 사장 선택 2026-08-15).
  *
- * ★ 앞선 판(sticky + 활주로)을 버린 이유:
- *   - sticky 헤더 높이를 계산하지 않아 제목 윗줄이 잘렸다
- *   - 단어를 조각내 inline-block 으로 만들었더니 "인프라 / 를 짓고," 처럼
- *     조사가 줄바꿈에서 떨어져 나갔다. 한글 조판에서 가장 하면 안 되는 것.
- *   - 활주로가 빈 공간으로 남고 숫자판이 사진을 덮었다.
+ * 스크롤한 만큼 문장 → 소개 → 버튼이 차례로 조립되고, 다 되면 놓아준다.
+ * 속도를 사용자가 쥔다 — 천천히 굴리면 천천히 조립된다.
  *
- * 지금 방식: **줄 단위** 등장. 줄 안쪽 텍스트는 손대지 않으니 조판이 깨질 수 없다.
- * 히어로에는 문장 하나와 다음으로 가는 길만 둔다. 나머지는 아래에서 하나씩.
+ * ⚠️ 앞선 시도에서 낸 사고 4개를 그대로 피한다:
+ *   1. 제목이 sticky 헤더에 잘림    → pin 안쪽에 헤더 높이만큼 padding
+ *   2. 조사가 줄바꿈에서 떨어져 나감 → 단어를 쪼개지 않는다. **줄 단위**만 움직인다
+ *   3. 사진이 숫자판에 잘림          → 사진·숫자는 히어로에서 뺐다 (푸터 / 다음 섹션)
+ *   4. 활주로가 빈 공간으로 남음     → 활주로는 pin 이 덮는다. 빈 화면이 생길 수 없다
+ *
+ * 갇힘 방지: 활주로는 1화면(100svh)뿐이고, 건너뛰는 길이 처음부터 보인다.
  */
 
 interface Props {
-  /** 첫 화면 아래에서 이어질 첫 섹션의 앵커 */
+  /** 히어로를 지나면 도달할 첫 섹션 앵커 */
   next: string;
 }
 const { next } = Astro.props;
 ---
 
-<section class="hero">
-  <div class="wrap">
-    <p class="eyebrow" data-line style="--d:0ms">AI Infrastructure · Agent Systems Engineer</p>
+<section class="hero" data-hero>
+  <div class="pin">
+    <div class="wrap inner">
+      <p class="eyebrow" data-step="0">AI Infrastructure · Agent Systems Engineer</p>
 
-    <h1>
-      <span class="ln" data-line style="--d:120ms">
-        <span>에이전트를 굴리는 <em>인프라</em>를 짓고,</span>
-      </span>
-      <span class="ln" data-line style="--d:260ms">
-        <span>그 위에 제품을 올립니다.</span>
-      </span>
-    </h1>
+      <h1>
+        <span class="ln" data-step="1"><span>에이전트를 굴리는 <em>인프라</em>를 짓고,</span></span>
+        <span class="ln" data-step="2"><span>그 위에 제품을 올립니다.</span></span>
+      </h1>
 
-    <p class="lede" data-line style="--d:440ms">
-      인프라만 만든 사람도, 제품만 만든 사람도 아닙니다.
-    </p>
+      <p class="lede" data-step="3">
+        인프라만 만든 사람도, 제품만 만든 사람도 아닙니다.
+      </p>
 
-    <div class="cue" data-line style="--d:620ms">
-      <a class="go" href={next}>
+      <a class="cta" data-step="4" href={next}>
         무엇을 지었는지 보기
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 2.5v9M3.5 8L7 11.5 10.5 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
-      <span class="hint">스크롤하면 하나씩 나옵니다</span>
     </div>
-  </div>
 
-  <div class="glow" aria-hidden="true"></div>
+    {/* 스크롤 유도 — 굴리기 시작하면 사라진다 */}
+    <div class="cue" data-cue aria-hidden="true">
+      <span class="cue-t">스크롤</span>
+      <span class="mouse"></span>
+    </div>
+
+    {/* 갇히지 않게 — 조립을 기다리지 않고 바로 갈 수 있다 */}
+    <a class="bail" href={next}>건너뛰기</a>
+
+    <div class="bar" data-bar aria-hidden="true"></div>
+    <div class="glow" aria-hidden="true"></div>
+  </div>
 </section>
 
 <style>
-  .hero {
-    min-height: 100svh;
+  /* 전체 높이 = 붙잡히는 1화면 + 조립용 활주로 1화면.
+     활주로는 pin 이 덮으므로 빈 화면이 생기지 않는다. */
+  .hero { position: relative; height: 200svh; }
+
+  .pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
     display: grid;
     align-content: center;
-    position: relative;
     overflow: hidden;
-    /* sticky 헤더(62px) 아래로 내려앉게 — 이걸 빼먹어 제목이 잘렸다 */
-    padding: calc(62px + 6vh) 0 12vh;
+    /* sticky 헤더(62px) 아래로 — 이걸 빼먹어 제목 윗줄이 잘렸다 */
+    padding-top: 62px;
   }
 
   .glow {
@@ -65,19 +77,18 @@ const { next } = Astro.props;
     width: 620px; height: 620px;
     background: radial-gradient(circle, rgba(224, 114, 58, .18), transparent 62%);
     pointer-events: none;
+    z-index: -1;
   }
+
+  .inner { position: relative; z-index: 1; }
 
   .eyebrow { margin-bottom: 26px; }
-
   h1 { margin-bottom: 30px; }
-
-  /* 줄 단위 등장 — 줄 안쪽 텍스트는 건드리지 않으므로 조판이 깨질 수 없다 */
-  .ln {
-    display: block;
-    overflow: hidden;
-  }
-  .ln > span { display: block; }
   h1 em { font-style: normal; color: var(--accent); }
+
+  /* 줄 단위로만 움직인다 — 줄 안쪽 텍스트는 손대지 않으니 조판이 깨질 수 없다 */
+  .ln { display: block; overflow: hidden; }
+  .ln > span { display: block; }
 
   .lede {
     font-size: clamp(17px, 2.1vw, 20px);
@@ -85,17 +96,11 @@ const { next } = Astro.props;
     max-width: 46ch;
   }
 
-  .cue {
-    margin-top: 44px;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    flex-wrap: wrap;
-  }
-  .go {
+  .cta {
     display: inline-flex;
     align-items: center;
     gap: 9px;
+    margin-top: 40px;
     font-size: 14.5px;
     font-weight: 600;
     color: var(--ink);
@@ -105,55 +110,141 @@ const { next } = Astro.props;
     border-radius: 99px;
     transition: color var(--t-fast), border-color var(--t-fast), background var(--t-fast), gap var(--t-fast);
   }
-  .go:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); gap: 13px; }
-  .go svg { animation: nudge 2.4s ease-in-out infinite; }
-  @keyframes nudge {
-    0%, 70%, 100% { transform: translateY(0); }
-    82% { transform: translateY(3px); }
-  }
-  .hint { font-size: 13px; color: var(--ink-faint); }
+  .cta:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); gap: 13px; }
 
-  /* ── 등장 모션 ──
-     숨김은 html.js 가 붙었을 때만. 스크립트가 죽어도 백지가 되지 않는다. */
-  :global(html.js) [data-line] {
+  /* ── 스크롤 유도 ── */
+  .cue {
+    position: absolute;
+    left: 0; right: 0; bottom: 26px;
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    pointer-events: none;
+    transition: opacity .45s ease;
+  }
+  .cue[data-gone] { opacity: 0; }
+  .cue-t { font-size: 11.5px; color: var(--ink-faint); letter-spacing: .1em; }
+  .mouse {
+    width: 21px; height: 32px;
+    border: 1.5px solid var(--ink-faint);
+    border-radius: 11px;
+    position: relative;
+  }
+  .mouse::after {
+    content: '';
+    position: absolute;
+    left: 50%; top: 6px;
+    width: 3px; height: 6px;
+    border-radius: 2px;
+    background: var(--accent);
+    transform: translateX(-50%);
+    animation: wheel 1.7s cubic-bezier(.22,1,.36,1) infinite;
+  }
+  @keyframes wheel {
+    0%   { opacity: 0; transform: translate(-50%, 0); }
+    25%  { opacity: 1; }
+    70%  { opacity: 0; transform: translate(-50%, 9px); }
+    100% { opacity: 0; }
+  }
+
+  .bail {
+    position: absolute;
+    right: 26px; bottom: 30px;
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 2px;
+    transition: color var(--t-fast), border-color var(--t-fast);
+  }
+  .bail:hover { color: var(--accent); border-color: var(--accent); }
+
+  .bar {
+    position: absolute;
+    left: 0; bottom: 0;
+    height: 2px; width: 0;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+  }
+
+  /* ── 조립 상태 ──
+     숨김은 html.js 가 붙었을 때만. 스크립트가 죽어도 백지가 되지 않는다.
+     ⚠️ 숨김/표시 쌍은 반드시 같은 접두사를 써야 한다 — 한쪽만 :global 하면
+        우선순위가 뒤집혀 영원히 안 보인다(실제로 카드가 그렇게 사라졌다). */
+  :global(html.js) [data-step] {
     opacity: 0;
-    transform: translateY(18px);
+    transition: opacity .55s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1);
   }
-  :global(html.js) [data-line].on {
-    opacity: 1;
-    transform: none;
-    transition: opacity .85s cubic-bezier(.22,1,.36,1) var(--d), transform .85s cubic-bezier(.22,1,.36,1) var(--d);
+  :global(html.js) .ln[data-step] { opacity: 1; }
+  :global(html.js) .ln[data-step] > span {
+    transform: translateY(105%);
+    transition: transform .75s cubic-bezier(.22,1,.36,1);
   }
+  :global(html.js) .eyebrow[data-step],
+  :global(html.js) .lede[data-step],
+  :global(html.js) .cta[data-step] { transform: translateY(14px); }
+
+  :global(html.js) [data-step].on { opacity: 1; transform: none; }
+  :global(html.js) .ln[data-step].on > span { transform: none; }
 
   @media (max-width: 720px) {
-    .hero { padding: calc(62px + 4vh) 0 9vh; min-height: 92svh; }
+    .hero { height: 190svh; }
+    .pin { padding-top: 62px; }
     h1 { margin-bottom: 24px; }
-    .cue { margin-top: 34px; gap: 12px; }
-    .hint { display: none; }
+    .cta { margin-top: 30px; }
+    .cue { bottom: 20px; }
+    .bail { right: 20px; bottom: 24px; }
   }
 
+  /* 모션을 원치 않으면 붙잡지 않고 완성 상태를 즉시 준다 */
   @media (prefers-reduced-motion: reduce) {
-    :global(html.js) [data-line] { opacity: 1; transform: none; }
-    .go svg { animation: none; }
+    .hero { height: auto; }
+    .pin { position: static; height: auto; padding: calc(62px + 8vh) 0 10vh; }
+    :global(html.js) [data-step],
+    :global(html.js) .ln[data-step] > span { opacity: 1 !important; transform: none !important; }
+    .cue, .bar { display: none; }
+    .mouse::after { animation: none; }
   }
 </style>
 
 <script>
-  const lines = Array.from(document.querySelectorAll<HTMLElement>('.hero [data-line]'));
+  const hero = document.querySelector<HTMLElement>('[data-hero]');
+  const steps = Array.from(document.querySelectorAll<HTMLElement>('.hero [data-step]'));
+  const cue = document.querySelector<HTMLElement>('[data-cue]');
+  const bar = document.querySelector<HTMLElement>('[data-bar]');
+
   // 살아났다고 알린다 — 없으면 2.5초 뒤 failsafe 가 강제로 다 보여준다
   document.documentElement.classList.add('hero-ready');
-  // 첫 화면은 스크롤을 기다리지 않는다. 들어오자마자 순서대로 뜬다.
-  requestAnimationFrame(() => lines.forEach((el) => el.classList.add('on')));
 
-  // 아래로 갔다가 다시 첫 화면으로 올라오면 처음부터 재생한다.
-  const heroEl = document.querySelector('.hero');
-  if (heroEl && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) lines.forEach((el) => el.classList.add('on'));
-        else lines.forEach((el) => el.classList.remove('on'));
-      });
-    }, { threshold: 0.35 });
-    io.observe(heroEl);
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduce || !hero) {
+    steps.forEach((el) => el.classList.add('on'));
+  } else {
+    const sync = () => {
+      // 활주로 = 전체 높이 - 붙잡히는 1화면. 그 구간을 얼마나 지났는가.
+      const runway = hero.offsetHeight - window.innerHeight;
+      const p = runway > 0
+        ? Math.min(1, Math.max(0, -hero.getBoundingClientRect().top / runway))
+        : 1;
+
+      // 1.2 를 곱해 활주로가 끝나기 전에 조립이 완성되게 — 끝까지 끌면 답답하다
+      const shown = Math.round(p * steps.length * 1.2);
+      steps.forEach((el, i) => el.classList.toggle('on', i < shown));
+
+      if (bar) bar.style.width = (p * 100).toFixed(1) + '%';
+      // 굴리기 시작하면 유도 표시를 거둔다
+      if (cue) cue.toggleAttribute('data-gone', p > 0.03);
+    };
+
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { sync(); ticking = false; });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    // 첫 조각은 바로 보여준다 — 스크롤 전에 빈 화면이면 뭘 해야 할지 모른다
+    requestAnimationFrame(() => { steps[0]?.classList.add('on'); sync(); });
   }
 </script>
