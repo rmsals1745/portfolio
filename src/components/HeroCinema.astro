@@ -211,8 +211,9 @@ const { next } = Astro.props;
     .pin { padding-top: 62px; }
     h1 { margin-bottom: 24px; }
     .cta { margin-top: 30px; }
-    .cue { bottom: 20px; }
-    .bail { right: 20px; bottom: 24px; }
+    .cue { bottom: 26px; }
+    /* 좁은 화면에서는 가운데 유도 표시와 겹치므로 위로 올려 자리를 가른다 */
+    .bail { right: 18px; bottom: auto; top: calc(62px + 14px); }
   }
 
   /* 모션을 원치 않으면 붙잡지 않고 완성 상태를 즉시 준다 */
