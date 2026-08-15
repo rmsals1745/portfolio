@@ -18,7 +18,7 @@ const statusLabel: Record<string, string> = {
 };
 ---
 
-<article class={`card ${variant}`}>
+<article class={`card ${variant}`} data-reveal>
   <a class="hit" href={href} aria-labelledby={`t-${entry.id}`}>
     <span class="visually-hidden">{d.title} 자세히 보기</span>
   </a>
@@ -62,6 +62,21 @@ const statusLabel: Record<string, string> = {
     background: transparent;
     border: 1px solid transparent;
     transition: background var(--t-fast), border-color var(--t-fast), transform var(--t-fast);
+  }
+
+  /* 스크롤해 들어올 때 한 장씩 올라온다 */
+  :global(html.js) .card[data-reveal] {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  .card[data-reveal].in {
+    opacity: 1;
+    transform: none;
+    transition: opacity .55s ease, transform .55s cubic-bezier(.2,.7,.2,1),
+                background var(--t-fast), border-color var(--t-fast);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card[data-reveal] { opacity: 1; transform: none; }
   }
   .card:hover,
   .card:focus-within {
@@ -182,3 +197,27 @@ const statusLabel: Record<string, string> = {
     .metrics dd { font-size: 23px; }
   }
 </style>
+
+<script>
+  // 카드 등장 — 컴포넌트 스크립트는 한 번만 번들되므로 여기서 전체를 관장한다.
+  const cards = document.querySelectorAll<HTMLElement>('.card[data-reveal]');
+  if (cards.length) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      cards.forEach((c) => c.classList.add('in'));
+    } else {
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e, i) => {
+            if (!e.isIntersecting) return;
+            const el = e.target as HTMLElement;
+            // 같은 화면에 여러 장이면 살짝 시차를 준다 — 한꺼번에 뜨면 싸구려로 보인다
+            setTimeout(() => el.classList.add('in'), i * 70);
+            io.unobserve(el);
+          });
+        },
+        { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+      );
+      cards.forEach((c) => io.observe(c));
+    }
+  }
+</script>

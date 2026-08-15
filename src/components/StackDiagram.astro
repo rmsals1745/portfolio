@@ -11,13 +11,16 @@ const { counts } = Astro.props;
  * 층 순서 — 위로 갈수록 사용자에게 가깝고, 아래로 갈수록 토대다.
  * 평면 그리드로 늘어놓지 않는 이유: 이 포트폴리오의 논지 자체가
  * "인프라를 짓고 그 위에 제품을 올린다" 라서, 배치가 곧 주장이다.
+ *
+ * 방향 B — 도식을 살아있게. 층 사이로 흐름이 보이고, 누르면 제자리에서 펼쳐진다.
+ * 설명 문장을 접어 두니 첫 화면의 글자 수가 줄어든다.
  */
 const ORDER: CategoryId[] = ['product', 'applied', 'agent-infra', 'ops'];
 const byId = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
 const strata = ORDER.map((id) => ({ ...byId[id], count: counts[id] ?? 0 }));
 ---
 
-<div class="diagram">
+<div class="diagram" data-diagram>
   <div class="axis" aria-hidden="true">
     <span class="axis-top">사용자에게 가까움</span>
     <span class="axis-line"></span>
@@ -27,18 +30,29 @@ const strata = ORDER.map((id) => ({ ...byId[id], count: counts[id] ?? 0 }));
   <ul class="strata">
     {
       strata.map((s, i) => (
-        <li class="stratum" style={`--tint:${s.accent}; --depth:${i}`}>
-          <a href={`/category/${s.id}/`}>
-            <div class="line">
+        <li class="stratum" style={`--tint:${s.accent}; --d:${i * 90}ms`}>
+          <div class="box" data-box>
+            <button class="toggle" data-toggle aria-expanded="false" aria-controls={`s-${s.id}`}>
               <span class="label">{s.label}</span>
               <span class="en">{s.en}</span>
-              <span class="count">
-                {s.count}
-                <i>건</i>
+              <span class="count" data-num={s.count}>
+                {s.count}<i>건</i>
               </span>
+              <span class="chev" aria-hidden="true" />
+            </button>
+
+            <div class="panel" id={`s-${s.id}`} data-panel>
+              <div class="panel-in">
+                <p class="blurb">{s.blurb}</p>
+                <a class="go" href={`/category/${s.id}/`}>
+                  이 층 {s.count}건 모아 보기
+                  <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M2.5 6.5h8M7 3l3.5 3.5L7 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+              </div>
             </div>
-            <p class="blurb">{s.blurb}</p>
-          </a>
+          </div>
+
+          {i < strata.length - 1 && <div class="pipe" aria-hidden="true" />}
         </li>
       ))
     }
@@ -60,8 +74,7 @@ const strata = ORDER.map((id) => ({ ...byId[id], count: counts[id] ?? 0 }));
     justify-items: center;
     padding: 4px 0;
   }
-  .axis-top,
-  .axis-bottom {
+  .axis-top, .axis-bottom {
     writing-mode: vertical-rl;
     font-size: 10.5px;
     letter-spacing: .14em;
@@ -76,41 +89,45 @@ const strata = ORDER.map((id) => ({ ...byId[id], count: counts[id] ?? 0 }));
     align-self: stretch;
   }
 
-  .strata { list-style: none; display: grid; gap: 3px; }
+  .strata { list-style: none; }
+  .stratum { display: block; }
 
-  .stratum a {
-    display: block;
-    text-decoration: none;
-    padding: 20px 24px;
+  /* 등장 — 아래에서 하나씩 올라온다 */
+  .box {
     border-radius: var(--r-sm);
     background: var(--paper2);
-    /* 층마다 아래로 갈수록 미세하게 어두워진다 — 깊이감 */
     background-image: linear-gradient(
       to right,
       color-mix(in srgb, var(--tint) 9%, transparent),
       transparent 46%
     );
     border: 1px solid var(--rule-soft);
-    transition: transform var(--t-fast), border-color var(--t-fast), background-color var(--t-fast);
+    overflow: hidden;
+    transition: opacity .6s ease var(--d), transform .6s cubic-bezier(.2,.7,.2,1) var(--d),
+                border-color var(--t-fast), background-color var(--t-fast);
   }
-  .stratum a:hover {
+  :global(html.js) .box { opacity: 0; transform: translateY(14px); }
+  :global(html.js) .diagram.in .box { opacity: 1; transform: none; }
+  .box:hover { background-color: var(--paper-lift); border-color: color-mix(in srgb, var(--tint) 42%, var(--rule)); }
+  .box:has(.toggle[aria-expanded='true']) {
+    border-color: color-mix(in srgb, var(--tint) 55%, var(--rule));
     background-color: var(--paper-lift);
-    border-color: color-mix(in srgb, var(--tint) 42%, var(--rule));
-    transform: translateX(5px);
   }
 
-  .line {
+  .toggle {
+    width: 100%;
     display: flex;
     align-items: baseline;
     gap: 12px;
-    margin-bottom: 5px;
+    padding: 19px 22px;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+    color: inherit;
   }
-  .label {
-    font-size: 18px;
-    font-weight: 650;
-    color: var(--ink);
-    letter-spacing: -.01em;
-  }
+  .label { font-size: 18px; font-weight: 650; color: var(--ink); letter-spacing: -.01em; }
   .en {
     font-family: var(--serif);
     font-size: 12.5px;
@@ -127,19 +144,118 @@ const strata = ORDER.map((id) => ({ ...byId[id], count: counts[id] ?? 0 }));
   }
   .count i { font-style: normal; font-size: 11.5px; color: var(--ink-faint); margin-left: 3px; }
 
+  .chev {
+    flex: 0 0 auto;
+    width: 9px; height: 9px;
+    border-right: 1.5px solid var(--ink-faint);
+    border-bottom: 1.5px solid var(--ink-faint);
+    transform: rotate(45deg) translateY(-2px);
+    transition: transform .3s cubic-bezier(.2,.7,.2,1), border-color .2s;
+    align-self: center;
+  }
+  .toggle[aria-expanded='true'] .chev {
+    transform: rotate(-135deg) translateY(-2px);
+    border-color: var(--accent);
+  }
+
+  /* 제자리 펼침 — 새 화면으로 튀지 않는다 */
+  .panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .34s cubic-bezier(.2,.7,.2,1);
+  }
+  .toggle[aria-expanded='true'] + .panel { grid-template-rows: 1fr; }
+  .panel-in { overflow: hidden; }
   .blurb {
-    font-size: 14px;
-    line-height: 1.65;
+    font-size: 14.5px;
+    line-height: 1.7;
     color: var(--ink-dim);
-    max-width: 68ch;
+    padding: 0 22px 4px;
+    max-width: 66ch;
+  }
+  .go {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 12px 22px 20px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--tint);
+    text-decoration: none;
+    transition: gap var(--t-fast);
+  }
+  .go:hover { gap: 10px; }
+
+  /* 층 사이 흐름 — 데이터가 아래에서 위로 올라간다 */
+  .pipe {
+    height: 16px;
+    width: 2px;
+    margin: 0 0 0 34px;
+    background: var(--rule-soft);
+    position: relative;
+    overflow: hidden;
+  }
+  .pipe::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, transparent, var(--accent), transparent);
+    transform: translateY(100%);
+  }
+  .diagram.in .pipe::after { animation: flow 2.6s linear infinite; }
+  @keyframes flow {
+    to { transform: translateY(-100%); }
   }
 
   @media (max-width: 640px) {
     .diagram { grid-template-columns: 1fr; }
     .axis { display: none; }
-    .stratum a { padding: 17px 16px; }
+    .toggle { padding: 16px 15px; gap: 9px; }
     .label { font-size: 16.5px; }
     .en { display: none; }
-    .blurb { font-size: 13.5px; }
+    .blurb { padding: 0 15px 4px; font-size: 13.5px; }
+    .go { margin: 10px 15px 16px; }
+    .pipe { margin-left: 22px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .box { opacity: 1; transform: none; transition: none; }
+    .panel { transition: none; }
+    .diagram.in .pipe::after { animation: none; }
   }
 </style>
+
+<script>
+  const diagram = document.querySelector<HTMLElement>('[data-diagram]');
+  if (diagram) {
+    // 화면에 들어오면 층이 하나씩 올라오고 흐름이 시작된다
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          diagram.classList.add('in');
+          io.disconnect();
+        }
+      });
+    }, { threshold: 0.15 });
+    io.observe(diagram);
+
+    // 아코디언 — 한 번에 하나만 열린다 (한 화면 한 결정)
+    const toggles = Array.from(diagram.querySelectorAll<HTMLButtonElement>('[data-toggle]'));
+    toggles.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const open = btn.getAttribute('aria-expanded') === 'true';
+        toggles.forEach((b) => b.setAttribute('aria-expanded', 'false'));
+        btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      });
+    });
+
+    // 처음 한 번 맨 위를 열어 "눌리는 것" 임을 알린다
+    if (toggles[0] && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setTimeout(() => {
+        if (toggles.every((b) => b.getAttribute('aria-expanded') === 'false')) {
+          toggles[0].setAttribute('aria-expanded', 'true');
+        }
+      }, 900);
+    }
+  }
+</script>

@@ -52,6 +52,22 @@ const ogUrl = new URL(ogImage, Astro.site ?? 'https://parkgeunmin.pages.dev');
       href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&display=swap"
     />
 
+    {/*
+      ★ 백지 방지. 모션은 요소를 숨겼다가 보여주는 방식이라, 스크립트가 죽으면
+        화면이 통째로 비어 버린다. 두 겹으로 막는다:
+        (1) html.js 가 붙어야만 숨김 상태가 적용된다 → JS 꺼진 브라우저는 그냥 다 보인다
+        (2) 2.5초 안에 히어로가 살아나지 않으면 강제로 다 보여준다
+            → 모션이 없는 편이 백지보다 언제나 낫다
+    */}
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      setTimeout(function () {
+        if (!document.documentElement.classList.contains('hero-ready')) {
+          document.documentElement.classList.add('motion-failsafe');
+        }
+      }, 2500);
+    </script>
+
     <slot name="head" />
   </head>
 

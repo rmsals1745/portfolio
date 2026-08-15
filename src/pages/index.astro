@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import SectionHead from '../components/SectionHead.astro';
-import StatGrid from '../components/StatGrid.astro';
+import HeroCinema from '../components/HeroCinema.astro';
 import StackDiagram from '../components/StackDiagram.astro';
 import CaseCard from '../components/CaseCard.astro';
 import CapabilityRow from '../components/CapabilityRow.astro';
@@ -68,27 +68,7 @@ const skills = [
   title="박근민 — AI 인프라 / 에이전트 시스템 엔지니어"
   description="에이전트를 굴리는 인프라를 짓고, 그 위에 제품을 올립니다. 멀티모델 오케스트레이션 엔진 · 컨트롤 플레인 · 결제 붙은 SaaS."
 >
-  <header class="hero">
-    <div class="wrap">
-      <p class="eyebrow">AI Infrastructure · Agent Systems Engineer</p>
-      <h1>에이전트를 굴리는<br /><em>인프라</em>를 짓고,<br />그 위에 제품을 올립니다.</h1>
-      <p class="lede">
-        멀티모델 오케스트레이션 엔진, 컨트롤 플레인, 내구성 워크플로 —
-        <strong>에이전트를 실제 프로덕션으로 굴릴 때 필요한 것들</strong>을 직접 설계해 운영합니다.
-        그리고 그 인프라 위에서 <strong>결제까지 붙은 제품</strong>을 혼자 출시했습니다.
-        인프라만 만든 사람도, 제품만 만든 사람도 아닙니다.
-      </p>
-
-      <div class="contact">
-        <span class="nm">박근민 · Park Geunmin</span>
-        <a href="mailto:rmsals1745@gmail.com">rmsals1745@gmail.com</a>
-        <a href="https://github.com/rmsals1745" rel="me noopener">github.com/rmsals1745</a>
-        <span>인천 · 서울 (수도권) · 원격 가능</span>
-      </div>
-
-      <StatGrid stats={stats} />
-    </div>
-  </header>
+  <HeroCinema stats={stats} />
 
   <section>
     <div class="wrap">
@@ -126,7 +106,7 @@ const skills = [
     )
   }
 
-  <section class="tight">
+  <section class="tight" id="work">
     <div class="wrap">
       <SectionHead
         num="03"
@@ -194,37 +174,7 @@ const skills = [
 </Base>
 
 <style>
-  .hero { padding: 92px 0 56px; position: relative; overflow: hidden; }
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: -200px; right: -180px;
-    width: 560px; height: 560px;
-    background: radial-gradient(circle, rgba(224, 114, 58, .20), transparent 62%);
-    pointer-events: none;
-  }
-  .hero .eyebrow { margin-bottom: 22px; }
-  .hero h1 { margin-bottom: 26px; }
-
-  .contact {
-    margin-top: 34px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px 24px;
-    font-size: 14px;
-    color: var(--ink-faint);
-    align-items: center;
-  }
-  .contact .nm { color: var(--ink); font-weight: 700; font-size: 15px; letter-spacing: .02em; }
-  .contact a {
-    color: var(--ink-dim);
-    text-decoration: none;
-    border-bottom: 1px solid var(--rule);
-    padding-bottom: 2px;
-    transition: color var(--t-fast), border-color var(--t-fast);
-  }
-  .contact a:hover { color: var(--accent); border-color: var(--accent); }
-
+  /* 히어로·연락처·숫자는 HeroCinema 로 옮겼다 */
   .caps { border-top: 1px solid var(--rule); }
 
   .stratum-block { margin-top: 44px; }

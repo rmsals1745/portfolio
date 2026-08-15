@@ -161,6 +161,37 @@
 .term .cmd { font-size: 13px; color: var(--ink-dim); margin-bottom: 12px; white-space: nowrap; }
 .term .cmd::before { content: '$ '; color: var(--accent); }
 
+/* ── 실행 기록이 살아있게 (방향 C) ──
+   화면에 들어오면 명령이 쳐지고 결과가 한 줄씩 올라온다.
+   이 사이트가 말하는 게 "돌아가는 시스템" 이라 형태와 내용을 맞춘다. */
+.term[data-live] .cmd { position: relative; }
+.term[data-live] .cmd::after {
+  content: '';
+  display: inline-block;
+  width: 7px; height: 13px;
+  background: var(--accent);
+  vertical-align: -2px;
+  margin-left: 4px;
+  animation: term-blink 1.05s steps(2) infinite;
+}
+.term[data-live].done .cmd::after { display: none; }
+@keyframes term-blink { 50% { opacity: 0; } }
+
+.term[data-live] tbody tr,
+.term[data-live] table tr {
+  opacity: 0;
+  transform: translateY(3px);
+}
+.term[data-live].run table tr {
+  animation: term-row .34s cubic-bezier(.2,.7,.2,1) forwards;
+}
+@keyframes term-row { to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .term[data-live] table tr { opacity: 1; transform: none; animation: none; }
+  .term[data-live] .cmd::after { display: none; }
+}
+
 /* 그림/패널 아래 설명 */
 .cap {
   margin-top: 9px;

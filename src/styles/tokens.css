@@ -186,6 +186,17 @@ section.tight { padding-top: 0; }
   }
 }
 
+/* ── 백지 방지 최후 방어선 ──
+   스크립트가 죽어 모션이 시작되지 않으면 숨겨둔 것을 전부 되돌린다.
+   Base.astro 의 인라인 스크립트가 2.5초 뒤 이 클래스를 단다. */
+html.motion-failsafe .pc,
+html.motion-failsafe [data-fade],
+html.motion-failsafe [data-reveal],
+html.motion-failsafe [data-diagram] .box {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
 @media (max-width: 720px) {
   section { padding: 56px 0; }
   :root { --pad: 20px; }

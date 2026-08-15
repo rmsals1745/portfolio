@@ -195,3 +195,33 @@ const siblings = (
     .metrics dd { font-size: 27px; }
   }
 </style>
+
+<script>
+  /* 터미널 패널이 화면에 들어오면 결과가 한 줄씩 올라온다 (방향 C).
+     마크다운 본문 안의 raw HTML 이라 여기서 잡아 붙인다. */
+  const terms = Array.from(document.querySelectorAll<HTMLElement>('.prose .term'));
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  terms.forEach((t) => t.setAttribute('data-live', ''));
+
+  if (terms.length) {
+    if (reduce) {
+      terms.forEach((t) => { t.classList.add('run', 'done'); });
+    } else {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          const term = e.target as HTMLElement;
+          const rows = Array.from(term.querySelectorAll<HTMLElement>('table tr'));
+          rows.forEach((r, i) => { r.style.animationDelay = 260 + i * 95 + 'ms'; });
+          term.classList.add('run');
+          // 마지막 줄이 뜨면 커서를 거둔다 — 계속 깜빡이면 시선을 뺏는다
+          const total = 260 + rows.length * 95 + 340;
+          setTimeout(() => term.classList.add('done'), total);
+          io.unobserve(term);
+        });
+      }, { threshold: 0.25 });
+      terms.forEach((t) => io.observe(t));
+    }
+  }
+</script>
