@@ -9,6 +9,7 @@ const isHome = path === '/' || path === '';
   <div class="wrap-wide inner">
     <a href="/" class="mark" aria-label="박근민 포트폴리오 첫 화면">
       <span class="mark-nm">박근민</span>
+      <span class="mark-en">Justin Avery Park</span>
       <span class="mark-role">AI 인프라 · 에이전트 시스템</span>
     </a>
 
@@ -70,6 +71,12 @@ const isHome = path === '/' || path === '';
     letter-spacing: -.01em;
     color: var(--ink);
   }
+  .mark-en {
+    font-family: var(--serif);
+    font-size: 12.5px;
+    color: var(--ink-dim);
+    letter-spacing: .02em;
+  }
   .mark-role {
     font-size: 11.5px;
     color: var(--ink-faint);
@@ -122,6 +129,7 @@ const isHome = path === '/' || path === '';
 
   @media (max-width: 860px) {
     .mark-role { display: none; }
+    .mark-en { display: none; }
     .cta { display: none; }
     .inner { gap: 18px; }
   }

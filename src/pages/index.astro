@@ -320,9 +320,13 @@ const skills = [
     };
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        run(e.target as HTMLElement);
-        io.unobserve(e.target);
+        const el = e.target as HTMLElement;
+        if (e.isIntersecting) {
+          run(el);
+        } else if (e.boundingClientRect.top > 0) {
+          // 위로 올라가 화면 아래로 벗어났다 → 0 으로 되돌려 다시 셀 준비를 한다
+          el.textContent = '0';
+        }
       });
     }, { threshold: 0.5 });
     els.forEach((el) => io.observe(el));

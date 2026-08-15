@@ -103,7 +103,7 @@ const strata = ORDER.map((id) => ({ ...byId[id], count: counts[id] ?? 0 }));
     );
     border: 1px solid var(--rule-soft);
     overflow: hidden;
-    transition: opacity .6s ease var(--d), transform .6s cubic-bezier(.2,.7,.2,1) var(--d),
+    transition: opacity .8s cubic-bezier(.22,1,.36,1) var(--d), transform .8s cubic-bezier(.22,1,.36,1) var(--d),
                 border-color var(--t-fast), background-color var(--t-fast);
   }
   :global(html.js) .box { opacity: 0; transform: translateY(14px); }
@@ -231,12 +231,10 @@ const strata = ORDER.map((id) => ({ ...byId[id], count: counts[id] ?? 0 }));
     // 화면에 들어오면 층이 하나씩 올라오고 흐름이 시작된다
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
-        if (e.isIntersecting) {
-          diagram.classList.add('in');
-          io.disconnect();
-        }
+        if (e.isIntersecting) diagram.classList.add('in');
+        else if (e.boundingClientRect.top > 0) diagram.classList.remove('in');
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
     io.observe(diagram);
 
     // 아코디언 — 한 번에 하나만 열린다 (한 화면 한 결정)

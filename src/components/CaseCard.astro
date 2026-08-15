@@ -65,15 +65,17 @@ const statusLabel: Record<string, string> = {
   }
 
   /* 스크롤해 들어올 때 한 장씩 올라온다 */
+  /* ⚠️ 표시 규칙에도 html.js 를 붙여야 한다. 안 붙이면 숨김 규칙이
+     우선순위에서 이겨 카드가 영원히 안 보인다 (실제로 그렇게 비어 있었다). */
   :global(html.js) .card[data-reveal] {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(18px);
+    transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1),
+                background var(--t-fast), border-color var(--t-fast);
   }
-  .card[data-reveal].in {
+  :global(html.js) .card[data-reveal].in {
     opacity: 1;
     transform: none;
-    transition: opacity .55s ease, transform .55s cubic-bezier(.2,.7,.2,1),
-                background var(--t-fast), border-color var(--t-fast);
   }
   @media (prefers-reduced-motion: reduce) {
     .card[data-reveal] { opacity: 1; transform: none; }
@@ -208,14 +210,20 @@ const statusLabel: Record<string, string> = {
       const io = new IntersectionObserver(
         (entries) => {
           entries.forEach((e, i) => {
-            if (!e.isIntersecting) return;
             const el = e.target as HTMLElement;
-            // 같은 화면에 여러 장이면 살짝 시차를 준다 — 한꺼번에 뜨면 싸구려로 보인다
-            setTimeout(() => el.classList.add('in'), i * 70);
-            io.unobserve(el);
+            if (e.isIntersecting) {
+              // 같은 화면에 여러 장이면 살짝 시차를 준다 — 한꺼번에 뜨면 싸구려로 보인다
+              const t = window.setTimeout(() => el.classList.add('in'), i * 80);
+              (el as any)._rvT = t;
+            } else if (e.boundingClientRect.top > 0) {
+              // 위로 스크롤해 이 요소가 화면 아래로 내려갔다 → 되감는다.
+              // 다시 내려오면 모션이 처음부터 재생된다. (아래로 지나쳐 올라간 것은 건드리지 않는다)
+              window.clearTimeout((el as any)._rvT);
+              el.classList.remove('in');
+            }
           });
         },
-        { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+        { threshold: 0.1, rootMargin: '0px 0px -8% 0px' }
       );
       cards.forEach((c) => io.observe(c));
     }

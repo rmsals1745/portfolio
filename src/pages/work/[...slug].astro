@@ -210,15 +210,19 @@ const siblings = (
     } else {
       const io = new IntersectionObserver((entries) => {
         entries.forEach((e) => {
-          if (!e.isIntersecting) return;
           const term = e.target as HTMLElement;
-          const rows = Array.from(term.querySelectorAll<HTMLElement>('table tr'));
-          rows.forEach((r, i) => { r.style.animationDelay = 260 + i * 95 + 'ms'; });
-          term.classList.add('run');
-          // 마지막 줄이 뜨면 커서를 거둔다 — 계속 깜빡이면 시선을 뺏는다
-          const total = 260 + rows.length * 95 + 340;
-          setTimeout(() => term.classList.add('done'), total);
-          io.unobserve(term);
+          if (e.isIntersecting) {
+            const rows = Array.from(term.querySelectorAll<HTMLElement>('table tr'));
+            rows.forEach((r, i) => { r.style.animationDelay = 260 + i * 95 + 'ms'; });
+            term.classList.add('run');
+            // 마지막 줄이 뜨면 커서를 거둔다 — 계속 깜빡이면 시선을 뺏는다
+            const total = 260 + rows.length * 95 + 340;
+            (term as any)._t = window.setTimeout(() => term.classList.add('done'), total);
+          } else if (e.boundingClientRect.top > 0) {
+            // 위로 올라갔다 → 되감는다. 다시 내려오면 처음부터 실행된 것처럼 보인다.
+            window.clearTimeout((term as any)._t);
+            term.classList.remove('run', 'done');
+          }
         });
       }, { threshold: 0.25 });
       terms.forEach((t) => io.observe(t));

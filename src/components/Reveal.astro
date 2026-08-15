@@ -24,12 +24,12 @@ const { stagger = 90, each = false, class: cls = '' } = Astro.props;
 <style>
   :global(html.js) .rv[data-reveal-group]:not([data-each]) {
     opacity: 0;
-    transform: translateY(22px);
+    transform: translateY(20px);
   }
   :global(html.js) .rv[data-reveal-group]:not([data-each]).in {
     opacity: 1;
     transform: none;
-    transition: opacity .75s ease, transform .75s cubic-bezier(.16,.84,.24,1);
+    transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1);
   }
 
   /* each 모드 — 직계 자식이 순서대로 */
@@ -40,7 +40,7 @@ const { stagger = 90, each = false, class: cls = '' } = Astro.props;
   :global(html.js) .rv[data-each].in > :global(*) {
     opacity: 1;
     transform: none;
-    transition: opacity .7s ease var(--dly, 0ms), transform .7s cubic-bezier(.16,.84,.24,1) var(--dly, 0ms);
+    transition: opacity .75s cubic-bezier(.22,1,.36,1) var(--dly, 0ms), transform .75s cubic-bezier(.22,1,.36,1) var(--dly, 0ms);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -61,20 +61,23 @@ const { stagger = 90, each = false, class: cls = '' } = Astro.props;
       const io = new IntersectionObserver(
         (entries) => {
           entries.forEach((e) => {
-            if (!e.isIntersecting) return;
             const g = e.target as HTMLElement;
-            if (g.hasAttribute('data-each')) {
-              const step = parseInt(getComputedStyle(g).getPropertyValue('--stg')) || 90;
-              Array.from(g.children).forEach((c, i) => {
-                (c as HTMLElement).style.setProperty('--dly', i * step + 'ms');
-              });
+            if (e.isIntersecting) {
+              if (g.hasAttribute('data-each')) {
+                const step = parseInt(getComputedStyle(g).getPropertyValue('--stg')) || 90;
+                Array.from(g.children).forEach((c, i) => {
+                  (c as HTMLElement).style.setProperty('--dly', i * step + 'ms');
+                });
+              }
+              g.classList.add('in');
+            } else if (e.boundingClientRect.top > 0) {
+              // 위로 올라가 화면 아래로 벗어났다 → 되감아 둔다. 다시 내려오면 재생.
+              g.classList.remove('in');
             }
-            g.classList.add('in');
-            io.unobserve(g);
           });
         },
         // 화면에 조금 들어왔을 때 시작 — 다 보이고 나서 뜨면 늦다
-        { threshold: 0.08, rootMargin: '0px 0px -60px 0px' }
+        { threshold: 0.06, rootMargin: '0px 0px -8% 0px' }
       );
       groups.forEach((g) => io.observe(g));
     }
