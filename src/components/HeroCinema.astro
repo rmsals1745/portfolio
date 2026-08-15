@@ -1,320 +1,147 @@
 ---
 /**
- * 히어로 — 스크롤에 따라 문장이 조립된다 (방향 A).
+ * 히어로 — 한 화면에 한 덩어리.
  *
- * ⚠️ 스크롤 재킹의 위험: 정보를 찾으러 온 사람(채용담당)이 갇히면 최악이다.
- *   그래서 (1) 조립 구간을 짧게(≈90vh) 잡고 (2) 처음부터 "바로 사례 보기" 를 띄우고
- *   (3) 스크롤을 가로채지 않는다 — 페이지는 평소 속도로 그대로 흐르고,
- *   그 위에서 글자만 반응한다.
+ * ★ 앞선 판(sticky + 활주로)을 버린 이유:
+ *   - sticky 헤더 높이를 계산하지 않아 제목 윗줄이 잘렸다
+ *   - 단어를 조각내 inline-block 으로 만들었더니 "인프라 / 를 짓고," 처럼
+ *     조사가 줄바꿈에서 떨어져 나갔다. 한글 조판에서 가장 하면 안 되는 것.
+ *   - 활주로가 빈 공간으로 남고 숫자판이 사진을 덮었다.
  *
- * prefers-reduced-motion 이면 전부 완성 상태로 즉시 보여준다.
+ * 지금 방식: **줄 단위** 등장. 줄 안쪽 텍스트는 손대지 않으니 조판이 깨질 수 없다.
+ * 히어로에는 문장 하나와 다음으로 가는 길만 둔다. 나머지는 아래에서 하나씩.
  */
 
 interface Props {
-  stats: { value: string; label: string }[];
+  /** 첫 화면 아래에서 이어질 첫 섹션의 앵커 */
+  next: string;
 }
-const { stats } = Astro.props;
-
-// 조각 단위로 켜진다. hot = 주황 강조.
-const PIECES: { t: string; hot?: boolean; br?: boolean }[] = [
-  { t: '에이전트를' },
-  { t: '굴리는' },
-  { t: '인프라', hot: true },
-  { t: '를 짓고,', br: true },
-  { t: '그 위에' },
-  { t: '제품을' },
-  { t: '올립니다.' },
-];
+const { next } = Astro.props;
 ---
 
-<section class="hero" data-hero>
-  <div class="hero-sticky">
-    <div class="wrap">
-      <p class="eyebrow" data-fade>AI Infrastructure · Agent Systems Engineer</p>
-
-      <h1 class="assemble">
-        {
-          PIECES.map((p, i) => (
-            <>
-              <span class:list={['pc', { hot: p.hot }]} style={`--i:${i}`}>{p.t}</span>
-              {p.br && <br />}
-            </>
-          ))
-        }
-      </h1>
-
-      <p class="lede" data-fade>
-        멀티모델 오케스트레이션 엔진, 컨트롤 플레인, 내구성 워크플로 —
-        <strong>에이전트를 실제 프로덕션으로 굴릴 때 필요한 것들</strong>을 직접 설계해 운영합니다.
-        그리고 그 인프라 위에서 <strong>결제까지 붙은 제품</strong>을 혼자 출시했습니다.
-      </p>
-
-      <div class="id" data-fade>
-        <img
-          class="portrait"
-          src="/me/portrait.jpg"
-          alt="박근민"
-          width="96" height="96"
-          fetchpriority="high"
-        />
-        <div class="id-txt">
-          <p class="nm">박근민 · Park Geunmin</p>
-          <p class="meta">
-            <a href="mailto:rmsals1745@gmail.com">rmsals1745@gmail.com</a>
-            <span aria-hidden="true">·</span>
-            <a href="https://github.com/rmsals1745" rel="me noopener">github.com/rmsals1745</a>
-            <span aria-hidden="true">·</span>
-            <span>인천 · 서울 · 원격 가능</span>
-          </p>
-        </div>
-      </div>
-
-      {/* 갇히지 않게 — 처음부터 보인다 */}
-      <a class="skip" href="#work">사례 바로 보기 ↓</a>
-    </div>
-
-    <div class="prog" data-prog aria-hidden="true"></div>
-  </div>
-
-  <div class="hero-runway" aria-hidden="true"></div>
-
+<section class="hero">
   <div class="wrap">
-    <dl class="stats" data-stats>
-      {
-        stats.map((s) => (
-          <div class="stat">
-            <dd data-count={s.value}>{s.value}</dd>
-            <dt set:html={s.label} />
-          </div>
-        ))
-      }
-    </dl>
+    <p class="eyebrow" data-line style="--d:0ms">AI Infrastructure · Agent Systems Engineer</p>
+
+    <h1>
+      <span class="ln" data-line style="--d:120ms">
+        <span>에이전트를 굴리는 <em>인프라</em>를 짓고,</span>
+      </span>
+      <span class="ln" data-line style="--d:260ms">
+        <span>그 위에 제품을 올립니다.</span>
+      </span>
+    </h1>
+
+    <p class="lede" data-line style="--d:440ms">
+      인프라만 만든 사람도, 제품만 만든 사람도 아닙니다.
+    </p>
+
+    <div class="cue" data-line style="--d:620ms">
+      <a class="go" href={next}>
+        무엇을 지었는지 보기
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 2.5v9M3.5 8L7 11.5 10.5 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <span class="hint">스크롤하면 하나씩 나옵니다</span>
+    </div>
   </div>
+
+  <div class="glow" aria-hidden="true"></div>
 </section>
 
 <style>
-  .hero { position: relative; }
-
-  .hero-sticky {
-    position: sticky;
-    top: 0;
-    padding: 104px 0 44px;
+  .hero {
+    min-height: 100svh;
+    display: grid;
+    align-content: center;
+    position: relative;
     overflow: hidden;
+    /* sticky 헤더(62px) 아래로 내려앉게 — 이걸 빼먹어 제목이 잘렸다 */
+    padding: calc(62px + 6vh) 0 12vh;
   }
-  .hero-sticky::before {
-    content: '';
+
+  .glow {
     position: absolute;
-    top: -200px; right: -180px;
-    width: 560px; height: 560px;
-    background: radial-gradient(circle, rgba(224, 114, 58, .2), transparent 62%);
+    top: -220px; right: -200px;
+    width: 620px; height: 620px;
+    background: radial-gradient(circle, rgba(224, 114, 58, .18), transparent 62%);
     pointer-events: none;
   }
-  /* 조립이 일어나는 활주로. 여기만큼 스크롤하면 문장이 완성된다. */
-  .hero-runway { height: 90vh; }
 
-  .eyebrow { margin-bottom: 22px; }
+  .eyebrow { margin-bottom: 26px; }
 
-  h1.assemble { margin-bottom: 26px; }
-  .pc {
-    display: inline-block;
-    /* 숨김은 JS 가 있을 때만. 없으면 그냥 다 보인다 (백지 방지) */
-    opacity: 1;
-    transform: none;
-    transition: opacity .5s cubic-bezier(.2,.7,.2,1), transform .5s cubic-bezier(.2,.7,.2,1), color .5s;
-    will-change: opacity, transform;
+  h1 { margin-bottom: 30px; }
+
+  /* 줄 단위 등장 — 줄 안쪽 텍스트는 건드리지 않으므로 조판이 깨질 수 없다 */
+  .ln {
+    display: block;
+    overflow: hidden;
   }
-  :global(html.js) .pc { opacity: .13; transform: translateY(10px); }
-  :global(html.js) .pc.on { opacity: 1; transform: none; }
-  .pc.hot { color: var(--accent); }
-  /* 조각 사이 공백 — inline-block 이라 직접 준다 */
-  .pc + .pc { margin-left: .28em; }
+  .ln > span { display: block; }
+  h1 em { font-style: normal; color: var(--accent); }
 
-  [data-fade] {
-    transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1);
+  .lede {
+    font-size: clamp(17px, 2.1vw, 20px);
+    color: var(--ink-dim);
+    max-width: 46ch;
   }
-  :global(html.js) [data-fade] { opacity: 0; transform: translateY(12px); }
-  :global(html.js) [data-fade].on { opacity: 1; transform: none; }
-  .lede { margin-top: 4px; }
 
-  .id {
-    margin-top: 34px;
+  .cue {
+    margin-top: 44px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 18px;
     flex-wrap: wrap;
   }
-  /* 방향 ① — 원형 그대로. 흰 배경이 원 안에 남는 게 의도된 형태다. */
-  .portrait {
-    width: 96px; height: 96px;
-    border-radius: 50%;
-    object-fit: cover;
-    object-position: center 16%;
-    border: 1px solid var(--rule);
-    background: var(--paper2);
-    flex: 0 0 auto;
-    transition: transform .4s cubic-bezier(.2,.7,.2,1), border-color .3s;
-  }
-  .id:hover .portrait { transform: scale(1.04); border-color: var(--accent); }
-
-  .id-txt { min-width: 0; }
-  .nm { color: var(--ink); font-weight: 700; font-size: 16px; letter-spacing: .02em; }
-  .meta {
-    margin-top: 5px;
-    display: flex; flex-wrap: wrap; gap: 4px 10px;
-    font-size: 13.5px; color: var(--ink-faint);
-  }
-  .meta a {
-    color: var(--ink-dim);
-    text-decoration: none;
-    border-bottom: 1px solid var(--rule);
-    padding-bottom: 1px;
-    transition: color var(--t-fast), border-color var(--t-fast);
-  }
-  .meta a:hover { color: var(--accent); border-color: var(--accent); }
-
-  .skip {
-    display: inline-block;
-    margin-top: 30px;
-    font-size: 13.5px;
-    color: var(--ink-faint);
+  .go {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--ink);
     text-decoration: none;
     border: 1px solid var(--rule);
-    padding: 8px 17px;
+    padding: 12px 22px;
     border-radius: 99px;
-    transition: color var(--t-fast), border-color var(--t-fast), background var(--t-fast);
+    transition: color var(--t-fast), border-color var(--t-fast), background var(--t-fast), gap var(--t-fast);
   }
-  .skip:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  .go:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); gap: 13px; }
+  .go svg { animation: nudge 2.4s ease-in-out infinite; }
+  @keyframes nudge {
+    0%, 70%, 100% { transform: translateY(0); }
+    82% { transform: translateY(3px); }
+  }
+  .hint { font-size: 13px; color: var(--ink-faint); }
 
-  .prog {
-    position: absolute;
-    left: 0; bottom: 0;
-    height: 2px; width: 0;
-    background: linear-gradient(90deg, var(--accent2), var(--accent));
-    transition: width .1s linear;
+  /* ── 등장 모션 ──
+     숨김은 html.js 가 붙었을 때만. 스크립트가 죽어도 백지가 되지 않는다. */
+  :global(html.js) [data-line] {
+    opacity: 0;
+    transform: translateY(18px);
   }
-
-  /* ── 숫자 ── */
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    border-top: 1px solid var(--rule);
-    border-bottom: 1px solid var(--rule);
-    position: relative;
-    background: var(--paper);
+  :global(html.js) [data-line].on {
+    opacity: 1;
+    transform: none;
+    transition: opacity .8s ease var(--d), transform .8s cubic-bezier(.16,.84,.24,1) var(--d);
   }
-  .stat { padding: 30px 22px 30px 0; }
-  .stat:not(:last-child) { border-right: 1px solid var(--rule); }
-  .stat:not(:first-child) { padding-left: 22px; }
-  .stats dd {
-    font-family: var(--serif);
-    font-size: 38px;
-    color: var(--accent2);
-    line-height: 1;
-    letter-spacing: -.02em;
-    font-variant-numeric: tabular-nums;
-  }
-  .stats dt { margin-top: 9px; font-size: 13px; color: var(--ink-faint); line-height: 1.5; }
 
   @media (max-width: 720px) {
-    .hero-sticky { padding: 64px 0 34px; }
-    .hero-runway { height: 60vh; }
-    .stats { grid-template-columns: repeat(2, 1fr); }
-    .stat:nth-child(2) { border-right: none; }
-    .stat:nth-child(3), .stat:nth-child(4) { border-top: 1px solid var(--rule); }
-    .stat:nth-child(3) { padding-left: 0; }
-    .stats dd { font-size: 31px; }
-    .portrait { width: 76px; height: 76px; }
+    .hero { padding: calc(62px + 4vh) 0 9vh; min-height: 92svh; }
+    h1 { margin-bottom: 24px; }
+    .cue { margin-top: 34px; gap: 12px; }
+    .hint { display: none; }
   }
 
-  /* 모션을 원치 않는 사용자에겐 완성 상태를 즉시 준다 */
   @media (prefers-reduced-motion: reduce) {
-    .hero-sticky { position: static; }
-    .hero-runway { display: none; }
-    .pc, [data-fade] { opacity: 1 !important; transform: none !important; }
-    .prog { display: none; }
+    :global(html.js) [data-line] { opacity: 1; transform: none; }
+    .go svg { animation: none; }
   }
 </style>
 
 <script>
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const hero = document.querySelector<HTMLElement>('[data-hero]');
-  const pieces = Array.from(document.querySelectorAll<HTMLElement>('.pc'));
-  const fades = Array.from(document.querySelectorAll<HTMLElement>('[data-fade]'));
-  const prog = document.querySelector<HTMLElement>('[data-prog]');
-
-  // 살아났다고 알린다 — 이게 없으면 2.5초 뒤 failsafe 가 강제로 다 보여준다
+  const lines = Array.from(document.querySelectorAll<HTMLElement>('.hero [data-line]'));
+  // 살아났다고 알린다 — 없으면 2.5초 뒤 failsafe 가 강제로 다 보여준다
   document.documentElement.classList.add('hero-ready');
-
-  if (reduce) {
-    pieces.forEach((p) => p.classList.add('on'));
-    fades.forEach((f) => f.classList.add('on'));
-  } else if (hero) {
-    // 조립 진행도 = 히어로가 화면 위로 얼마나 밀려 올라갔는가
-    const sync = () => {
-      const runway = hero.offsetHeight - window.innerHeight;
-      const p = runway > 0 ? Math.min(1, Math.max(0, -hero.getBoundingClientRect().top / runway)) : 1;
-
-      // 1.25 를 곱해 마지막 조각이 끝나기 전에 완성되게 — 끝까지 끌면 답답하다
-      const shown = Math.round(p * pieces.length * 1.25);
-      pieces.forEach((el, i) => el.classList.toggle('on', i < shown));
-
-      // 문장이 다 조립된 뒤에 나머지가 따라 나온다
-      const done = shown >= pieces.length;
-      fades.forEach((el, i) => {
-        if (i === 0) el.classList.add('on');           // eyebrow 는 처음부터
-        else el.classList.toggle('on', done);
-      });
-
-      if (prog) prog.style.width = (p * 100).toFixed(1) + '%';
-    };
-
-    let ticking = false;
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => { sync(); ticking = false; });
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
-    sync();
-  }
-
-  /* ── 숫자 카운트업 (방향 C) — 화면에 들어올 때 한 번 ── */
-  const statEls = Array.from(document.querySelectorAll<HTMLElement>('[data-count]'));
-  if (statEls.length) {
-    if (reduce) {
-      // 값 그대로 둔다
-    } else {
-      const run = (el: HTMLElement) => {
-        const raw = el.dataset.count || '';
-        // "1,464" / "700+" / "5" 에서 숫자만 뽑고 접두·접미는 보존한다
-        const m = raw.match(/^([^\d]*)([\d,]+)(.*)$/);
-        if (!m) return;
-        const [, pre, numStr, post] = m;
-        const target = parseInt(numStr.replace(/,/g, ''), 10);
-        if (!isFinite(target) || target === 0) return;
-        const hasComma = numStr.includes(',');
-        const dur = 900;
-        const t0 = performance.now();
-        const tick = (t: number) => {
-          const k = Math.min(1, (t - t0) / dur);
-          // ease-out — 끝에서 부드럽게 멎는다
-          const v = Math.round(target * (1 - Math.pow(1 - k, 3)));
-          el.textContent = pre + (hasComma ? v.toLocaleString('en-US') : String(v)) + post;
-          if (k < 1) requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
-      };
-
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            run(e.target as HTMLElement);
-            io.unobserve(e.target);
-          }
-        });
-      }, { threshold: 0.6 });
-      statEls.forEach((el) => io.observe(el));
-    }
-  }
+  // 첫 화면은 스크롤을 기다리지 않는다. 들어오자마자 순서대로 뜬다.
+  requestAnimationFrame(() => lines.forEach((el) => el.classList.add('on')));
 </script>

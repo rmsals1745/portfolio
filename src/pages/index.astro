@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import SectionHead from '../components/SectionHead.astro';
 import HeroCinema from '../components/HeroCinema.astro';
+import Reveal from '../components/Reveal.astro';
 import StackDiagram from '../components/StackDiagram.astro';
 import CaseCard from '../components/CaseCard.astro';
 import CapabilityRow from '../components/CapabilityRow.astro';
@@ -68,29 +69,52 @@ const skills = [
   title="박근민 — AI 인프라 / 에이전트 시스템 엔지니어"
   description="에이전트를 굴리는 인프라를 짓고, 그 위에 제품을 올립니다. 멀티모델 오케스트레이션 엔진 · 컨트롤 플레인 · 결제 붙은 SaaS."
 >
-  <HeroCinema stats={stats} />
+  <HeroCinema next="#scale" />
 
-  <section>
+  {/* 숫자만 있는 한 화면. 히어로와 섞으면 사진이 잘리고 밀도가 터진다. */}
+  <section class="beat" id="scale">
     <div class="wrap">
-      <SectionHead
-        num="01"
-        title="무엇을 어디까지 지었는가"
-        sub="분야를 나열한 게 아니라 쌓은 순서대로 놓았습니다. 아래층이 없으면 위층이 서지 않습니다 — 층을 누르면 그 층의 사례만 모아 봅니다."
-      />
+      <Reveal>
+        <p class="beat-lead">4개월 동안 혼자 만든 것의 규모입니다.</p>
+      </Reveal>
+      <Reveal each stagger={110} class="stats">
+        {
+          stats.map((s) => (
+            <div class="stat">
+              <dd data-count={s.value}>{s.value}</dd>
+              <dt set:html={s.label} />
+            </div>
+          ))
+        }
+      </Reveal>
+    </div>
+  </section>
+
+  <section class="beat">
+    <div class="wrap">
+      <Reveal>
+        <SectionHead
+          num="01"
+          title="무엇을 어디까지 지었는가"
+          sub="분야를 나열한 게 아니라 쌓은 순서대로 놓았습니다. 아래층이 없으면 위층이 서지 않습니다 — 층을 누르면 그 층의 사례만 모아 봅니다."
+        />
+      </Reveal>
       <StackDiagram counts={counts} />
     </div>
   </section>
 
   {
     capabilities.length > 0 && (
-      <section class="tight">
+      <section class="beat">
         <div class="wrap">
-          <SectionHead
-            num="02"
-            title="이 서비스들이 증명하는 것"
-            sub="기술 나열 대신, 만든 것에서 역산한 역량입니다. 각 항목마다 근거가 되는 실물이 아래에 있습니다."
-          />
-          <div class="caps">
+          <Reveal>
+            <SectionHead
+              num="02"
+              title="이 서비스들이 증명하는 것"
+              sub="기술 나열 대신, 만든 것에서 역산한 역량입니다. 각 항목마다 근거가 되는 실물이 아래에 있습니다."
+            />
+          </Reveal>
+          <Reveal each stagger={140} class="caps">
             {capabilities.map((c, i) => (
               <CapabilityRow
                 num={String(i + 1).padStart(2, '0')}
@@ -100,19 +124,21 @@ const skills = [
                 evidence={c.data.evidence}
               />
             ))}
-          </div>
+          </Reveal>
         </div>
       </section>
     )
   }
 
-  <section class="tight" id="work">
+  <section class="beat" id="work">
     <div class="wrap">
-      <SectionHead
-        num="03"
-        title="사례"
-        sub="층마다 대표 사례만 세웠습니다. 각 카드의 숫자는 추정이 아니라 실측이고, 근거는 상세 문서 안에 있습니다."
-      />
+      <Reveal>
+        <SectionHead
+          num="03"
+          title="사례"
+          sub="층마다 대표 사례만 세웠습니다. 각 카드의 숫자는 추정이 아니라 실측이고, 근거는 상세 문서 안에 있습니다."
+        />
+      </Reveal>
 
       {
         strata.map((s) => (
@@ -135,19 +161,21 @@ const skills = [
     </div>
   </section>
 
-  <section class="tight">
+  <section class="beat">
     <div class="wrap">
+      <Reveal>
       <PullQuote>
         AI 시스템의 진짜 난이도는 모델을 부르는 데 있지 않습니다.<br />
         <span class="hl">“이 결과를 믿어도 되는가”</span> 를 사람 없이 판정하는 구조를 짜는 데 있습니다.
       </PullQuote>
+      </Reveal>
     </div>
   </section>
 
-  <section class="tight">
+  <section class="beat">
     <div class="wrap">
-      <SectionHead num="04" title="기술 스택" />
-      <div class="skills">
+      <Reveal><SectionHead num="04" title="기술 스택" /></Reveal>
+      <Reveal each stagger={80} class="skills">
         {
           skills.map((s) => (
             <div class="skill">
@@ -156,25 +184,57 @@ const skills = [
             </div>
           ))
         }
-      </div>
+      </Reveal>
     </div>
   </section>
 
-  <section class="tight">
+  <section class="beat">
     <div class="wrap">
-      <SectionHead num="05" title="배경" />
-      <p class="bg">
+      <Reveal><SectionHead num="05" title="배경" /></Reveal>
+      <Reveal><p class="bg">
         개발 이전에 <b>B2B 컨설팅 · 영업</b>을 했습니다. 니즈 발굴 → 문제 인식 → 해결책 제시 → 반론 처리 →
         클로징 → 사후관리까지 현장에서 굴린 경험이 있습니다. 그래서
         <b>고객 앞에 직접 설 수 있는 엔지니어</b>입니다 — 요구사항을 통역해서 받는 게 아니라 직접 캐내고,
         만든 것을 직접 설명합니다. 지금은 그 상담 플레이북을 AI 에이전트의 대화 설계에 그대로 이식하고 있습니다.
-      </p>
+      </p></Reveal>
     </div>
   </section>
 </Base>
 
 <style>
-  /* 히어로·연락처·숫자는 HeroCinema 로 옮겼다 */
+  /* 한 화면에 한 덩어리. 여백이 곧 "다음 것"이라는 신호다. */
+  .beat { padding: 15vh 0; }
+  .beat + .beat { padding-top: 0; }
+
+  .beat-lead {
+    font-family: var(--serif);
+    font-size: clamp(20px, 2.8vw, 27px);
+    color: var(--ink);
+    letter-spacing: -.01em;
+    margin-bottom: 40px;
+    max-width: 42ch;
+  }
+
+  /* 숫자 — 자기 화면을 가진다 */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .stat { padding: 36px 22px 36px 0; }
+  .stat:not(:last-child) { border-right: 1px solid var(--rule); }
+  .stat:not(:first-child) { padding-left: 22px; }
+  .stats dd {
+    font-family: var(--serif);
+    font-size: clamp(30px, 4.6vw, 46px);
+    color: var(--accent2);
+    line-height: 1;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .stats dt { margin-top: 12px; font-size: 13px; color: var(--ink-faint); line-height: 1.55; }
+
   .caps { border-top: 1px solid var(--rule); }
 
   .stratum-block { margin-top: 44px; }
@@ -227,6 +287,44 @@ const skills = [
   .hl { color: var(--accent); }
 
   @media (max-width: 720px) {
-    .hero { padding: 60px 0 40px; }
+    .beat { padding: 11vh 0; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stat { padding: 26px 16px 26px 0; }
+    .stat:nth-child(2) { border-right: none; }
+    .stat:nth-child(3), .stat:nth-child(4) { border-top: 1px solid var(--rule); }
+    .stat:nth-child(3) { padding-left: 0; }
   }
 </style>
+
+<script>
+  /* 숫자 카운트업 — 자기 화면에 들어올 때 한 번 (방향 C) */
+  const els = Array.from(document.querySelectorAll<HTMLElement>('[data-count]'));
+  if (els.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const run = (el: HTMLElement) => {
+      const raw = el.dataset.count || '';
+      // "1,464" / "700+" / "5" — 숫자만 뽑고 접두·접미는 보존한다
+      const m = raw.match(/^([^\d]*)([\d,]+)(.*)$/);
+      if (!m) return;
+      const [, pre, numStr, post] = m;
+      const target = parseInt(numStr.replace(/,/g, ''), 10);
+      if (!isFinite(target) || target === 0) return;
+      const comma = numStr.includes(',');
+      const t0 = performance.now();
+      const tick = (t: number) => {
+        const k = Math.min(1, (t - t0) / 1100);
+        const v = Math.round(target * (1 - Math.pow(1 - k, 3)));
+        el.textContent = pre + (comma ? v.toLocaleString('en-US') : String(v)) + post;
+        if (k < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        run(e.target as HTMLElement);
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.5 });
+    els.forEach((el) => io.observe(el));
+  }
+</script>

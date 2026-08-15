@@ -8,10 +8,17 @@ const year = new Date().getFullYear();
       만든 것을 <em>직접 설명할 수 있는</em> 엔지니어를 찾고 계시다면.
     </p>
 
-    <div class="lines">
-      <a href="mailto:rmsals1745@gmail.com">rmsals1745@gmail.com</a>
-      <a href="https://github.com/rmsals1745" rel="me noopener">github.com/rmsals1745</a>
-      <span>인천 · 서울 (수도권) · 원격 가능</span>
+    {/* 사진은 여기가 제자리다 — 히어로에 두면 밀도가 터지고 숫자판에 잘렸다 */}
+    <div class="who">
+      <img class="portrait" src="/me/portrait.jpg" alt="박근민" width="104" height="104" loading="lazy" />
+      <div>
+        <p class="nm">박근민 · Park Geunmin</p>
+        <div class="lines">
+          <a href="mailto:rmsals1745@gmail.com">rmsals1745@gmail.com</a>
+          <a href="https://github.com/rmsals1745" rel="me noopener">github.com/rmsals1745</a>
+          <span>인천 · 서울 (수도권) · 원격 가능</span>
+        </div>
+      </div>
     </div>
 
     <p class="fine">
@@ -37,6 +44,28 @@ const year = new Date().getFullYear();
   }
   .call em { font-style: normal; color: var(--accent); }
 
+  .who {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding-bottom: 30px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  /* 원형 그대로 (사장 선택 ①) */
+  .portrait {
+    width: 104px; height: 104px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center 16%;
+    border: 1px solid var(--rule);
+    background: var(--paper2);
+    flex: 0 0 auto;
+    transition: transform .4s cubic-bezier(.2,.7,.2,1), border-color .3s;
+  }
+  .who:hover .portrait { transform: scale(1.04); border-color: var(--accent); }
+  .nm { color: var(--ink); font-weight: 700; font-size: 16.5px; margin-bottom: 8px; }
+
   .lines {
     display: flex;
     flex-wrap: wrap;
@@ -44,8 +73,6 @@ const year = new Date().getFullYear();
     align-items: center;
     font-size: 14.5px;
     color: var(--ink-faint);
-    padding-bottom: 30px;
-    border-bottom: 1px solid var(--rule-soft);
   }
   .lines a {
     color: var(--ink-dim);

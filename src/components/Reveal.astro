@@ -1,0 +1,82 @@
+---
+/**
+ * 스크롤해 들어올 때 하나씩 나타나는 껍데기.
+ *
+ * 왜 필요한가: 한 화면에 정보를 다 펼쳐 놓으면 읽기 전에 좌절한다.
+ * 같은 양이라도 **시선이 닿는 순간 하나씩** 오면 읽힌다.
+ *
+ * 백지 방지: 숨김은 html.js 가 붙었을 때만 적용된다.
+ */
+interface Props {
+  /** 자식들을 순서대로 터뜨릴 때의 간격(ms) */
+  stagger?: number;
+  /** 직계 자식 각각을 따로 터뜨릴지, 덩어리째 한 번에 터뜨릴지 */
+  each?: boolean;
+  class?: string;
+}
+const { stagger = 90, each = false, class: cls = '' } = Astro.props;
+---
+
+<div class={`rv ${cls}`} data-reveal-group data-each={each ? '' : undefined} style={`--stg:${stagger}ms`}>
+  <slot />
+</div>
+
+<style>
+  :global(html.js) .rv[data-reveal-group]:not([data-each]) {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  :global(html.js) .rv[data-reveal-group]:not([data-each]).in {
+    opacity: 1;
+    transform: none;
+    transition: opacity .75s ease, transform .75s cubic-bezier(.16,.84,.24,1);
+  }
+
+  /* each 모드 — 직계 자식이 순서대로 */
+  :global(html.js) .rv[data-each] > :global(*) {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  :global(html.js) .rv[data-each].in > :global(*) {
+    opacity: 1;
+    transform: none;
+    transition: opacity .7s ease var(--dly, 0ms), transform .7s cubic-bezier(.16,.84,.24,1) var(--dly, 0ms);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.js) .rv[data-reveal-group],
+    :global(html.js) .rv[data-each] > :global(*) {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+</style>
+
+<script>
+  const groups = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal-group]'));
+  if (groups.length) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      groups.forEach((g) => g.classList.add('in'));
+    } else {
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (!e.isIntersecting) return;
+            const g = e.target as HTMLElement;
+            if (g.hasAttribute('data-each')) {
+              const step = parseInt(getComputedStyle(g).getPropertyValue('--stg')) || 90;
+              Array.from(g.children).forEach((c, i) => {
+                (c as HTMLElement).style.setProperty('--dly', i * step + 'ms');
+              });
+            }
+            g.classList.add('in');
+            io.unobserve(g);
+          });
+        },
+        // 화면에 조금 들어왔을 때 시작 — 다 보이고 나서 뜨면 늦다
+        { threshold: 0.08, rootMargin: '0px 0px -60px 0px' }
+      );
+      groups.forEach((g) => io.observe(g));
+    }
+  }
+</script>
