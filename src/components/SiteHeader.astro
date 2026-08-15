@@ -38,17 +38,20 @@ const isHome = path === '/' || path === '';
   .bar {
     position: sticky;
     top: 0;
-    z-index: 50;
-    background: rgba(18, 16, 14, .72);
-    backdrop-filter: blur(14px) saturate(1.4);
-    -webkit-backdrop-filter: blur(14px) saturate(1.4);
-    /* 스크롤 전에는 경계선을 그리지 않는다 — 얇은 균일 테두리가 화면을 싸구려로 만든다 */
-    border-bottom: 1px solid transparent;
-    transition: border-color var(--t-mid), background var(--t-mid);
+    /* 히어로가 sticky 로 붙잡히는 구간에서도 절대 덮이지 않게 넉넉히 위로 */
+    z-index: 100;
+    /* 항상 떠 있는 바. 스크롤 전에도 배경을 깔아 '떠 있는 것' 임을 분명히 한다. */
+    background: rgba(18, 16, 14, .86);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    border-bottom: 1px solid var(--rule-soft);
+    transition: border-color var(--t-mid), background var(--t-mid), box-shadow var(--t-mid);
   }
+  /* 내용이 밑으로 들어가면 조금 더 또렷해진다 */
   .bar[data-scrolled] {
     border-bottom-color: var(--rule);
-    background: rgba(18, 16, 14, .92);
+    background: rgba(18, 16, 14, .96);
+    box-shadow: 0 8px 26px -18px rgba(0, 0, 0, .9);
   }
 
   .inner {

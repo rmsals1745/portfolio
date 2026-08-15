@@ -41,10 +41,17 @@ const { next } = Astro.props;
       </a>
     </div>
 
-    {/* 스크롤 유도 — 굴리기 시작하면 사라진다 */}
+    {/*
+      스크롤 유도 — 화면 가운데 아래. 크게 움직여서 "고장난 게 아니라
+      굴리면 이어진다" 를 한눈에 알게 한다. 굴리기 시작하면 사라진다.
+    */}
     <div class="cue" data-cue aria-hidden="true">
-      <span class="cue-t">스크롤</span>
-      <span class="mouse"></span>
+      <span class="chevs">
+        <svg viewBox="0 0 28 12" width="28" height="12" style="--c:0"><path d="M2 2l12 8 12-8" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 28 12" width="28" height="12" style="--c:1"><path d="M2 2l12 8 12-8" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 28 12" width="28" height="12" style="--c:2"><path d="M2 2l12 8 12-8" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="cue-t">스크롤하면 이어집니다</span>
     </div>
 
     {/* 갇히지 않게 — 조립을 기다리지 않고 바로 갈 수 있다 */}
@@ -112,39 +119,47 @@ const { next } = Astro.props;
   }
   .cta:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); gap: 13px; }
 
-  /* ── 스크롤 유도 ── */
+  /* ── 스크롤 유도 ──
+     화면 가운데 아래에 크게. 작으면 사람들이 못 보고 "화면이 안 넘어간다" 로 읽는다. */
   .cue {
     position: absolute;
-    left: 0; right: 0; bottom: 26px;
+    left: 0; right: 0; bottom: 40px;
     display: grid;
     justify-items: center;
-    gap: 8px;
+    gap: 10px;
     pointer-events: none;
-    transition: opacity .45s ease;
+    transition: opacity .45s ease, transform .45s ease;
   }
-  .cue[data-gone] { opacity: 0; }
-  .cue-t { font-size: 11.5px; color: var(--ink-faint); letter-spacing: .1em; }
-  .mouse {
-    width: 21px; height: 32px;
-    border: 1.5px solid var(--ink-faint);
-    border-radius: 11px;
-    position: relative;
+  .cue[data-gone] { opacity: 0; transform: translateY(10px); }
+
+  .chevs {
+    display: grid;
+    gap: 1px;
+    color: var(--accent);
   }
-  .mouse::after {
-    content: '';
-    position: absolute;
-    left: 50%; top: 6px;
-    width: 3px; height: 6px;
-    border-radius: 2px;
-    background: var(--accent);
-    transform: translateX(-50%);
-    animation: wheel 1.7s cubic-bezier(.22,1,.36,1) infinite;
+  .chevs svg {
+    display: block;
+    opacity: 0;
+    animation: chev 1.9s cubic-bezier(.22,1,.36,1) infinite;
+    /* 세 개가 위에서 아래로 차례로 흐른다 — 방향이 한눈에 읽힌다 */
+    animation-delay: calc(var(--c) * .17s);
   }
-  @keyframes wheel {
-    0%   { opacity: 0; transform: translate(-50%, 0); }
-    25%  { opacity: 1; }
-    70%  { opacity: 0; transform: translate(-50%, 9px); }
-    100% { opacity: 0; }
+  @keyframes chev {
+    0%   { opacity: 0; transform: translateY(-5px); }
+    28%  { opacity: 1; }
+    60%  { opacity: .25; }
+    100% { opacity: 0; transform: translateY(7px); }
+  }
+
+  .cue-t {
+    font-size: 12.5px;
+    color: var(--ink-dim);
+    letter-spacing: .04em;
+    animation: breathe 2.6s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: .55; }
+    50%      { opacity: 1; }
   }
 
   .bail {
@@ -207,7 +222,7 @@ const { next } = Astro.props;
     :global(html.js) [data-step],
     :global(html.js) .ln[data-step] > span { opacity: 1 !important; transform: none !important; }
     .cue, .bar { display: none; }
-    .mouse::after { animation: none; }
+    .chevs svg, .cue-t { animation: none; opacity: 1; }
   }
 </style>
 
