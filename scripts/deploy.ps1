@@ -45,7 +45,23 @@ function Get-Head([string]$path) {
         return @{
             code = [int]$r.StatusCode
             type = First $r.Headers['Content-Type']
-            len  = [int](First $r.Headers['Content-Length'])
+        }
+    } catch {
+        return @{ code = 0; type = '' }
+    }
+}
+
+# ⚠️ CF Pages 는 HEAD 응답에 Content-Length 를 주지 않는다(압축/청크).
+#    헤더로 크기를 재려다 멀쩡한 이미지 7장을 전부 FAIL 로 찍었다.
+#    크기를 확인하려면 실제로 받아서 재는 수밖에 없다.
+function Get-Body([string]$path) {
+    try {
+        $r = Invoke-WebRequest "$url$path" -UseBasicParsing `
+             -Headers @{'Cache-Control' = 'no-cache'} -TimeoutSec 60
+        return @{
+            code = [int]$r.StatusCode
+            type = First $r.Headers['Content-Type']
+            len  = [int]$r.RawContentLength
         }
     } catch {
         return @{ code = 0; type = ''; len = 0 }
@@ -79,7 +95,7 @@ foreach ($p in @('/', '/category/agent-infra/', '/work/justswarm/', '/work/just-
 foreach ($img in @('inlife-login.jpg','statusline.png','justdesign-intake.jpg',
                    'justdesign-flower.jpg','justdesign-3variants.jpg',
                    'justdesign-map.jpg','justdesign-variant-c.jpg')) {
-    $h = Get-Head "/shots/$img"
+    $h = Get-Body "/shots/$img"
     $ok = ($h.code -eq 200 -and $h.type -like 'image/*' -and $h.len -gt 1000)
     if (-not $ok) { $fail++ }
     "{0}  shots/{1,-28} {2} {3} {4}B" -f $(if($ok){'  OK  '}else{'  FAIL'}), $img, $h.code, $h.type, $h.len | Write-Host
@@ -88,12 +104,21 @@ foreach ($img in @('inlife-login.jpg','statusline.png','justdesign-intake.jpg',
 # ── 변별력 검사 ──
 # 이 검증이 "무엇이든 통과시키는 검증"이 아님을 증명한다.
 # 존재하지 않는 이미지가 image/* 로 잡히면 위의 OK 들은 아무 의미가 없다.
-$ghost = Get-Head '/shots/__does-not-exist__.jpg'
-if ($ghost.type -like 'image/*') {
-    Write-Host "  FAIL  변별력 없음 — 없는 파일도 image/* 로 응답한다. 위 결과 전부 무효."
+$ghost = Get-Body '/shots/__does-not-exist__.jpg'
+if ($ghost.type -like 'image/*' -and $ghost.len -gt 1000) {
+    Write-Host "  FAIL  변별력 없음 — 없는 파일도 이미지로 응답한다. 위 결과 전부 무효."
     $fail++
 } else {
-    Write-Host "  OK    변별력 있음 — 없는 파일은 $($ghost.type) (검증이 실제로 구별한다)"
+    Write-Host "  OK    변별력 있음 — 없는 이미지는 code=$($ghost.code) type='$($ghost.type)'"
+}
+
+# 없는 페이지가 홈 내용으로 200 을 주면 검색엔진이 오타 URL 을 홈의 중복으로 색인한다.
+$ghostPage = Get-Body '/work/__does-not-exist__/'
+if ($ghostPage.code -eq 200) {
+    Write-Host "  FAIL  없는 페이지가 200 이다 — 404 가 안 잡히고 있다."
+    $fail++
+} else {
+    Write-Host "  OK    없는 페이지는 code=$($ghostPage.code) (404 동작)"
 }
 
 Write-Host ""

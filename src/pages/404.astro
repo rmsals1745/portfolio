@@ -1,0 +1,82 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { CATEGORIES } from '../content.config';
+
+// 막다른 길을 만들지 않는다 — 여기 온 사람에게 갈 곳을 준다.
+const recent = (await getCollection('cases', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.weight - a.data.weight)
+  .slice(0, 3);
+---
+
+<Base
+  title="찾는 페이지가 없습니다 — 박근민"
+  description="주소가 바뀌었거나 없는 페이지입니다."
+>
+  <section class="lost">
+    <div class="wrap">
+      <p class="eyebrow">404</p>
+      <h1>여기엔 아무것도 없습니다.</h1>
+      <p class="lede">
+        주소가 바뀌었거나 처음부터 없던 페이지입니다. 아래로 가시면 됩니다.
+      </p>
+
+      <div class="cols">
+        <div>
+          <p class="col-h">분야</p>
+          <ul class="links">
+            {CATEGORIES.map((c) => <li><a href={`/category/${c.id}/`}>{c.label}</a></li>)}
+          </ul>
+        </div>
+        <div>
+          <p class="col-h">대표 사례</p>
+          <ul class="links">
+            {recent.map((c) => <li><a href={`/work/${c.id}/`}>{c.data.title}</a></li>)}
+          </ul>
+        </div>
+      </div>
+
+      <p class="home"><a href="/">첫 화면으로</a></p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .lost { padding: 96px 0 120px; }
+  h1 { margin: 14px 0 18px; font-size: clamp(28px, 4.6vw, 46px); }
+
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 40px;
+    margin-top: 52px;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+  }
+  .col-h {
+    font-size: 11.5px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .links { list-style: none; display: grid; gap: 10px; }
+  .links a {
+    color: var(--ink-dim);
+    text-decoration: none;
+    font-size: 15.5px;
+    transition: color var(--t-fast);
+  }
+  .links a:hover { color: var(--accent); }
+
+  .home { margin-top: 44px; }
+  .home a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 3px;
+    font-size: 15px;
+  }
+  .home a:hover { border-color: var(--accent); }
+</style>
