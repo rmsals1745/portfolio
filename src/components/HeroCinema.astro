@@ -185,6 +185,11 @@ const { next } = Astro.props;
 
   :global(html.js) [data-step].on { opacity: 1; transform: none; }
   :global(html.js) .ln[data-step].on > span { transform: none; }
+  /* ⚠️ 위 한 줄만으로는 .eyebrow/.lede/.cta 숨김 규칙과 **우선순위 동점**이라
+     소스 순서에만 기대게 된다. 명시적으로 이기게 클래스를 맞춰 둔다. */
+  :global(html.js) .eyebrow[data-step].on,
+  :global(html.js) .lede[data-step].on,
+  :global(html.js) .cta[data-step].on { transform: none; }
 
   @media (max-width: 720px) {
     .hero { height: 190svh; }
