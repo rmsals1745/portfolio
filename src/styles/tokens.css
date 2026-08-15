@@ -33,6 +33,7 @@
   --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
 
   /* ── 리듬 */
+  --header-h: 62px;
   --wrap: 940px;
   --wrap-wide: 1180px;
   --pad: 28px;
@@ -48,9 +49,13 @@
 
 html {
   scroll-behavior: smooth;
-  /* 앵커로 점프했을 때 제목이 상단에 딱 붙지 않게 */
-  scroll-padding-top: 88px;
+  /* 앵커로 점프했을 때 고정 헤더에 가리지 않게 */
+  scroll-padding-top: calc(var(--header-h) + 26px);
 }
+
+/* 헤더가 고정이라 흐름에서 자리를 차지하지 않는다.
+   히어로가 있는 첫 화면은 자기 안에서 헤더 높이를 처리하므로 제외한다. */
+main:not(:has(.hero)) { padding-top: var(--header-h); }
 
 body {
   background: var(--paper);

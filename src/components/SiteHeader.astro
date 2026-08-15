@@ -36,8 +36,10 @@ const isHome = path === '/' || path === '';
 
 <style>
   .bar {
-    position: sticky;
-    top: 0;
+    /* 고정. sticky 는 흐름에서 자리를 차지해 아래 요소를 62px 밀어내고,
+       그 경계에서 히어로의 빛이 잘려 직선이 생겼다. */
+    position: fixed;
+    top: 0; left: 0; right: 0;
     /* 히어로가 sticky 로 붙잡히는 구간에서도 절대 덮이지 않게 넉넉히 위로 */
     z-index: 100;
     /* 항상 떠 있는 바. 스크롤 전에도 배경을 깔아 '떠 있는 것' 임을 분명히 한다. */

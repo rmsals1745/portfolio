@@ -58,7 +58,7 @@ const { next } = Astro.props;
     <a class="bail" href={next}>건너뛰기</a>
 
     <div class="bar" data-bar aria-hidden="true"></div>
-    <div class="glow" aria-hidden="true"></div>
+    <div class="glow" aria-hidden="true"><i class="g1"></i><i class="g2"></i></div>
   </div>
 </section>
 
@@ -78,13 +78,54 @@ const { next } = Astro.props;
     padding-top: 62px;
   }
 
+  /* ── 빛 ──
+     ⚠️ 예전엔 top:-220px 로 컨테이너 밖까지 나가 있었고, overflow:hidden 이
+        그걸 잘라 헤더 바로 밑에 **직선**이 생겼다.
+        이제 빛덩이는 컨테이너 안에 완전히 들어와 있고, 제 가장자리에서
+        이미 투명해진 상태다 — 어디서 잘리든 선이 생길 수 없다. */
   .glow {
     position: absolute;
-    top: -220px; right: -200px;
-    width: 620px; height: 620px;
-    background: radial-gradient(circle, rgba(224, 114, 58, .18), transparent 62%);
+    inset: 0;
     pointer-events: none;
     z-index: -1;
+    overflow: hidden;
+  }
+  .glow i {
+    position: absolute;
+    display: block;
+    border-radius: 50%;
+    /* 가장자리로 갈수록 완전히 사라진다. 65% 지점에서 이미 0. */
+    background: radial-gradient(circle at 50% 50%,
+                var(--c1) 0%, var(--c2) 34%, transparent 66%);
+    filter: blur(28px);
+    will-change: transform;
+  }
+  .g1 {
+    --c1: rgba(224, 114, 58, .26);
+    --c2: rgba(224, 114, 58, .09);
+    width: min(72vw, 780px);
+    aspect-ratio: 1;
+    top: -14%;
+    right: -12%;
+    animation: drift1 26s ease-in-out infinite;
+  }
+  /* 두 번째 덩이 — 색을 살짝 달리해 깊이를 준다 */
+  .g2 {
+    --c1: rgba(92, 158, 173, .12);
+    --c2: rgba(92, 158, 173, .04);
+    width: min(56vw, 600px);
+    aspect-ratio: 1;
+    bottom: -22%;
+    left: -14%;
+    animation: drift2 34s ease-in-out infinite;
+  }
+  @keyframes drift1 {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50%      { transform: translate3d(-4%, 5%, 0) scale(1.08); }
+  }
+  @keyframes drift2 {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50%      { transform: translate3d(6%, -5%, 0) scale(1.12); }
   }
 
   .inner { position: relative; z-index: 1; }
