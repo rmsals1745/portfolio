@@ -24,7 +24,7 @@ src/content/cases/*.md → Astro 빌드 → Cloudflare Pages
 
 | | |
 |---|---|
-| `src/content.config.ts` | 콘텐츠 스키마와 **분야 5축** 정의 |
+| `src/content.config.ts` | 콘텐츠 스키마와 **분야 4축** 정의 |
 | `src/pages/index.astro` | 첫 화면 — 층 단면 |
 | `scripts/ingest/` | 볼트 → 초안 변환기 (결정론, 테스트 27) |
 | `scripts/polish.py` | 초안 다듬기 (LLM, 인용 대조 가드) |

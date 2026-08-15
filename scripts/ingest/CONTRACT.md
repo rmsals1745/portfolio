@@ -50,7 +50,7 @@ Astro `src/content.config.ts` 의 zod 스키마와 **기계적으로 일치**해
 ---
 title: string                 # 필수
 tagline: string               # 필수. 카드에 보이는 한 줄. 원천의 첫 문장에서 뽑되 110자 이내로 자른다
-category: string              # 필수. 아래 5개 중 하나만
+category: string              # 필수. 아래 4개 중 하나만
 period: string                # 필수. 예 "2026.04 –" / "2026.07"
 role: string                  # 선택
 status: live | active | archived    # 기본 active
@@ -68,15 +68,15 @@ updated: YYYY-MM-DD           # 원천 파일 mtime
 ---
 ```
 
-`category` 허용값 5개, 이 외에는 금지:
-`agent-infra` · `product` · `applied` · `ops` · `genai`
+`category` 허용값 4개, 이 외에는 금지:
+`agent-infra` · `product` · `applied` · `ops`
 
 분류 규칙 (키워드 기반, 결정론):
 - justswarm / justlink / justgraph / Hermes / 오케스트레이션 / 컨트롤 플레인 / 워크플로 → `agent-infra`
 - 인생딸깍 / inlifeclick / 결제 / 포트원 / 크레딧 / 구독 → `product`
 - JUST DESIGN / 시안 / 파이프라인 / 컴플라이언스 / 플러그인 / 검수 → `applied`
 - 크론 / 백업 / 스케줄 / 복원 / juststandby / 상시 / systemd → `ops`
-- ComfyUI / LoRA / 확산 / 이미지 / 영상 / 시네마틱 → `genai`
+- ComfyUI / LoRA / 확산 / 시네마틱 → `applied` (옛 genai 축, 2026-08-15 폐지)
 - 어디에도 안 걸리면 `applied` + `draft: true` 유지 + stderr 에 경고
 
 ## 반드시 지킬 것
