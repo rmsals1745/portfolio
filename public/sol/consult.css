@@ -1,0 +1,310 @@
+/* consult.css — 최소 구조 스타일 (미감은 Rex 가 덮어쓴다) */
+
+/* ── 기초 리셋 ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── 레이아웃 ── */
+.consult-wrap {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px; /* iOS 확대 방지 최소 */
+  line-height: 1.5;
+  color: #222;
+}
+
+/* ── 진행 표시 ── */
+.progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #666;
+}
+.progress-track {
+  flex: 1;
+  height: 6px;
+  background: #eee;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: #4a7;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* ── 메시지 영역 ── */
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.bubble {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 15px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+.bubble-sol {
+  align-self: flex-start;
+  background: #f0f0f0;
+  color: #222;
+}
+.bubble-user {
+  align-self: flex-end;
+  background: #4a7;
+  color: #fff;
+}
+.bubble-system {
+  align-self: center;
+  background: #fff3cd;
+  color: #856404;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ── Step 컨테이너 ── */
+.step-area {
+  margin-bottom: 16px;
+}
+.step {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px;
+}
+.step-title {
+  font-weight: 600;
+  font-size: 17px;
+  margin-bottom: 6px;
+}
+.step-hint {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 10px;
+}
+.req-mark {
+  color: #c33;
+  margin-left: 4px;
+  font-weight: 700;
+}
+.range-hint {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+/* ── 입력 ── */
+.step-input {
+  width: 100%;
+  font-size: 16px; /* iOS 확대 방지 */
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+}
+.step-input:focus {
+  border-color: #4a7;
+  box-shadow: 0 0 0 2px rgba(68,170,119,0.2);
+}
+textarea.step-input {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* ── 옵션 카드 (choice/multi) ── */
+.option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.option-card:hover { border-color: #4a7; }
+.option-card input { flex-shrink: 0; }
+.option-label { font-size: 15px; }
+
+/* ── Swatch 카드 ── */
+.swatch-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+.swatch-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.swatch-card:hover { border-color: #4a7; }
+.swatch-card input { flex-shrink: 0; }
+.swatch-preview {
+  display: flex;
+  width: 100%;
+  height: 40px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.swatch-preview span {
+  flex: 1;
+  display: block;
+}
+.swatch-label {
+  font-size: 13px;
+  text-align: center;
+  color: #555;
+}
+
+/* ── Products 테이블 ── */
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.products-table th {
+  text-align: left;
+  font-size: 13px;
+  color: #666;
+  padding: 4px 6px;
+  border-bottom: 1px solid #ddd;
+}
+.products-table td {
+  padding: 4px 4px;
+}
+.products-table input {
+  width: 100%;
+  font-size: 15px;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.btn-remove-row {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #999;
+  padding: 4px 8px;
+}
+.btn-remove-row:hover { color: #c33; }
+.btn-add-row {
+  margin-top: 8px;
+  background: none;
+  border: 1px dashed #aaa;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #555;
+}
+.btn-add-row:hover { border-color: #4a7; color: #4a7; }
+
+/* ── Contact 그리드 ── */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.contact-label {
+  font-size: 13px;
+  color: #666;
+}
+
+/* ── Confirm ── */
+.confirm-body {
+  font-size: 15px;
+  line-height: 1.7;
+}
+.confirm-body dt {
+  font-weight: 600;
+  margin-top: 8px;
+}
+.confirm-body dd {
+  margin-left: 0;
+  color: #444;
+}
+
+/* ── 하단 액션 ── */
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.btn-submit {
+  flex: 1;
+  padding: 12px;
+  font-size: 16px;
+  background: #4a7;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-skip {
+  padding: 12px 16px;
+  font-size: 15px;
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #666;
+}
+.btn-skip:hover { border-color: #999; }
+.btn-retry {
+  padding: 10px 20px;
+  font-size: 15px;
+  background: #fff;
+  border: 1px solid #c33;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #c33;
+}
+
+/* ── Done / Ref ── */
+.done-screen {
+  text-align: center;
+  padding: 24px 16px;
+}
+.ref-number {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin: 12px 0;
+  color: #4a7;
+}
+
+/* ── 모바일 ── */
+@media (max-width: 520px) {
+  .consult-wrap { padding: 10px; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .swatch-list { grid-template-columns: repeat(2, 1fr); }
+}

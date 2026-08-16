@@ -202,3 +202,14 @@
 .cap b { color: var(--ink-dim); }
 
 .figure { margin: 26px 0; }
+
+/* 사례 본문에서 실제 서비스로 나가는 문 (JUST DESIGN 상담).
+   사례 글은 읽는 사람이 채용·컨설팅 쪽이라, 눈에 띄되 광고처럼 굴지 않게 한 줄로만 둔다. */
+.cta-line {
+  margin: 22px 0 26px;
+  padding: 14px 16px;
+  border-left: 3px solid var(--accent, #b4623a);
+  background: color-mix(in srgb, var(--accent, #b4623a) 7%, transparent);
+  border-radius: 0 8px 8px 0;
+}
+.cta-line a { font-weight: 700; white-space: nowrap; }

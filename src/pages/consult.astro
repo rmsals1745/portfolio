@@ -1,0 +1,159 @@
+---
+/**
+ * JUST DESIGN — 홈페이지 상담 (Sol)
+ *
+ * 이 페이지는 커리어 포트폴리오의 레이아웃(Base.astro)을 쓰지 않는다.
+ * 보는 사람이 다르기 때문이다 — 여긴 동네 가게 사장님이 오는 자리다.
+ * 헤더·푸터·사례 링크가 붙으면 "여기가 어디지" 가 된다.
+ *
+ * 화면 로직 = /sol/consult-boot.js (계약: Projects\justdesign\SOL-API.md)
+ * 서버      = functions/api/consult/*  (같은 오리진)
+ */
+const title = '홈페이지 상담 — JUST DESIGN';
+const description = '가게 이야기를 들려주시면, 홈페이지 시안 세 가지를 만들어 보여드립니다.';
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#faf7f2" />
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+    <link rel="stylesheet" href="/sol/consult.css" />
+
+    <style>
+      :root {
+        --paper: #faf7f2;
+        --ink: #2b2622;
+        --ink-soft: #6b625a;
+        --line: #e3dbd0;
+        --accent: #b4623a;
+        --accent-soft: #f2e4da;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background: var(--paper);
+        color: var(--ink);
+        font-family: 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif;
+        /* 60대도 읽는다. 본문 17px 밑으로 내리지 않는다. */
+        font-size: 17px;
+        line-height: 1.7;
+        -webkit-text-size-adjust: 100%;
+      }
+      .page { max-width: 640px; margin: 0 auto; padding: 32px 20px 80px; }
+
+      .intro { margin-bottom: 28px; }
+      .brandline {
+        font-size: 13px; letter-spacing: .18em; color: var(--accent);
+        font-weight: 700; margin: 0 0 14px;
+      }
+      .intro h1 {
+        font-size: clamp(26px, 6vw, 34px); line-height: 1.35;
+        margin: 0 0 12px; font-weight: 700; letter-spacing: -.02em;
+      }
+      .intro p { margin: 0; color: var(--ink-soft); }
+      .intro .reassure {
+        margin-top: 16px; padding: 12px 14px;
+        background: var(--accent-soft); border-radius: 10px;
+        font-size: 15px; color: #7a4227;
+      }
+
+      /* 화면 로직이 만드는 구조에 종이 느낌을 입힌다 */
+      .consult-wrap {
+        background: #fff; border: 1px solid var(--line); border-radius: 14px;
+        padding: 20px 18px; box-shadow: 0 1px 2px rgba(43,38,34,.04);
+      }
+      .progress-bar { margin-bottom: 18px; }
+      .progress-text { font-size: 13px; color: var(--ink-soft); }
+      .progress-track {
+        height: 5px; background: var(--line); border-radius: 99px;
+        overflow: hidden; margin-top: 7px;
+      }
+      .progress-fill { height: 100%; background: var(--accent); transition: width .25s ease; }
+
+      .messages { margin-bottom: 18px; }
+      .messages .msg {
+        background: var(--accent-soft); color: #533022;
+        padding: 12px 15px; border-radius: 14px 14px 14px 4px;
+        margin-bottom: 10px; max-width: 92%;
+      }
+      .messages .msg.user {
+        background: #f1efeb; color: var(--ink);
+        margin-left: auto; border-radius: 14px 14px 4px 14px;
+      }
+      .messages .msg.error { background: #fbe9e7; color: #8c2f1d; }
+
+      .step-area { margin-bottom: 18px; }
+      .step-area .step-title { font-size: 19px; font-weight: 700; margin: 0 0 6px; }
+      .step-area .step-hint { font-size: 14px; color: var(--ink-soft); margin: 0 0 14px; }
+
+      .step-area input[type='text'],
+      .step-area input[type='tel'],
+      .step-area textarea {
+        width: 100%; padding: 12px 13px;
+        border: 1px solid var(--line); border-radius: 9px;
+        /* ⚠️ 16px 밑으로 내리면 iOS 가 입력할 때 화면을 확대한다 */
+        font-size: 17px; font-family: inherit; color: var(--ink); background: #fff;
+      }
+      .step-area textarea { min-height: 96px; resize: vertical; }
+      .step-area input:focus, .step-area textarea:focus {
+        outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent;
+      }
+
+      .step-area label { display: block; margin-bottom: 9px; cursor: pointer; }
+      .step-area label input { margin-right: 9px; }
+
+      .actions { display: flex; gap: 10px; align-items: center; }
+      .btn-submit, .btn-skip {
+        font-family: inherit; font-size: 17px; font-weight: 700;
+        padding: 13px 24px; border-radius: 10px; cursor: pointer; border: 1px solid transparent;
+        min-height: 48px; /* 손가락으로 누르는 크기 */
+      }
+      .btn-submit { background: var(--accent); color: #fff; }
+      .btn-submit:disabled { background: #cbbfb4; cursor: default; }
+      .btn-skip { background: transparent; color: var(--ink-soft); border-color: var(--line); }
+
+      .foot { margin-top: 22px; font-size: 13px; color: var(--ink-soft); text-align: center; }
+    </style>
+  </head>
+
+  <body>
+    <main class="page">
+      <div class="intro">
+        <p class="brandline">JUST DESIGN</p>
+        <h1>가게 이야기를 들려주세요.</h1>
+        <p>들은 내용으로 홈페이지 시안 <strong>세 가지</strong>를 만들어 보여드립니다. 그중에 고르시면 됩니다.</p>
+        <p class="reassure">
+          어려운 말은 묻지 않습니다. 모르시는 건 <strong>건너뛰기</strong>를 누르셔도 됩니다.
+          사진이 없으셔도 저희가 만들어 드립니다.
+        </p>
+      </div>
+
+      <!-- 화면 로직이 이 안에 제 구조를 만든다 -->
+      <div id="consult">
+        <noscript>
+          <p>
+            상담은 자바스크립트가 켜져 있어야 진행됩니다. 불편하시면 전화로 도와드리겠습니다.
+          </p>
+        </noscript>
+      </div>
+
+      <p class="foot">JUST DESIGN · 저스트 홀딩스</p>
+    </main>
+
+    <script type="module">
+      import { init } from '/sol/consult-boot.js';
+      init({ wrapSelector: '#consult' });
+    </script>
+  </body>
+</html>

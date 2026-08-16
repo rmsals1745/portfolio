@@ -1,0 +1,18 @@
+# Cloudflare Pages 설정 — 이 파일은 **Pages Functions 의 바인딩** 때문에 생겼다.
+# 정적 사이트만이던 시절엔 필요 없었다(astro.config.mjs 주석 참고).
+#
+# ⚠️ 배포 명령은 `scripts\deploy.ps1` 이 정본이다. 거기서 `--branch main` 을 빼면
+#    preview 로 새고 apex 는 옛 버전으로 남는다(DEPLOY-BRANCH-TRAP).
+#
+# 필요한 환경변수(값은 여기 적지 않는다 — `wrangler pages secret put` 로 넣는다):
+#   LLM_API_BASE · LLM_API_KEY · LLM_MODEL   → Sol 이 말투를 입힐 때만 쓴다(없으면 대본 문구로 진행)
+#   TELEGRAM_BOT_TOKEN · TELEGRAM_CHAT_ID    → 상담 완료 알림(실패해도 상담은 성공 처리)
+
+name = "parkgeunmin"
+compatibility_date = "2026-08-16"
+pages_build_output_dir = "dist"
+
+# 상담 세션(24시간)과 확정된 상담지를 담는다. 상담지는 TTL 없음.
+[[kv_namespaces]]
+binding = "INTAKE"
+id = "1553fbfcb0de47fd909330d3448db9eb"
