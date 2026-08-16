@@ -1,0 +1,150 @@
+---
+/**
+ * 터미널 리플레이 — 실제 실행 기록을 글자로 재생한다.
+ *
+ * 영상 파일이 아니다. 용량이 거의 0 이고, 글자가 또렷하며(확대해도 안 뭉갬),
+ * 선택·검색·스크린리더가 전부 살아 있다. 무엇보다 **데이터가 진짜다.**
+ *
+ * 출처: 2026-08-16 실행 `20260816-160819-673161` 의 `.swarm_events.jsonl` 그대로.
+ * 각색하지 않았다 — 실패도 그대로 둔다. 실패를 지우면 게이트가 일했다는 증거도 같이 사라진다.
+ */
+
+type Line = {
+  /** 화면에 찍히는 글자 */
+  t: string;
+  /** 색 계열 — cmd(명령) · ok · fail · gold(최종) · dim(구분선) */
+  k?: 'cmd' | 'ok' | 'fail' | 'gold' | 'dim';
+};
+
+const LINES: Line[] = [
+  { t: '$ swarm_run_v6.py "포트폴리오 사례 사실 감사" --worker glen --verifier mimo', k: 'cmd' },
+  { t: '  baseline        ok        5b42c80' },
+  { t: '  ── 1회차', k: 'dim' },
+  { t: '  worker   glen   FAIL      exit=-1 · 1,815.9s', k: 'fail' },
+  { t: '  fallback kai    ok        exit=0', k: 'ok' },
+  { t: '  gate            FAIL      accept 토큰 부족 — FACT-AUDIT.md 0개', k: 'fail' },
+  { t: '  ── 2회차', k: 'dim' },
+  { t: '  worker   glen   ok        exit=0 · 132.1s', k: 'ok' },
+  { t: '  gate            ok        2 files' },
+  { t: '  bs_gate         ok        critical 0 / warning 0' },
+  { t: '  verify   mimo   APPROVE', k: 'gold' },
+  { t: '  ── 판정: approve', k: 'gold' },
+];
+---
+
+<figure class="term" data-term>
+  <figcaption class="head">
+    <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="ttl">실행 기록 <b>20260816-160819</b> — 각색 없음</span>
+  </figcaption>
+
+  <pre class="body"><code>{
+    LINES.map((l, i) => (
+      <span class={`ln ${l.k ?? ''}`} style={`--n:${i}`}>{l.t}</span>
+    ))
+  }</code></pre>
+
+  <figcaption class="note">
+    워커가 <b>30분 만에 죽었고</b>, 폴백이 받았지만 <b>산출물을 내지 않았습니다.</b>
+    그걸 사람이 아니라 <b>게이트가 잡아냈고</b> — 다시 돌린 워커가 132초에 끝냈으며,
+    <b>다른 프로바이더</b>가 검수해 통과시켰습니다. 이 과정에 사람은 없었습니다.
+  </figcaption>
+</figure>
+
+<style>
+  .term {
+    border: 1px solid var(--rule);
+    border-radius: var(--r-sm);
+    background: var(--paper2);
+    overflow: hidden;
+    margin-top: 30px;
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--rule-soft);
+    background: var(--paper3);
+  }
+  .dots { display: flex; gap: 6px; }
+  .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--rule); }
+  .ttl { font-size: 12px; color: var(--ink-faint); letter-spacing: .02em; }
+  .ttl b { color: var(--ink-dim); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  .body {
+    margin: 0;
+    padding: 18px 16px 20px;
+    overflow-x: auto;            /* 좁은 화면에서 줄이 접히지 않고 가로로 흐른다 */
+    font-size: 12.5px;
+    line-height: 1.85;
+    -webkit-overflow-scrolling: touch;
+  }
+  .body code {
+    display: block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    white-space: pre;
+    min-width: max-content;
+  }
+
+  .ln { display: block; color: var(--ink-dim); }
+  .ln.cmd  { color: var(--ink); }
+  .ln.ok   { color: var(--cool); }
+  .ln.fail { color: var(--accent); }
+  .ln.gold { color: var(--accent2); }
+  .ln.dim  { color: var(--ink-faint); }
+
+  /* 한 줄씩 찍힌다 — 화면에 들어왔을 때만 */
+  :global(html.js) .ln { opacity: 0; transform: translateY(3px); }
+  :global(html.js) .term.in .ln {
+    opacity: 1;
+    transform: none;
+    transition: opacity .22s ease calc(var(--n) * 190ms), transform .22s ease calc(var(--n) * 190ms);
+  }
+  /* 마지막 줄 뒤 커서 */
+  :global(html.js) .term.in .ln:last-child::after {
+    content: '▋';
+    margin-left: 6px;
+    animation: blink 1.1s steps(1) infinite;
+    animation-delay: calc(var(--n) * 190ms + .3s);
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .note {
+    padding: 15px 17px 17px;
+    border-top: 1px solid var(--rule-soft);
+    font-size: 13.5px;
+    line-height: 1.75;
+    color: var(--ink-dim);
+  }
+  .note b { color: var(--ink); font-weight: 650; }
+
+  @media (max-width: 640px) {
+    .body { font-size: 11.5px; padding: 14px 12px 16px; }
+    .note { font-size: 12.5px; padding: 13px 13px 15px; }
+  }
+
+  /* 정지 선호 — 전부 처음부터 보인다. 읽는 데 아무 지장이 없다 */
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.js) .ln { opacity: 1; transform: none; transition: none; }
+    :global(html.js) .term.in .ln:last-child::after { animation: none; }
+  }
+</style>
+
+<script>
+  const term = document.querySelector<HTMLElement>('[data-term]');
+  if (term) {
+    // 화면에 들어오면 찍기 시작한다. 나갔다 오면 다시 찍는다(사이트 전체 규칙과 동일).
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) term.classList.add('in');
+          else if (e.boundingClientRect.top > 0) term.classList.remove('in');
+        });
+      },
+      { threshold: 0.25 }
+    );
+    io.observe(term);
+  }
+</script>

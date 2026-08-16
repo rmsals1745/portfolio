@@ -1,0 +1,226 @@
+---
+/**
+ * 히어로 배경 — 오케스트레이션 메시 (3D)
+ *
+ * 첫 화면에서 **파는 물건 자체가 움직인다.** 노드는 실제로 굴리는 모델이고,
+ * 선의 굵기와 흐르는 빛은 `hermes\metrics\runs.jsonl` 210런의 **실측 핸드오프 횟수**다.
+ * 추상 덩어리가 아니라 실명·실측이라서 "AI 티" 가 나지 않는다 — 구체성이 그 해독제다.
+ *
+ * ⚠️ three.js 를 쓰지 않았다. 노드 5개·선 11개에 150KB 를 얹을 이유가 없고,
+ *    직접 투영하면 색·감쇠·펄스를 이 사이트 팔레트에 정확히 맞출 수 있다.
+ *    (원근 투영 · 깊이 정렬 · 깊이별 크기/불투명도 — 흉내가 아니라 실제 3D 연산이다.)
+ *
+ * ★ 이 캔버스는 **장식 레이어**다. 죽어도 히어로는 그대로 선다:
+ *   - 캔버스 실패 / JS 없음 → 배경이 비어 있을 뿐 글자·CTA 는 원래대로
+ *   - reduced-motion → 정지 화면 한 장만 그리고 루프를 돌지 않는다
+ *   - 화면 밖으로 나가면 rAF 정지 (배터리)
+ */
+---
+
+<canvas class="mesh" data-mesh aria-hidden="true"></canvas>
+
+<style>
+  .mesh {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;              /* .glow(-1) 위, .inner(1) 아래 */
+    pointer-events: none;    /* 글자 선택·CTA 클릭을 가리지 않는다 */
+    opacity: 0;
+    transition: opacity 1.2s ease;
+  }
+  .mesh.on { opacity: 1; }
+</style>
+
+<script>
+  type Node = {
+    id: string; label: string; sub: string;
+    x: number; y: number; z: number;
+    impl: number; verify: number; kind: 'lead' | 'worker' | 'verifier';
+  };
+
+  /* 실측치 — runs.jsonl 210런 (2026-08-16 집계).
+     impl = 구현 워커로 뛴 횟수, verify = 검수자로 뛴 횟수. */
+  const NODES: Node[] = [
+    { id: 'rex',  label: 'Rex',  sub: '지휘',        x:  0.00, y: -0.86, z:  0.00, impl:   0, verify:  0, kind: 'lead' },
+    { id: 'glen', label: 'Glen', sub: 'GLM 5.2',    x: -0.78, y:  0.16, z:  0.30, impl: 118, verify:  0, kind: 'worker' },
+    { id: 'mimo', label: 'Mick', sub: 'MiMo v2.5',  x:  0.72, y:  0.04, z: -0.26, impl:  20, verify: 76, kind: 'verifier' },
+    { id: 'kimi', label: 'Kimi', sub: 'Moonshot',   x:  0.26, y:  0.74, z:  0.56, impl:   9, verify: 28, kind: 'verifier' },
+    { id: 'kai',  label: 'Kai',  sub: 'DeepSeek',   x: -0.36, y:  0.62, z: -0.62, impl:  10, verify:  6, kind: 'worker' },
+  ];
+
+  /* [출발, 도착, 실제 횟수] — rex→* 는 배정, 그 외는 구현→검수 핸드오프 */
+  const EDGES: [string, string, number][] = [
+    ['rex', 'glen', 118], ['rex', 'mimo', 20], ['rex', 'kai', 10], ['rex', 'kimi', 9],
+    ['glen', 'mimo', 72], ['glen', 'kimi', 28], ['mimo', 'kimi', 7],
+    ['kai', 'mimo', 4], ['mimo', 'kai', 3], ['kimi', 'kai', 3], ['glen', 'kai', 2],
+  ];
+
+  const COLOR = {
+    lead:     '224,114,58',   // --accent  주황
+    worker:   '242,236,227',  // --ink     밝은 상아
+    verifier: '92,158,173',   // --cool    청
+  } as const;
+
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-mesh]');
+  const ctx = canvas?.getContext('2d');
+
+  if (canvas && ctx) {
+    const byId = Object.fromEntries(NODES.map((n) => [n.id, n]));
+    const maxCount = Math.max(...EDGES.map((e) => e[2]));
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    let W = 0, H = 0, DPR = 1;
+    let ry = 0.0;                  // 자동 회전(Y축)
+    let mx = 0, my = 0;            // 마우스 시차 목표
+    let cx = 0, cy = 0;            // 시차 현재값(감속 추종)
+    let raf = 0, visible = true, t0 = 0;
+
+    const resize = () => {
+      const r = canvas.getBoundingClientRect();
+      DPR = Math.min(2, window.devicePixelRatio || 1);
+      W = Math.max(1, Math.round(r.width));
+      H = Math.max(1, Math.round(r.height));
+      canvas.width = Math.round(W * DPR);
+      canvas.height = Math.round(H * DPR);
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    };
+
+    /** 3D → 2D 원근 투영. 카메라는 +Z 쪽에 있고 d 만큼 떨어져 있다. */
+    const project = (n: { x: number; y: number; z: number }) => {
+      const a = ry + cx * 0.9;
+      const ca = Math.cos(a), sa = Math.sin(a);
+      const x1 = n.x * ca - n.z * sa;
+      const z1 = n.x * sa + n.z * ca;
+
+      const b = -0.22 + cy * 0.5;          // 살짝 위에서 내려다본다
+      const cb = Math.cos(b), sb = Math.sin(b);
+      const y1 = n.y * cb - z1 * sb;
+      const z2 = n.y * sb + z1 * cb;
+
+      const d = 3.15;
+      const s = d / (d - z2);              // 가까울수록 크다
+      // 짧은 변 기준으로 크기를 잡아 어떤 비율에서도 잘리지 않게 한다
+      const R = Math.min(W, H) * 0.33;
+      return { X: W / 2 + x1 * s * R, Y: H / 2 + y1 * s * R, s, z: z2 };
+    };
+
+    const draw = (time: number) => {
+      raf = 0;
+      if (!t0) t0 = time;
+      const el = (time - t0) / 1000;
+
+      if (!still.matches) {
+        ry += 0.0016;
+        cx += (mx - cx) * 0.05;
+        cy += (my - cy) * 0.05;
+      }
+
+      ctx.clearRect(0, 0, W, H);
+
+      const P = Object.fromEntries(NODES.map((n) => [n.id, project(n)]));
+
+      // 뒤에 있는 선부터 그린다 (화가 알고리즘)
+      const edges = EDGES.map(([a, b, c]) => {
+        const pa = P[a], pb = P[b];
+        return { a, b, c, pa, pb, mid: (pa.z + pb.z) / 2 };
+      }).sort((u, v) => u.mid - v.mid);
+
+      for (const e of edges) {
+        const depth = Math.max(0.12, Math.min(1, (e.mid + 1.1) / 2.2));
+        const weight = e.c / maxCount;
+        ctx.beginPath();
+        ctx.moveTo(e.pa.X, e.pa.Y);
+        ctx.lineTo(e.pb.X, e.pb.Y);
+        ctx.strokeStyle = `rgba(224,114,58,${(0.05 + weight * 0.16) * depth})`;
+        ctx.lineWidth = (0.5 + weight * 2.1) * depth;
+        ctx.stroke();
+
+        // 핸드오프 펄스 — 자주 일어난 경로일수록 자주 흐른다
+        if (!still.matches) {
+          const n = 1 + Math.round(weight * 2);
+          for (let k = 0; k < n; k++) {
+            const speed = 0.16 + weight * 0.1;
+            const t = ((el * speed + k / n + e.c * 0.017) % 1);
+            const px = e.pa.X + (e.pb.X - e.pa.X) * t;
+            const py = e.pa.Y + (e.pb.Y - e.pa.Y) * t;
+            const fade = Math.sin(t * Math.PI);
+            ctx.beginPath();
+            ctx.arc(px, py, (1.1 + weight * 1.5) * depth, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(201,162,39,${0.5 * fade * depth})`;
+            ctx.fill();
+          }
+        }
+      }
+
+      // 노드도 뒤에서 앞으로
+      const order = [...NODES].sort((u, v) => P[u.id].z - P[v.id].z);
+      for (const n of order) {
+        const p = P[n.id];
+        const depth = Math.max(0.2, Math.min(1, (p.z + 1.1) / 2.2));
+        const load = Math.max(n.impl, n.verify);
+        const r = (5 + Math.sqrt(load) * 1.5) * p.s * 0.62;
+        const rgb = COLOR[n.kind];
+
+        const g = ctx.createRadialGradient(p.X, p.Y, 0, p.X, p.Y, r * 4.2);
+        g.addColorStop(0, `rgba(${rgb},${0.3 * depth})`);
+        g.addColorStop(1, `rgba(${rgb},0)`);
+        ctx.beginPath();
+        ctx.arc(p.X, p.Y, r * 4.2, 0, Math.PI * 2);
+        ctx.fillStyle = g;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(p.X, p.Y, r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${rgb},${0.5 * depth})`;
+        ctx.fill();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = `rgba(${rgb},${0.85 * depth})`;
+        ctx.stroke();
+
+        // 이름은 실명으로 — 여기가 "AI 티" 와 갈리는 지점이다
+        ctx.font = `600 ${Math.round(11.5 * p.s)}px ui-sans-serif, system-ui, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = `rgba(242,236,227,${0.82 * depth})`;
+        ctx.fillText(n.label, p.X, p.Y - r - 9);
+        ctx.font = `${Math.round(9.5 * p.s)}px ui-sans-serif, system-ui, sans-serif`;
+        ctx.fillStyle = `rgba(168,157,143,${0.6 * depth})`;
+        ctx.fillText(n.sub, p.X, p.Y + r + 14);
+      }
+
+      if (!still.matches && visible) raf = requestAnimationFrame(draw);
+    };
+
+    const kick = () => {
+      if (!raf && visible) raf = requestAnimationFrame(draw);
+    };
+
+    resize();
+    requestAnimationFrame(draw);
+    requestAnimationFrame(() => canvas.classList.add('on'));
+
+    window.addEventListener('resize', () => { resize(); t0 = 0; kick(); }, { passive: true });
+
+    // 마우스 시차 — 히어로 안에서만
+    const hero = canvas.closest('section') ?? document.body;
+    hero.addEventListener('pointermove', (e) => {
+      const ev = e as PointerEvent;
+      const r = hero.getBoundingClientRect();
+      mx = ((ev.clientX - r.left) / r.width - 0.5) * 0.8;
+      my = ((ev.clientY - r.top) / r.height - 0.5) * -0.5;
+      kick();
+    }, { passive: true });
+
+    // 화면 밖이면 멈춘다 — 배터리
+    new IntersectionObserver((es) => {
+      es.forEach((en) => {
+        visible = en.isIntersecting;
+        if (visible) kick();
+        else if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      });
+    }, { threshold: 0 }).observe(canvas);
+
+    still.addEventListener('change', () => { t0 = 0; kick(); });
+  }
+</script>

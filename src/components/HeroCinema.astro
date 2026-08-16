@@ -14,6 +14,8 @@
  * 갇힘 방지: 활주로는 1화면(100svh)뿐이고, 건너뛰는 길이 처음부터 보인다.
  */
 
+import HeroMesh from './HeroMesh.astro';
+
 interface Props {
   /** 히어로를 지나면 도달할 첫 섹션 앵커 */
   next: string;
@@ -23,6 +25,9 @@ const { next } = Astro.props;
 
 <section class="hero" data-hero>
   <div class="pin">
+    {/* 배경 3D — 글자보다 뒤(z-index 0). 죽어도 히어로는 그대로 선다 */}
+    <HeroMesh />
+
     <div class="wrap inner">
       <p class="eyebrow" data-step="0">AI 자동화 시스템 · 설계부터 운영까지</p>
 
@@ -63,14 +68,20 @@ const { next } = Astro.props;
 </section>
 
 <style>
-  /* 전체 높이 = 붙잡히는 1화면 + 조립용 활주로 1화면.
-     활주로는 pin 이 덮으므로 빈 화면이 생기지 않는다. */
-  .hero { position: relative; height: 200svh; }
+  /* 2026-08-16 — 활주로 1화면을 없앴다.
+     페이지 단위 스크롤(덱)로 바뀌면서, 「조립되는 것을 보기 위한」 화면 하나가
+     **정보 없는 페이지 한 장**이 되어 버렸다. 조립은 그대로 두되 스크롤이 아니라
+     시간이 굴린다 — 들어오자마자 저절로 맞춰지고, 첫 스크롤은 곧장 다음 페이지로 간다. */
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
 
   .pin {
-    position: sticky;
-    top: 0;
-    height: 100svh;
+    position: relative;
+    min-height: 100svh;
     display: grid;
     align-content: center;
     overflow: hidden;
@@ -323,32 +334,25 @@ const { next } = Astro.props;
     */
     const FREE = 2;
 
-    const sync = () => {
-      // 활주로 = 전체 높이 - 붙잡히는 1화면. 그 구간을 얼마나 지났는가.
-      const runway = hero.offsetHeight - window.innerHeight;
-      const p = runway > 0
-        ? Math.min(1, Math.max(0, -hero.getBoundingClientRect().top / runway))
-        : 1;
+    /* 시간이 조립한다 (2026-08-16 전환).
+       예전엔 스크롤이 굴렸는데, 페이지 덱에서는 그 스크롤이 곧 "다음 페이지"라
+       조립을 볼 기회가 없어진다. 라벨·첫 문장은 즉시, 나머지는 차례로 붙는다. */
+    steps.forEach((el, i) => {
+      if (i < FREE) {
+        el.classList.add('on');
+      } else {
+        setTimeout(() => el.classList.add('on'), 260 + (i - FREE) * 240);
+      }
+    });
 
-      // 1.25 를 곱해 활주로가 끝나기 전에 조립이 완성되게 — 끝까지 끌면 답답하다
-      const rest = steps.length - FREE;
-      const shown = FREE + Math.round(p * rest * 1.25);
-      steps.forEach((el, i) => el.classList.toggle('on', i < shown));
+    // 진행 막대는 활주로가 없어졌으니 의미가 없다 — 치운다
+    if (bar) bar.remove();
 
-      if (bar) bar.style.width = (p * 100).toFixed(1) + '%';
-      // 굴리기 시작하면 유도 표시를 거둔다
-      if (cue) cue.toggleAttribute('data-gone', p > 0.04);
-    };
-
-    let ticking = false;
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => { sync(); ticking = false; });
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
-    // sync 가 FREE 만큼을 알아서 켠다. 여기서 따로 켜면 sync 가 도로 꺼버린다.
-    requestAnimationFrame(sync);
+    // 유도 표시는 한 번이라도 굴리면 거둔다
+    if (cue) {
+      const hide = () => cue.toggleAttribute('data-gone', window.scrollY > 12);
+      window.addEventListener('scroll', hide, { passive: true });
+      hide();
+    }
   }
 </script>

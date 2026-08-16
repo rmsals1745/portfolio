@@ -8,15 +8,17 @@ interface Props {
   description: string;
   /** og:image 경로 (public 기준). 없으면 기본 스크린샷. */
   ogImage?: string;
+  /** 페이지 단위 스크롤(덱). 첫 화면에서만 쓴다 — 사례 상세는 읽는 문서라 일반 스크롤. */
+  deck?: boolean;
 }
 
-const { title, description, ogImage = '/shots/statusline.png' } = Astro.props;
+const { title, description, ogImage = '/shots/statusline.png', deck = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://parkgeunmin.pages.dev');
 const ogUrl = new URL(ogImage, Astro.site ?? 'https://parkgeunmin.pages.dev');
 ---
 
 <!doctype html>
-<html lang="ko">
+<html lang="ko" class={deck ? 'deck' : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -78,6 +80,38 @@ const ogUrl = new URL(ogImage, Astro.site ?? 'https://parkgeunmin.pages.dev');
       <slot />
     </main>
     <SiteFooter />
+
+    <style is:global>
+      /* ── 페이지 단위 스크롤(덱) ──────────────────────────────────
+         한 번 굴리면 한 페이지. `scroll-snap-stop: always` 가 "여러 장 훌쩍 넘어감"을 막는다.
+
+         ★ 안전장치 3겹 — 스냅은 잘못 쓰면 **내용을 가둔다**:
+           (1) 정지 선호(reduced-motion) 면 스냅을 끈다
+           (2) 화면이 낮으면(≤640px) 끈다 — 한 페이지가 화면보다 커져 갇히는 구간
+           (3) 페이지는 `height` 가 아니라 `min-height` 라, 내용이 넘치면 그냥 길어진다.
+               잘리는 경우가 생길 수 없다.
+         ────────────────────────────────────────────────────────── */
+      html.deck {
+        scroll-snap-type: y proximity;
+        scroll-behavior: smooth;
+      }
+      @media (min-height: 641px) and (pointer: fine) {
+        html.deck { scroll-snap-type: y mandatory; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html.deck { scroll-snap-type: none; scroll-behavior: auto; }
+      }
+      @media (max-height: 640px) {
+        html.deck { scroll-snap-type: none; }
+      }
+
+      /* ★ 푸터도 스냅 지점이어야 한다. 없으면 mandatory 스냅이 마지막 페이지로
+         계속 되돌려서 **푸터에 영영 못 닿는다**(연락처·사진이 거기 있다). */
+      html.deck > body > footer {
+        scroll-snap-align: start;
+        scroll-snap-stop: normal;
+      }
+    </style>
 
     <style>
       .skip {
