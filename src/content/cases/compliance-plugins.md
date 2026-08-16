@@ -7,9 +7,9 @@ role: 규칙 설계 · 구현
 status: archived
 badge: AX Hackathon 2026
 metrics:
-  - value: "3개"
-    label: 기업편 (커머스·헬스·트래블)
-  - value: "57/57"
+  - value: "2개"
+    label: 기업편 (커머스 · 헬스케어)
+  - value: "56/56"
     label: 회귀테스트 통과
   - value: "3축"
     label: 공개 근거 (공식·언론·고시)

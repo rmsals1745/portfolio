@@ -7,7 +7,7 @@ role: 배선 · 운용
 status: active
 badge: 로컬 추론
 metrics:
-  - value: "10장"
+  - value: "8장"
     label: 시안용 상품 사진 생성
 stack:
   - ComfyUI

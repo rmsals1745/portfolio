@@ -1,18 +1,18 @@
 ---
 title: 인생딸깍 (inlifeclick)
-tagline: AI 에이전트의 노동을 크레딧으로 파는 범용 콘텐츠·마케팅 자동화 서비스. 기획부터 결제·배포까지 혼자 끝냈습니다.
+tagline: AI 에이전트의 노동을 월 구독으로 파는 범용 콘텐츠·마케팅 자동화 서비스. 기획부터 결제·배포까지 혼자 끝냈습니다.
 category: product
 period: "2026.06 –"
 role: 기획 · 설계 · 구현 · 결제 · 배포 전 과정 단독
 status: live
 badge: Payment-enabled SaaS
 metrics:
-  - value: "12차"
-    label: D1 스키마 마이그레이션
-  - value: "4단"
-    label: 크레딧 충전팩 + 정기결제
+  - value: "40차"
+    label: 운영 중 무중단 D1 스키마 마이그레이션
+  - value: "구독"
+    label: 정기결제 단일 요금제
   - value: "3중"
-    label: 결제 복귀 안전망
+    label: 결제 안전망 (웹훅 검증 · 재조회 · 멱등 가드)
 stack:
   - Cloudflare Pages Functions
   - D1

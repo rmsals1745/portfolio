@@ -6,19 +6,13 @@ period: "2026.04 –"
 role: 설계 · 구현 단독
 status: active
 badge: Control Plane
-metrics:
-  - value: "486"
-    label: 커밋
-  - value: "1,464"
-    label: 관리 파일 수
+metrics: []
 stack:
   - TypeScript
-  - React
   - Node
-  - pnpm 모노레포
-  - Playwright
+  - npm
   - Cloudflare Workers
-tags: [컨트롤 플레인, 가시성, 모노레포]
+tags: [컨트롤 플레인, 가시성]
 weight: 80
 ---
 

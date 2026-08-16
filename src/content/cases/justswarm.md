@@ -11,11 +11,11 @@ metrics:
     label: 실행 런 (2026-07-18 → 08-09)
   - value: "17"
     label: 수정 요구가 나온 런
-  - value: "0"
-    label: 검수 우회 자동승인
+  - value: "2→0"
+    label: 검수 우회 자동승인 (가드 도입 후 103런 0건)
 stack:
   - Python
-  - Claude Agent SDK
+  - Claude Code CLI
   - GLM 5.2
   - MiMo v2.5-pro
   - DeepSeek

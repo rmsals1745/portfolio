@@ -7,7 +7,7 @@ role: 설계 · 구현 단독
 status: active
 badge: Always-on Automation
 metrics:
-  - value: "12건"
+  - value: "14건"
     label: OS 스케줄러로 분리된 잡
   - value: "3중"
     label: 백업 (로컬 · GitHub · 클라우드)
