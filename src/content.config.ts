@@ -91,7 +91,19 @@ const capabilities = defineCollection({
   schema: z.object({
     claim: z.string(),
     why: z.string(),
-    evidenceLabel: z.string(),
+    /** 근거가 되는 실물의 이름. 자작 고유명사(just*)가 그대로 들어온다. */
+    product: z.string(),
+    /**
+     * ★ 그 이름이 **뭐 하는 물건인지** 평이한 한 줄.
+     * 사장 지적(2026-08-16): "상품명만 듣고는 감도 안 온다."
+     * 처음 보는 사람에게 `justswarm` 은 아무 뜻도 없다. 이름 옆에 반드시 이게 붙는다.
+     */
+    productPlain: z.string(),
+    /** 카드에 크게 박히는 수치 — 3개까지. 넘으면 표가 되고 아무것도 안 읽힌다. */
+    facts: z
+      .array(z.object({ value: z.string(), label: z.string() }))
+      .max(3)
+      .default([]),
     evidence: z.string(),
     order: z.number().default(0),
   }),

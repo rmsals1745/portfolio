@@ -126,30 +126,28 @@ const skills = [
     구조 설명이 먼저 오면 자작 고유명사(just*)가 벽이 되어 거기서 이탈한다.
   */}
   {
-    capabilities.length > 0 && (
-      <section class="page" data-page>
+    capabilities.map((c, i) => (
+      <section class="page" data-page data-motion="flip">
         <div class="wrap">
+          {i === 0 && (
+            <Reveal>
+              <p class="over">저를 쓰면 무엇이 달라집니까 — 넷으로 답합니다</p>
+            </Reveal>
+          )}
           <Reveal>
-            <SectionHead
-              num="01"
-              title="저를 쓰면 무엇이 달라집니까"
-              sub="기술 나열 대신, 실제로 만든 것에서 역산한 역량입니다. 항목마다 근거가 되는 실물이 아래에 있습니다."
+            <CapabilityPage
+              num={`${String(i + 1).padStart(2, '0')} / ${String(capabilities.length).padStart(2, '0')}`}
+              claim={c.data.claim}
+              why={c.data.why}
+              product={c.data.product}
+              productPlain={c.data.productPlain}
+              facts={c.data.facts}
+              evidence={c.data.evidence}
             />
-          </Reveal>
-          <Reveal each stagger={140} class="caps">
-            {capabilities.map((c, i) => (
-              <CapabilityRow
-                num={String(i + 1).padStart(2, '0')}
-                claim={c.data.claim}
-                why={c.data.why}
-                evidenceLabel={c.data.evidenceLabel}
-                evidence={c.data.evidence}
-              />
-            ))}
           </Reveal>
         </div>
       </section>
-    )
+    ))
   }
 
   {/*
