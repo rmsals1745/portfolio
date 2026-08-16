@@ -36,11 +36,32 @@ const strata = ORDER.map((id) => {
   };
 }).filter((s) => s.shown.length > 0);
 
+/**
+ * 숫자는 "얼마나 많이 했나"(투입량)가 아니라 "그래서 뭐가 달라졌나"(결과)를 재야 한다.
+ * 커밋 수 · 파일 수는 채용관에게 오히려 경계 신호라 2026-08-16 전부 교체했다.
+ */
 const stats = [
-  { value: '700+', label: '4개월간 생산한 커밋<br>(자작 스웜 파이프라인 경유)' },
-  { value: '5', label: '실전 운용 중인<br>LLM 프로바이더' },
-  { value: '40+', label: '자작 에이전트 스킬<br>설계 · 운영' },
-  { value: '1,464', label: '단일 모노레포<br>관리 파일 수' },
+  { value: '4개월', label: '첫 줄부터 결제 붙은<br>서비스 출시까지' },
+  { value: '10', label: '지금도 돌아가고 있는<br>자작 시스템' },
+  { value: '0건', label: 'AI가 자기 작업을 스스로<br>통과시킨 사례 (52회 전수)' },
+  { value: '5', label: '한 곳이 죽어도 안 멈추게<br>묶어둔 LLM 프로바이더' },
+];
+
+/** 함께 일하는 두 경로. 손님이 둘(의뢰인 · 채용관)이라 여기서만 갈라준다. */
+const MAIL = 'rmsals1745@gmail.com';
+const tracks = [
+  {
+    h: '프로젝트를 맡기고 싶습니다',
+    p: 'AI 자동화 · 에이전트 파이프라인 · 결제 붙은 서비스를 기획부터 배포까지 맡깁니다. 요구사항이 아직 문장이 아니어도 됩니다 — 캐내는 것부터가 제 일입니다.',
+    cta: '의뢰 문의하기',
+    href: `mailto:${MAIL}?subject=${encodeURIComponent('[프로젝트 의뢰] ')}`,
+  },
+  {
+    h: '채용을 검토하고 있습니다',
+    p: 'AI 인프라 · 에이전트 시스템 · 풀스택. 혼자 굴러가는 시스템을 짓는 사람이라, 팀에서도 남이 안 하는 자리를 맡습니다. 이력서와 상세 근거는 요청 주시면 보냅니다.',
+    cta: '채용 문의하기',
+    href: `mailto:${MAIL}?subject=${encodeURIComponent('[채용 문의] ')}`,
+  },
 ];
 
 const skills = [
@@ -66,8 +87,8 @@ const skills = [
 ---
 
 <Base
-  title="박근민 — AI 인프라 / 에이전트 시스템 엔지니어"
-  description="에이전트를 굴리는 인프라를 짓고, 그 위에 제품을 올립니다. 멀티모델 오케스트레이션 엔진 · 컨트롤 플레인 · 결제 붙은 SaaS."
+  title="박근민 — AI 자동화 시스템 설계 · 구현"
+  description="AI 에이전트에게 일을 시키고, 그 결과를 믿을 수 있게 만듭니다. 4개월간 혼자 만들어 지금도 돌아가는 시스템 10개 — 결제 붙은 SaaS · 멀티모델 오케스트레이션 엔진 · 컨트롤 플레인."
 >
   <HeroCinema next="#scale" />
 
@@ -75,7 +96,7 @@ const skills = [
   <section class="beat" id="scale">
     <div class="wrap">
       <Reveal>
-        <p class="beat-lead">4개월 동안 혼자 만든 것의 규모입니다.</p>
+        <p class="beat-lead">4개월 동안 혼자, 여기까지 만들어 돌리고 있습니다.</p>
       </Reveal>
       <Reveal each stagger={110} class="stats">
         {
@@ -90,28 +111,20 @@ const skills = [
     </div>
   </section>
 
-  <section class="beat">
-    <div class="wrap">
-      <Reveal>
-        <SectionHead
-          num="01"
-          title="무엇을 어디까지 지었는가"
-          sub="분야를 나열한 게 아니라 쌓은 순서대로 놓았습니다. 아래층이 없으면 위층이 서지 않습니다 — 층을 누르면 그 층의 사례만 모아 봅니다."
-        />
-      </Reveal>
-      <StackDiagram counts={counts} />
-    </div>
-  </section>
-
+  {/*
+    역량이 층 단면보다 **앞**에 온다 (2026-08-16 순서 교체).
+    처음 온 사람은 "이 사람이 뭘 쌓았나" 보다 "나한테 뭘 해줄 수 있나" 를 먼저 묻는다.
+    구조 설명이 먼저 오면 자작 고유명사(just*)가 벽이 되어 거기서 이탈한다.
+  */}
   {
     capabilities.length > 0 && (
       <section class="beat">
         <div class="wrap">
           <Reveal>
             <SectionHead
-              num="02"
-              title="이 서비스들이 증명하는 것"
-              sub="기술 나열 대신, 만든 것에서 역산한 역량입니다. 각 항목마다 근거가 되는 실물이 아래에 있습니다."
+              num="01"
+              title="저를 쓰면 무엇이 달라집니까"
+              sub="기술 나열 대신, 실제로 만든 것에서 역산한 역량입니다. 항목마다 근거가 되는 실물이 아래에 있습니다."
             />
           </Reveal>
           <Reveal each stagger={140} class="caps">
@@ -129,6 +142,19 @@ const skills = [
       </section>
     )
   }
+
+  <section class="beat">
+    <div class="wrap">
+      <Reveal>
+        <SectionHead
+          num="02"
+          title="무엇을 어디까지 지었는가"
+          sub="분야를 나열한 게 아니라 쌓은 순서대로 놓았습니다. 아래층이 없으면 위층이 서지 않습니다 — 층을 누르면 그 층의 사례만 모아 봅니다."
+        />
+      </Reveal>
+      <StackDiagram counts={counts} />
+    </div>
+  </section>
 
   <section class="beat" id="work">
     <div class="wrap">
@@ -197,6 +223,31 @@ const skills = [
         <b>고객 앞에 직접 설 수 있는 엔지니어</b>입니다 — 요구사항을 통역해서 받는 게 아니라 직접 캐내고,
         만든 것을 직접 설명합니다. 지금은 그 상담 플레이북을 AI 에이전트의 대화 설계에 그대로 이식하고 있습니다.
       </p></Reveal>
+    </div>
+  </section>
+
+  {/*
+    손님이 둘이다 — 일을 맡기러 온 사람과, 사람을 찾으러 온 사람.
+    앞의 화면은 둘에게 똑같이 읽히도록 하나로 두고, **행동만** 여기서 갈라준다.
+    입구에서 갈라놓으면 화면이 두 벌이 되고 첫인상이 흐려진다.
+  */}
+  <section class="beat" id="contact">
+    <div class="wrap">
+      <Reveal><SectionHead num="06" title="함께 일하는 두 가지 방법" /></Reveal>
+      <Reveal each stagger={120} class="tracks">
+        {
+          tracks.map((t) => (
+            <a class="track" href={t.href}>
+              <h4>{t.h}</h4>
+              <p>{t.p}</p>
+              <span class="go">
+                {t.cta}
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M2.5 6.5h8M7 3l3.5 3.5L7 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </a>
+          ))
+        }
+      </Reveal>
     </div>
   </section>
 </Base>
@@ -284,6 +335,42 @@ const skills = [
   .bg { color: var(--ink-dim); font-size: 16px; max-width: 700px; line-height: 1.85; }
   .bg b { color: var(--ink); font-weight: 650; }
 
+  /* 두 갈래 — 카드가 아니라 문(門) 처럼 보이게 칸으로 나눈다 */
+  .tracks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    margin-top: 30px;
+    border-top: 1px solid var(--rule);
+  }
+  .track {
+    display: block;
+    padding: 32px 28px 28px;
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+    transition: background var(--t-fast);
+  }
+  .track + .track { border-left: 1px solid var(--rule); }
+  .track:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+  .track h4 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 12px;
+    letter-spacing: -.01em;
+  }
+  .track p { color: var(--ink-dim); font-size: 15px; line-height: 1.75; }
+  .track .go {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 20px;
+    font-size: 13.5px;
+    font-weight: 650;
+    color: var(--accent);
+  }
+  .track .go svg { transition: transform var(--t-fast); }
+  .track:hover .go svg { transform: translateX(3px); }
+
   .hl { color: var(--accent); }
 
   @media (max-width: 720px) {
@@ -293,6 +380,7 @@ const skills = [
     .stat:nth-child(2) { border-right: none; }
     .stat:nth-child(3), .stat:nth-child(4) { border-top: 1px solid var(--rule); }
     .stat:nth-child(3) { padding-left: 0; }
+    .track + .track { border-left: none; }
   }
 </style>
 
@@ -324,8 +412,10 @@ const skills = [
         if (e.isIntersecting) {
           run(el);
         } else if (e.boundingClientRect.top > 0) {
-          // 위로 올라가 화면 아래로 벗어났다 → 0 으로 되돌려 다시 셀 준비를 한다
-          el.textContent = '0';
+          // 위로 올라가 화면 아래로 벗어났다 → 0 으로 되돌려 다시 셀 준비를 한다.
+          // 접두·접미("4개월" 의 "개월")는 살려둔다 — 벗겨두면 되돌아올 때 맨 "0" 이 번쩍인다.
+          const m0 = (el.dataset.count || '').match(/^([^\d]*)([\d,]+)(.*)$/);
+          el.textContent = m0 ? m0[1] + '0' + m0[3] : '0';
         }
       });
     }, { threshold: 0.5 });
