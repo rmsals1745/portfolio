@@ -91,13 +91,27 @@ const ogUrl = new URL(ogImage, Astro.site ?? 'https://parkgeunmin.pages.dev');
            (3) 페이지는 `height` 가 아니라 `min-height` 라, 내용이 넘치면 그냥 길어진다.
                잘리는 경우가 생길 수 없다.
          ────────────────────────────────────────────────────────── */
+      /* ★ `mandatory` 를 쓰면 안 된다 (2026-08-16 실제 증상으로 확인).
+         mandatory 는 **반드시 스냅 지점 위에서만** 멈추게 한다. 그런데 화면보다 긴
+         페이지는 스냅 지점이 맨 위 하나뿐이라, 그 안에서는 멈출 수가 없어
+         브라우저가 **페이지를 통째로 건너뛰어** 다음 지점으로 끌고 간다
+         (= "뭉쳐서 한 번에 넘어감"). proximity 는 가까울 때만 붙잡으므로
+         긴 페이지는 자연스럽게 굴러가고, 짧은 페이지는 그대로 딱 맞는다.
+         `scroll-snap-stop: always` 가 남아 있어 **페이지를 건너뛰지도 않는다.** */
       html.deck {
         scroll-snap-type: y proximity;
-        scroll-behavior: smooth;
+        /* ★ 헤더 보정은 **여기 한 곳에서만** 한다.
+           tokens.css 는 앵커 점프용으로 `헤더+26px` 을 주는데, 페이지에도 같은 만큼
+           padding 을 넣으면 이중 보정이 되고, `min-height:100svh` 와 겹쳐
+           **스냅될 때마다 페이지 아래쪽이 화면 밖으로 밀린다** — 그러면 모든 페이지가
+           "화면보다 긴 페이지" 가 되어 뭉쳐 넘어간다(2026-08-16 증상의 진짜 원인). */
+        scroll-padding-top: var(--header-h);
+        /* 네이티브 스냅 애니메이션과 겹치면 끌리는 느낌이 난다.
+           점 클릭 이동은 scrollIntoView 가 따로 smooth 를 지정한다. */
+        scroll-behavior: auto;
       }
-      @media (min-height: 641px) and (pointer: fine) {
-        html.deck { scroll-snap-type: y mandatory; }
-      }
+      /* scroll-behavior: smooth 는 걸지 않는다 — 네이티브 스냅 애니메이션과 겹쳐
+         끌리는 느낌이 난다. 점 클릭 이동은 scrollIntoView 에서 따로 지정한다. */
       @media (prefers-reduced-motion: reduce) {
         html.deck { scroll-snap-type: none; scroll-behavior: auto; }
       }
