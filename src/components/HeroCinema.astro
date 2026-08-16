@@ -26,48 +26,30 @@ const { next } = Astro.props;
 <section class="hero" data-hero>
   <div class="pin">
     {/*
-      2단 (2026-08-16 사장 결정) — 글 왼쪽 / 메시 오른쪽.
-      배경으로 깔았을 때는 아무리 키우고 밝혀도 "뿌연 빛무리" 로만 읽혔다.
-      자리를 따로 주고 액자와 설명을 붙이는 순간 **장식이 아니라 도표**가 된다.
+      ★ 메시는 **화면 전체에 깔리는 배경**이다 (2026-08-16 사장 재확인, 사진으로 지목).
+        한때 액자(2단)로 옮겼다가 되돌렸다 — 옮긴 근거였던 "배경으로는 안 보인다" 는
+        **오진**이었다. 배경 탭에서 rAF 가 멈춰 스크린샷이 비었던 것이고,
+        실제로는 화면을 가로지르는 큰 그림으로 잘 나오고 있었다.
+        액자에 가두면 노드가 좁은 곳에 몰려 서로 겹치기까지 한다.
     */}
+    <HeroMesh />
+
     <div class="wrap inner">
-      <div class="say">
-        <p class="eyebrow" data-step="0">AI 자동화 시스템 · 설계부터 운영까지</p>
+      <p class="eyebrow" data-step="0">AI 자동화 시스템 · 설계부터 운영까지</p>
 
-        <h1>
-          <span class="ln" data-step="1"><span>AI 에이전트에게 <em>일을 시키고</em>,</span></span>
-          <span class="ln" data-step="2"><span>그 결과를 믿을 수 있게 만듭니다.</span></span>
-        </h1>
+      <h1>
+        <span class="ln" data-step="1"><span>AI 에이전트에게 <em>일을 시키고</em>,</span></span>
+        <span class="ln" data-step="2"><span>그 결과를 믿을 수 있게 만듭니다.</span></span>
+      </h1>
 
-        <p class="lede" data-step="3">
-          4개월간 혼자 만들어, 지금도 돌아가고 있는 시스템 10개.
-        </p>
+      <p class="lede" data-step="3">
+        4개월간 혼자 만들어, 지금도 돌아가고 있는 시스템 10개.
+      </p>
 
-        <a class="cta" data-step="4" href={next}>
-          무엇을 만들었는지 보기
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 2.5v9M3.5 8L7 11.5 10.5 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-      </div>
-
-      <figure class="panel" data-step="2">
-        <figcaption class="panel-head">
-          <span class="dot" aria-hidden="true"></span>
-          지금 굴리고 있는 모델과 그 사이 핸드오프
-        </figcaption>
-
-        <div class="panel-stage">
-          <HeroMesh />
-        </div>
-
-        <figcaption class="panel-foot">
-          선의 굵기와 흐르는 빛은 <b>실행 210회 실측</b>입니다 — 예시가 아니라 기록입니다.
-          <span class="legend">
-            <span><i class="k-lead"></i>지휘</span>
-            <span><i class="k-worker"></i>구현</span>
-            <span><i class="k-verifier"></i>검수</span>
-          </span>
-        </figcaption>
-      </figure>
+      <a class="cta" data-step="4" href={next}>
+        무엇을 만들었는지 보기
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 2.5v9M3.5 8L7 11.5 10.5 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
     </div>
 
     {/*
@@ -182,90 +164,11 @@ const { next } = Astro.props;
     50%      { transform: translate3d(6%, -5%, 0) scale(1.12); }
   }
 
-  /* ── 2단: 글 왼쪽 · 메시 오른쪽 ── */
-  .inner {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    /* 글 쪽을 넉넉히 — 반반으로 나누면 제목이 「일을 / 시키고,」 처럼 어색하게 꺾인다 */
-    grid-template-columns: minmax(0, 1.18fr) minmax(0, 0.82fr);
-    gap: clamp(26px, 3.4vw, 54px);
-    align-items: center;
-  }
-  /* 2단을 쓰려면 통이 넓어야 한다 — 기본 폭으로 나누면 양쪽 다 좁아진다 */
-  .pin .wrap { max-width: min(1300px, 92vw); }
+  .inner { position: relative; z-index: 1; }
 
-  .panel {
-    position: relative;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    gap: 12px;
-    padding: 14px 15px 15px;
-    border: 1px solid var(--rule);
-    border-radius: var(--r-sm);
-    background: linear-gradient(180deg, var(--paper2), var(--paper));
-    min-width: 0;
-  }
-  /* 캔버스(absolute inset:0)가 기댈 자리 */
-  .panel-stage {
-    position: relative;
-    aspect-ratio: 4 / 3;
-    min-height: 230px;
-    max-height: 50svh;
-    overflow: hidden;
-    border-radius: 6px;
-  }
-
-  .panel-head {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    font-size: 12px;
-    color: var(--ink-dim);
-    letter-spacing: .01em;
-  }
-  .panel-head .dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
-    flex: 0 0 auto;
-  }
-
-  .panel-foot {
-    font-size: 11.5px;
-    line-height: 1.65;
-    color: var(--ink-faint);
-    word-break: keep-all;
-  }
-  .panel-foot b { color: var(--ink-dim); font-weight: 650; }
-
-  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 9px; }
-  .legend span { display: inline-flex; align-items: center; }
-  .legend i {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    margin-right: 6px;
-    display: inline-block;
-  }
-  .k-lead { background: var(--accent); }
-  .k-worker { background: var(--ink); }
-  .k-verifier { background: var(--cool); }
-
-  /* 좁은 화면 — 글 먼저 읽고 그림은 아래로. 그림은 낮게 눕힌다 */
-  @media (max-width: 1000px) {
-    .inner { grid-template-columns: 1fr; gap: 24px; }
-    .panel-stage { aspect-ratio: 16 / 10; min-height: 190px; max-height: 34svh; }
-  }
 
   .eyebrow { margin-bottom: 26px; }
-  h1 {
-    margin-bottom: 30px;
-    /* 2단이 되면서 글 칸이 좁아졌다 — 전역 크기 그대로 두면
-       「AI 에이전트에게 일을 / 시키고,」 처럼 한 줄이 두 줄로 꺾인다. */
-    font-size: clamp(27px, 3.3vw, 45px);
-    line-height: 1.26;
-  }
+  h1 { margin-bottom: 30px; }
   h1 em { font-style: normal; color: var(--accent); }
 
   /* 줄 단위로만 움직인다 — 줄 안쪽 텍스트는 손대지 않으니 조판이 깨질 수 없다 */
@@ -308,8 +211,6 @@ const { next } = Astro.props;
     transition: opacity .45s ease, transform .45s ease;
   }
   .cue[data-gone] { opacity: 0; transform: translateY(10px); }
-  /* 2단에서는 가운데에 두면 오른쪽 액자와 겹친다 — 글 쪽(왼쪽 절반) 가운데로 */
-  @media (min-width: 1001px) { .cue { right: 46%; bottom: 5vh; } }
 
   /* 마우스 — 로드 순간부터 계속 구른다. 정지 화면이면 고장으로 읽힌다. */
   .mouse {
