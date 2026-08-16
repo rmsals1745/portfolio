@@ -11,7 +11,7 @@ export const CATEGORIES = [
     id: 'agent-infra',
     label: '에이전트 인프라',
     en: 'Agent Infrastructure',
-    blurb: '에이전트를 조직이 매일 그 위에서 일하게 만드는 층 — 오케스트레이션 엔진, 컨트롤 플레인, 내구성 워크플로.',
+    blurb: '에이전트를 하루하루 실제로 굴리기 위한 바닥 — AI끼리 서로 검사하게 만드는 엔진, 작업 관제 화면, 중단돼도 이어지는 워크플로.',
     accent: 'var(--accent)',
   },
   {

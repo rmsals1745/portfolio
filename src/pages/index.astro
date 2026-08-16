@@ -6,7 +6,7 @@ import HeroCinema from '../components/HeroCinema.astro';
 import Reveal from '../components/Reveal.astro';
 import StackDiagram from '../components/StackDiagram.astro';
 import CaseCard from '../components/CaseCard.astro';
-import CapabilityRow from '../components/CapabilityRow.astro';
+import CapabilityPage from '../components/CapabilityPage.astro';
 import TerminalReplay from '../components/TerminalReplay.astro';
 import PullQuote from '../components/PullQuote.astro';
 import { CATEGORIES } from '../content.config';
@@ -97,12 +97,12 @@ const skills = [
 <Base
   deck
   title="박근민 — AI 자동화 시스템 설계 · 구현"
-  description="AI 에이전트에게 일을 시키고, 그 결과를 믿을 수 있게 만듭니다. 4개월간 혼자 만들어 지금도 돌아가는 시스템 10개 — 결제 붙은 SaaS · 멀티모델 오케스트레이션 엔진 · 컨트롤 플레인."
+  description="AI 에이전트에게 일을 시키고, 그 결과를 믿을 수 있게 만듭니다. 4개월간 혼자 만들어 지금도 돌아가는 시스템 10개 — 결제 붙은 구독 서비스, AI끼리 서로 검사하게 만드는 엔진, 에이전트 관제 화면."
 >
   <HeroCinema next="#scale" />
 
   {/* 숫자만 있는 한 화면. 히어로와 섞으면 사진이 잘리고 밀도가 터진다. */}
-  <section class="page" data-page id="scale">
+  <section class="page" data-page data-motion="rise" id="scale">
     <div class="wrap">
       <Reveal>
         <p class="beat-lead">4개월 동안 혼자, 여기까지 만들어 돌리고 있습니다.</p>
@@ -154,7 +154,7 @@ const skills = [
     역량 바로 다음에 증거를 붙인다. 01 의 첫 주장이 "믿을 수 없는 출력을 믿을 수 있게" 인데,
     말로 한 번 더 설명하는 것보다 **실제 실행 기록 한 판**이 짧고 세다.
   */}
-  <section class="page" data-page>
+  <section class="page" data-page data-motion="type">
     <div class="wrap">
       <Reveal>
         <p class="beat-lead">말로 하면 길어지니, 실제로 돌아간 것을 한 판 보여드립니다.</p>
@@ -163,7 +163,7 @@ const skills = [
     </div>
   </section>
 
-  <section class="page" data-page>
+  <section class="page" data-page data-motion="stack">
     <div class="wrap">
       <Reveal>
         <SectionHead
@@ -183,7 +183,12 @@ const skills = [
   */}
   {
     strata.map((s, si) => (
-      <section class="page" data-page id={si === 0 ? 'work' : undefined}>
+      <section
+        class="page"
+        data-page
+        data-motion={si % 2 === 0 ? 'slide-l' : 'slide-r'}
+        id={si === 0 ? 'work' : undefined}
+      >
         <div class="wrap">
           {si === 0 && (
             <Reveal>
@@ -218,7 +223,7 @@ const skills = [
     ))
   }
 
-  <section class="page" data-page>
+  <section class="page" data-page data-motion="zoom">
     <div class="wrap">
       <Reveal>
       <PullQuote>
@@ -229,7 +234,7 @@ const skills = [
     </div>
   </section>
 
-  <section class="page" data-page>
+  <section class="page" data-page data-motion="rise">
     <div class="wrap">
       <Reveal><SectionHead num="04" title="기술 스택" /></Reveal>
       <Reveal each stagger={80} class="skills">
@@ -245,7 +250,7 @@ const skills = [
     </div>
   </section>
 
-  <section class="page" data-page>
+  <section class="page" data-page data-motion="fade">
     <div class="wrap">
       <Reveal><SectionHead num="05" title="배경" /></Reveal>
       <Reveal><p class="bg">
@@ -262,7 +267,7 @@ const skills = [
     앞의 화면은 둘에게 똑같이 읽히도록 하나로 두고, **행동만** 여기서 갈라준다.
     입구에서 갈라놓으면 화면이 두 벌이 되고 첫인상이 흐려진다.
   */}
-  <section class="page" data-page id="contact">
+  <section class="page" data-page data-motion="gate" id="contact">
     <div class="wrap">
       <Reveal><SectionHead num="06" title="함께 일하는 두 가지 방법" /></Reveal>
       <Reveal each stagger={120} class="tracks">
@@ -314,12 +319,79 @@ const skills = [
      --off = 화면 중앙 기준 위치(-1 위 · 0 중앙 · +1 아래), --a = |--off|.
      스크롤할 때마다 JS 가 채운다. **값이 없으면 0 이라 평면 그대로** —
      스크립트가 죽어도 화면은 멀쩡하다(이 사이트의 기본 규칙). */
+  /* ── 페이지마다 다른 연출 ──────────────────────────────────────
+     사장 지적(2026-08-16): *"다 똑같은 페이지로 취급해서 같은 공식으로 넘기면 안 된다."*
+     맞다. 숫자판과 긴 글과 한 문장짜리 화면이 같은 식으로 움직이면 전부 밋밋해진다.
+     화면이 **무엇을 하는 화면인지**에 따라 움직임을 갈랐다 — `data-motion`.
+     ──────────────────────────────────────────────────────────── */
+
+  /* 기본값 (data-motion 이 없을 때) */
   :global(html.js) .page > .wrap {
-    transform:
-      rotateX(calc(var(--off, 0) * -6deg))
-      translateZ(calc(var(--a, 0) * -150px))
-      scale(calc(1 - var(--a, 0) * 0.03));
     opacity: calc(1 - var(--a, 0) * 0.7);
+    transform: translateY(calc(var(--off, 0) * 4%));
+  }
+
+  /* rise — 아래에서 솟는다. 숫자·스택처럼 "쌓인 것" 을 세우는 화면 */
+  :global(html.js) .page[data-motion='rise'] > .wrap {
+    transform: translateY(calc(var(--off, 0) * 9%)) scale(calc(1 - var(--a, 0) * 0.05));
+  }
+
+  /* flip — 카드가 돌아앉는다. 역량 네 장은 각각 "한 장의 카드" 다 */
+  :global(html.js) .page[data-motion='flip'] > .wrap {
+    transform:
+      rotateY(calc(var(--off, 0) * 15deg))
+      translateX(calc(var(--off, 0) * 5%))
+      translateZ(calc(var(--a, 0) * -170px));
+  }
+
+  /* type — 글자를 읽어야 하는 화면. 움직임을 최소로 둔다 */
+  :global(html.js) .page[data-motion='type'] > .wrap {
+    transform: translateY(calc(var(--off, 0) * 4%));
+    opacity: calc(1 - var(--a, 0) * 0.85);
+  }
+
+  /* stack — 층 단면. 깊이에서 앞으로 나온다(그림 자체가 층이라 Z 를 크게) */
+  :global(html.js) .page[data-motion='stack'] > .wrap {
+    transform: rotateX(calc(var(--off, 0) * -13deg)) translateZ(calc(var(--a, 0) * -400px));
+  }
+
+  /* slide — 사례. 층마다 좌우 교대로 밀려 들어온다(넘긴다는 느낌) */
+  :global(html.js) .page[data-motion='slide-l'] > .wrap {
+    transform: translateX(calc(var(--a, 0) * -10%)) rotateY(calc(var(--a, 0) * 10deg));
+  }
+  :global(html.js) .page[data-motion='slide-r'] > .wrap {
+    transform: translateX(calc(var(--a, 0) * 10%)) rotateY(calc(var(--a, 0) * -10deg));
+  }
+
+  /* zoom — 한 문장짜리 화면. 크게 들어와 제자리에 선다 */
+  :global(html.js) .page[data-motion='zoom'] > .wrap {
+    transform: scale(calc(1 + var(--a, 0) * 0.22));
+    opacity: calc(1 - var(--a, 0));
+  }
+
+  /* fade — 읽는 글. 움직이면 방해되니 밝기만 바뀐다 */
+  :global(html.js) .page[data-motion='fade'] > .wrap {
+    transform: none;
+    opacity: calc(1 - var(--a, 0) * 0.9);
+  }
+
+  /* gate — 마지막 화면. 두 개의 문이 양쪽에서 닫히듯 모인다 */
+  :global(html.js) .page[data-motion='gate'] > .wrap { transform: none; }
+  :global(html.js) .page[data-motion='gate'] .track:first-child {
+    transform: translateX(calc(var(--a, 0) * -16%));
+  }
+  :global(html.js) .page[data-motion='gate'] .track:last-child {
+    transform: translateX(calc(var(--a, 0) * 16%));
+  }
+
+  /* 역량 첫 장의 머리말 — 섹션 제목을 크게 세우면 주장과 제목이 둘 다 커져 싸운다 */
+  .over {
+    font-size: 12px;
+    letter-spacing: .16em;
+    color: var(--ink-faint);
+    margin-bottom: 30px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule-soft);
   }
 
   /* 정지 선호 — 연출을 걷어낸다. 정보는 하나도 안 줄어든다 */
