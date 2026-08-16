@@ -23,7 +23,7 @@ weight: 80
 
 - **git worktree 기반 격리 개발 워크플로 자동화** — 포트 자동 할당, dev 서버 라이프사이클,
   좀비 프로세스 감사 · 철거까지 한 커맨드로 처리합니다.
-- pnpm 모노레포(TypeScript), Vitest + Playwright, Cloudflare Worker 모바일 뷰어(PWA/TWA).
+- TypeScript · npm, 자작 E2E 검사기(`room_e2e.mjs`), Cloudflare Worker 모바일 뷰어(PWA/TWA).
 
 ## 알아낸 것
 
