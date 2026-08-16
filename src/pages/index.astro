@@ -86,7 +86,9 @@ const skills = [
   { h: 'Commerce', p: '포트원 V2, 빌링키 정기결제, 크레딧 원장, 환불 정산, 통신판매업 · PG 심사 요건' },
   {
     h: 'Generative Media',
-    p: 'ComfyUI 로컬 추론(Z-Image-Turbo · LoRA · ControlNet · VideoX-Fun), Whisper STT, TTS 파이프라인',
+    // VideoX-Fun 은 뺐다 — 커스텀 노드 코드는 있는데 가중치가 없어 **지금 돌려 보일 수 없다**(8/16 감사).
+    // 데모 못 하는 항목은 면접에서 부채가 된다. 가중치를 받으면 되살릴 것.
+    p: 'ComfyUI 로컬 추론(Z-Image-Turbo · LoRA · ControlNet), Whisper STT, TTS 파이프라인',
   },
 ];
 ---

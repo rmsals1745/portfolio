@@ -27,10 +27,14 @@ const strata = ORDER.map((id) => ({ ...byId[id], count: counts[id] ?? 0 }));
     <span class="axis-bottom">토대</span>
   </div>
 
-  <ul class="strata">
+  <ul class="strata" data-scene>
     {
       strata.map((s, i) => (
-        <li class="stratum" style={`--tint:${s.accent}; --d:${i * 90}ms`}>
+        <li class="stratum" style={`--tint:${s.accent}; --d:${i * 90}ms; --i:${i}`}>
+          {/* 판 하나 = 두께(edge) + 면(box). 파이프는 판 밖에 둔다 —
+              안에 두면 두께가 파이프 길이만큼 늘어나 옆면이 어긋난다. */}
+          <div class="plate">
+          <span class="edge" aria-hidden="true" />
           <div class="box" data-box>
             <button class="toggle" data-toggle aria-expanded="false" aria-controls={`s-${s.id}`}>
               <span class="label">{s.label}</span>
@@ -50,6 +54,7 @@ const strata = ORDER.map((id) => ({ ...byId[id], count: counts[id] ?? 0 }));
                 </a>
               </div>
             </div>
+          </div>
           </div>
 
           {i < strata.length - 1 && <div class="pipe" aria-hidden="true" />}
@@ -90,7 +95,68 @@ const strata = ORDER.map((id) => ({ ...byId[id], count: counts[id] ?? 0 }));
   }
 
   .strata { list-style: none; }
-  .stratum { display: block; }
+  .stratum { display: block; position: relative; }
+
+  /* ───────────────────────────────────────────────────────────────
+     입체 층 단면 (2026-08-16)
+
+     three.js 를 쓰지 않은 이유: 층 이름·건수·링크는 **진짜 DOM**이어야 한다
+     (읽기·선택·검색·스크린리더·기존 아코디언 전부 그대로 살려야 하므로).
+     CSS 3D 면 번들 0KB 이고, 폴백이 곧 원래 화면이다.
+
+     --p = 스크롤 진행도 0→1.  0 = 눌려 쌓인 상태(기울어짐), 1 = 평평하게 펴진 상태.
+     ★ **기본값은 1(=읽을 수 있는 평면)** 이다. JS 가 죽든 reduced-motion 이든
+       no-JS 든 사용자는 항상 멀쩡한 화면을 본다. 3D 는 얹는 것이지 전제가 아니다.
+     ────────────────────────────────────────────────────────────── */
+  .diagram { --p: 1; }
+
+  @media (min-width: 641px) and (prefers-reduced-motion: no-preference) {
+    /* 좁은 화면에서는 기울이지 않는다 — 가로 넘침 위험이 이득보다 크다 */
+    :global(html.js) .strata {
+      perspective: 1400px;
+      perspective-origin: 50% 30%;
+      /* 눌릴 때 판들이 위로 최대 66px(=3×22) 올라간다. 그대로 두면 섹션 제목을
+         파고들므로 덩어리 전체를 절반만큼 내려 제자리에서 접히게 만든다. */
+      transform: translateY(calc((1 - var(--p)) * 33px));
+      transition: transform .18s linear;
+    }
+    :global(html.js) .plate {
+      position: relative;
+      transform-style: preserve-3d;
+    }
+    :global(html.js) .strata > .stratum {
+      transform-style: preserve-3d;
+      /* 눌린 상태에서는 위 층이 아래로 내려앉아 4장이 한 덩어리로 겹친다 */
+      transform:
+        rotateX(calc((1 - var(--p)) * 24deg))
+        translateY(calc((1 - var(--p)) * var(--i) * -22px))
+        translateZ(calc((1 - var(--p)) * var(--i) * -26px));
+      transition: transform .18s linear;
+    }
+    /* 손을 올리면 그 판만 앞으로 떠오른다 — 만질 수 있는 물건이라는 신호 */
+    :global(html.js) .strata > .stratum:hover {
+      transform:
+        rotateX(calc((1 - var(--p)) * 24deg))
+        translateY(calc((1 - var(--p)) * var(--i) * -22px))
+        translateZ(calc((1 - var(--p)) * var(--i) * -26px + var(--p) * 20px));
+    }
+    :global(html.js) .edge {
+      position: absolute;
+      inset: 0;
+      border-radius: var(--r-sm);
+      background: color-mix(in srgb, var(--tint) 30%, var(--paper2));
+      /* 뒤로 밀고 아래로 내리면 기울어진 공간에서 '판의 옆면'으로 읽힌다 */
+      transform: translateZ(-13px) translateY(7px);
+      opacity: calc(1 - var(--p) * 0.55);
+      pointer-events: none;
+    }
+  }
+
+  /* 3D 가 꺼진 모든 경우(모바일·reduced-motion·no-JS)에는 두께가 없어야 한다 */
+  .edge { display: none; }
+  @media (min-width: 641px) and (prefers-reduced-motion: no-preference) {
+    :global(html.js) .edge { display: block; }
+  }
 
   /* 등장 — 아래에서 하나씩 올라온다 */
   .box {
@@ -246,6 +312,40 @@ const strata = ORDER.map((id) => ({ ...byId[id], count: counts[id] ?? 0 }));
         btn.setAttribute('aria-expanded', open ? 'false' : 'true');
       });
     });
+
+    /* 입체 층 단면 — 스크롤 진행도(--p) 를 물려준다.
+       0 = 4장이 눌려 겹친 채 기울어짐 / 1 = 평평하게 펴져 읽히는 상태.
+
+       ★ CSS 기본값이 이미 1(평면)이므로, 여기서 아무 일도 안 일어나도 화면은 멀쩡하다.
+         3D 는 더하는 것이지 화면이 서기 위한 조건이 아니다. 좁은 화면·reduced-motion 은
+         아예 손대지 않는다(가로 넘침 위험 > 이득). */
+    const wide = window.matchMedia('(min-width: 641px)');
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    let ticking = false;
+    const applyDepth = () => {
+      ticking = false;
+      if (!wide.matches || still.matches) {
+        diagram.style.removeProperty('--p');
+        return;
+      }
+      const r = diagram.getBoundingClientRect();
+      const vh = window.innerHeight || 1;
+      // 화면 아래에 막 걸쳤을 때 0 → 화면 위쪽 45% 지점에 닿으면 1
+      const p = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.55)));
+      diagram.style.setProperty('--p', p.toFixed(3));
+    };
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(applyDepth);
+    };
+
+    applyDepth();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    wide.addEventListener('change', applyDepth);
+    still.addEventListener('change', applyDepth);
 
     // 처음 한 번 맨 위를 열어 "눌리는 것" 임을 알린다
     if (toggles[0] && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {

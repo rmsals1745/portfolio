@@ -32,7 +32,7 @@ weight: 85
       <tr><td class="k">HermesCron_ApiKeyCheck</td><td class="v"><span class="ok">Ready</span></td><td class="v" style="color:var(--ink-faint)">last 08-09 07:40</td></tr>
       <tr><td class="k">HermesCron_StudyDaemon</td><td class="v"><span class="ok">Ready</span></td><td class="v" style="color:var(--ink-faint)">last 08-03 19:21</td></tr>
       <tr><td class="k">HermesCron_ProjectArchiver</td><td class="v" style="color:var(--ink-faint)">Disabled</td><td class="v" style="color:var(--ink-faint)">last 08-05 06:56</td></tr>
-      <tr><td class="k" style="color:var(--ink-faint)">… 외 7건</td><td class="v"></td><td class="v"></td></tr>
+      <tr><td class="k" style="color:var(--ink-faint)">… 외 10건</td><td class="v"></td><td class="v"></td></tr>
     </table>
   </div>
 </div>

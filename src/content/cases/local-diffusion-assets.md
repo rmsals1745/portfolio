@@ -14,7 +14,6 @@ stack:
   - Z-Image-Turbo
   - LoRA
   - ControlNet
-  - VideoX-Fun
 tags: [확산모델, 로컬 추론, 자산 생성]
 weight: 40
 ---

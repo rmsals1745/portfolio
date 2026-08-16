@@ -4,7 +4,7 @@ tagline: 지시 한 번에 에이전트 3인이 같은 소재로 취향이 다�
 category: applied
 period: "2026.08"
 role: 설계 · 배선 · 검증 단독
-status: live
+status: active
 badge: Agent Pipeline
 metrics:
   - value: "3안"
