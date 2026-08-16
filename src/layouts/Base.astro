@@ -119,6 +119,14 @@ const ogUrl = new URL(ogImage, Astro.site ?? 'https://parkgeunmin.pages.dev');
         html.deck { scroll-snap-type: none; }
       }
 
+      /* ★ 전환 연출이 `translateX(±10%)` 로 내용을 옆으로 미는 페이지가 있다(사례 slide-l/r).
+         밀려난 만큼이 문서 폭에 더해져 **가로 스크롤바가 생긴다**(2026-08-16 실측: 2029 vs 1692).
+         `clip` 은 `hidden` 과 달리 스크롤 컨테이너를 새로 만들지 않아 sticky 를 깨지 않는다. */
+      /* ⚠️ `body` 에 걸면 안 먹는다 — 뷰포트 스크롤러는 `html` 이다(실측: body 에 clip 을 줘도
+         가로로 337px 밀렸고, html 에 주니 0 이 됐다). `clip` 은 `hidden` 과 달리
+         스크롤 컨테이너를 새로 만들지 않아 스냅·sticky 를 깨지 않는다. */
+      html.deck { overflow-x: clip; }
+
       /* ★ 푸터도 스냅 지점이어야 한다. 없으면 mandatory 스냅이 마지막 페이지로
          계속 되돌려서 **푸터에 영영 못 닿는다**(연락처·사진이 거기 있다). */
       html.deck > body > footer {

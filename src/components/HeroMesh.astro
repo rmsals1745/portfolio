@@ -101,8 +101,10 @@
 
       const d = 3.15;
       const s = d / (d - z2);              // 가까울수록 크다
-      // 짧은 변 기준으로 크기를 잡아 어떤 비율에서도 잘리지 않게 한다
-      const R = Math.min(W, H) * 0.33;
+      /* 이제 이 캔버스는 **자기 액자 안에** 있다 (히어로 2단, 2026-08-16 사장 결정).
+         배경으로 깔렸을 땐 글자를 피해 오른쪽으로 밀어야 했지만 지금은 가운데가 제자리다.
+         라벨이 액자 밖으로 삐져나가지 않게 R 은 짧은 변 기준으로 잡는다. */
+      const R = Math.min(W, H) * 0.36;
       return { X: W / 2 + x1 * s * R, Y: H / 2 + y1 * s * R, s, z: z2 };
     };
 
@@ -112,7 +114,13 @@
       const el = (time - t0) / 1000;
 
       if (!still.matches) {
-        ry += 0.0016;
+        /* ★ 한 바퀴 계속 돌리면 안 된다 (2026-08-16 사장 반려).
+           노드 배치는 **정면(ry≈0)에서 안 겹치도록** 좌표를 잡아둔 것인데,
+           360° 를 돌면 어떤 각도에서는 Mick 뒤로 Kai 가 들어가 원과 라벨이 포개진다.
+           같은 코드가 "가끔 예쁘고 가끔 지저분한" 복불복이 된다.
+           → 정면 근처에서만 **좌우로 살랑인다**(±0.16rad ≈ ±9°). 겹칠 각도에 갈 수가 없다.
+           살아 있는 느낌은 흐르는 펄스와 마우스 시차가 이미 충분히 낸다. */
+        ry = Math.sin(el * 0.26) * 0.16;
         cx += (mx - cx) * 0.05;
         cy += (my - cy) * 0.05;
       }
@@ -128,13 +136,14 @@
       }).sort((u, v) => u.mid - v.mid);
 
       for (const e of edges) {
-        const depth = Math.max(0.12, Math.min(1, (e.mid + 1.1) / 2.2));
+        // ★ 하한이 낮으면 뒤쪽 선이 배경에 묻혀 그림이 「뿌연 빛무리」로만 읽힌다(2026-08-16 픽셀 실측).
+        const depth = Math.max(0.45, Math.min(1, (e.mid + 1.1) / 2.2));
         const weight = e.c / maxCount;
         ctx.beginPath();
         ctx.moveTo(e.pa.X, e.pa.Y);
         ctx.lineTo(e.pb.X, e.pb.Y);
-        ctx.strokeStyle = `rgba(224,114,58,${(0.05 + weight * 0.16) * depth})`;
-        ctx.lineWidth = (0.5 + weight * 2.1) * depth;
+        ctx.strokeStyle = `rgba(224,114,58,${(0.16 + weight * 0.42) * depth})`;
+        ctx.lineWidth = (1 + weight * 3.4) * depth;
         ctx.stroke();
 
         // 핸드오프 펄스 — 자주 일어난 경로일수록 자주 흐른다
@@ -147,8 +156,8 @@
             const py = e.pa.Y + (e.pb.Y - e.pa.Y) * t;
             const fade = Math.sin(t * Math.PI);
             ctx.beginPath();
-            ctx.arc(px, py, (1.1 + weight * 1.5) * depth, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(201,162,39,${0.5 * fade * depth})`;
+            ctx.arc(px, py, (1.5 + weight * 2.1) * depth, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(201,162,39,${0.85 * fade * depth})`;
             ctx.fill();
           }
         }
@@ -158,13 +167,14 @@
       const order = [...NODES].sort((u, v) => P[u.id].z - P[v.id].z);
       for (const n of order) {
         const p = P[n.id];
-        const depth = Math.max(0.2, Math.min(1, (p.z + 1.1) / 2.2));
+        const depth = Math.max(0.62, Math.min(1, (p.z + 1.1) / 2.2));
         const load = Math.max(n.impl, n.verify);
-        const r = (5 + Math.sqrt(load) * 1.5) * p.s * 0.62;
+        // 라벨끼리 부딪히지 않게 한 치수 줄인다 (겹침 반려, 2026-08-16)
+        const r = (5.5 + Math.sqrt(load) * 1.7) * p.s;
         const rgb = COLOR[n.kind];
 
         const g = ctx.createRadialGradient(p.X, p.Y, 0, p.X, p.Y, r * 4.2);
-        g.addColorStop(0, `rgba(${rgb},${0.3 * depth})`);
+        g.addColorStop(0, `rgba(${rgb},${0.45 * depth})`);
         g.addColorStop(1, `rgba(${rgb},0)`);
         ctx.beginPath();
         ctx.arc(p.X, p.Y, r * 4.2, 0, Math.PI * 2);
@@ -173,19 +183,19 @@
 
         ctx.beginPath();
         ctx.arc(p.X, p.Y, r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${rgb},${0.5 * depth})`;
+        ctx.fillStyle = `rgba(${rgb},${0.85 * depth})`;
         ctx.fill();
         ctx.lineWidth = 1;
-        ctx.strokeStyle = `rgba(${rgb},${0.85 * depth})`;
+        ctx.strokeStyle = `rgba(${rgb},${1 * depth})`;
         ctx.stroke();
 
         // 이름은 실명으로 — 여기가 "AI 티" 와 갈리는 지점이다
-        ctx.font = `600 ${Math.round(11.5 * p.s)}px ui-sans-serif, system-ui, sans-serif`;
+        ctx.font = `700 ${Math.round(15 * p.s)}px ui-sans-serif, system-ui, sans-serif`;
         ctx.textAlign = 'center';
-        ctx.fillStyle = `rgba(242,236,227,${0.82 * depth})`;
+        ctx.fillStyle = `rgba(242,236,227,${0.95 * depth})`;
         ctx.fillText(n.label, p.X, p.Y - r - 9);
-        ctx.font = `${Math.round(9.5 * p.s)}px ui-sans-serif, system-ui, sans-serif`;
-        ctx.fillStyle = `rgba(168,157,143,${0.6 * depth})`;
+        ctx.font = `${Math.round(11 * p.s)}px ui-sans-serif, system-ui, sans-serif`;
+        ctx.fillStyle = `rgba(168,157,143,${0.78 * depth})`;
         ctx.fillText(n.sub, p.X, p.Y + r + 14);
       }
 
@@ -198,9 +208,24 @@
 
     resize();
     requestAnimationFrame(draw);
+    /* ★ rAF 하나에만 기대면 안 된다 — **배경 탭에서는 rAF 가 멈춰서**
+       페이드인이 영영 시작되지 않는다(2026-08-16: 숨은 탭에서 opacity 0.02 로 멎어 있었다).
+       타이머로도 한 번 켜 준다. 둘 중 먼저 오는 쪽이 켠다. */
     requestAnimationFrame(() => canvas.classList.add('on'));
+    setTimeout(() => canvas.classList.add('on'), 400);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') { t0 = 0; kick(); }
+    });
 
     window.addEventListener('resize', () => { resize(); t0 = 0; kick(); }, { passive: true });
+
+    /* ★ window resize 만으로는 부족하다 (2026-08-16 실측으로 잡음).
+       이 캔버스는 이제 **액자 안**에 있고, 액자 크기는 레이아웃이 끝나야 정해진다.
+       스크립트가 도는 시점에 rect 가 0 이면 버퍼가 1×1 로 잡히고 **영영 빈 액자**가 된다
+       (창 크기를 바꾸기 전까지 복구되지 않는다). 자기 상자를 직접 지켜본다. */
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(() => { resize(); t0 = 0; kick(); }).observe(canvas);
+    }
 
     // 마우스 시차 — 히어로 안에서만
     const hero = canvas.closest('section') ?? document.body;

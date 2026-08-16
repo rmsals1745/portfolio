@@ -5,7 +5,7 @@ import SectionHead from '../components/SectionHead.astro';
 import HeroCinema from '../components/HeroCinema.astro';
 import Reveal from '../components/Reveal.astro';
 import StackDiagram from '../components/StackDiagram.astro';
-import CaseCard from '../components/CaseCard.astro';
+import CasePage from '../components/CasePage.astro';
 import CapabilityPage from '../components/CapabilityPage.astro';
 import TerminalReplay from '../components/TerminalReplay.astro';
 import PullQuote from '../components/PullQuote.astro';
@@ -50,6 +50,67 @@ const stats = [
   { value: '17/52', label: 'AI가 낸 작업 중 자동 검수가<br>되돌려보낸 횟수 (실측 전수)' },
   { value: '5', label: '한 곳이 죽어도 안 멈추게<br>묶어둔 LLM 프로바이더' },
 ];
+
+/**
+ * 사례를 **한 장씩** 펼친다 (2026-08-16 사장 지시).
+ * 층 순서를 유지한 채 평평하게 편다 — 층 이름은 각 장의 머리에 다시 붙으므로
+ * 어느 층을 보는 중인지 놓치지 않는다.
+ */
+const CASE_SHOT: Record<string, { src: string; alt: string }> = {
+  inlifeclick: {
+    src: '/shots/inlife-login.jpg',
+    alt: '인생딸깍 실서비스 진입 화면 — 소셜 로그인과 약관·환불규정·사업자 정보',
+  },
+  'just-design': {
+    src: '/shots/justdesign-3variants.jpg',
+    alt: 'JUST DESIGN 이 같은 소재로 만든 홈페이지 시안 세 가지',
+  },
+};
+
+const caseList = strata.flatMap((s) =>
+  s.shown.map((entry) => ({
+    entry,
+    stratum: s.meta.label,
+    shot: CASE_SHOT[entry.id],
+  }))
+);
+
+/**
+ * 층마다 붙는 실물 한 장. 굴릴 때마다 이게 같이 바뀐다.
+ * ★ 「자동화·운영」만 사진이 아니라 **실제 스케줄 목록**이다 —
+ *   "PC 가 꺼져 있어도 돈다" 는 주장에는 웹 화면보다 이쪽이 증거로 세다.
+ *   출처: `Get-ScheduledTask HermesCron_*` 실측 (2026-08-16, 가동 5 · 대기 10).
+ */
+const shots: Record<string, { src?: string; alt?: string; term?: string; cap: string }> = {
+  product: {
+    src: '/shots/inlife-login.jpg',
+    alt: '인생딸깍 실서비스 진입 화면 — 소셜 로그인과 약관·환불규정·사업자 정보',
+    cap: '인생딸깍 — 실제로 돈을 받는 화면. 약관 · 청약철회 · 사업자 정보까지 갖춰 놓았습니다.',
+  },
+  applied: {
+    src: '/shots/justdesign-3variants.jpg',
+    alt: 'JUST DESIGN 이 같은 소재로 만든 홈페이지 시안 세 가지',
+    cap: 'JUST DESIGN — 같은 재료로 AI 세 명이 각자 만든 시안 3안. 검수 AI 가 판정합니다.',
+  },
+  'agent-infra': {
+    src: '/shots/statusline.png',
+    alt: 'CLI 하단에 지금 도는 외부 호출과 경과 시간이 표시된 상태 표시줄',
+    cap: '실행 가시성 — 지금 어떤 호출이 몇 초째 도는지 항상 아래에 떠 있습니다.',
+  },
+  ops: {
+    term: `PS> Get-ScheduledTask HermesCron_*
+
+  HermesCron_ApiKeyCheck        Ready      08-16 19:15   0
+  HermesCron_DesignCycle        Ready      08-16 23:00   0
+  HermesCron_StudyDaemon        Ready      08-16 12:50   0
+  HermesCron_SyncCronOutputs    Ready      08-16 23:00   0
+  HermesCron_Worklist           Ready      08-16 22:05   0
+  … 대기 10건
+
+  가동 5 · 대기 10 · 실패 0`,
+    cap: '중앙 게이트웨이가 죽어도 각자 도는 잡 15건. 놓친 실행은 기계가 켜지는 순간 따라잡습니다.',
+  },
+};
 
 /** 함께 일하는 두 경로. 손님이 둘(의뢰인 · 채용관)이라 여기서만 갈라준다. */
 const MAIL = 'rmsals1745@gmail.com';
@@ -163,17 +224,59 @@ const skills = [
     </div>
   </section>
 
-  <section class="page" data-page data-motion="stack">
-    <div class="wrap">
-      <Reveal>
-        <SectionHead
-          num="02"
-          title="무엇을 어디까지 지었는가"
-          sub="분야를 나열한 게 아니라 쌓은 순서대로 놓았습니다. 아래층이 없으면 위층이 서지 않습니다 — 층을 누르면 그 층의 사례만 모아 봅니다."
-        />
-      </Reveal>
-      <StackDiagram counts={counts} />
+  {/*
+    ★ 이 페이지는 **한 화면이 아니라 네 걸음**이다 (2026-08-16 사장 지시).
+      "한 페이지 안에서도 이런 애들은 하나씩 스크롤 넘길 때마다 넘어가야지."
+      맞다 — 층이 넷인데 한 번에 다 보여주면 넷 다 안 읽힌다.
+
+      구조: 섹션 높이 = 층 수 × 한 화면. 안쪽 그림은 sticky 로 붙잡아 두고,
+      **눈에 안 보이는 스냅 앵커**를 한 화면 간격으로 심었다. 굴릴 때마다 앵커 하나씩
+      물리고, 그때마다 그 층이 열리며 그 층의 실물 사진이 바뀐다.
+  */}
+  <section
+    class="page steps"
+    data-page
+    data-motion="stack"
+    data-steps={strata.length}
+    style={`--steps:${strata.length}`}
+  >
+    <div class="steps-pin">
+      <div class="wrap">
+        <Reveal>
+          <SectionHead
+            num="02"
+            title="무엇을 어디까지 지었는가"
+            sub="쌓은 순서대로 놓았습니다. 아래층이 없으면 위층이 서지 않습니다 — 굴릴 때마다 한 층씩 열립니다."
+          />
+        </Reveal>
+        <div class="stage">
+          <StackDiagram counts={counts} />
+          <div class="shots">
+            {
+              strata.map((s, i) => (
+                <figure class="shot" data-shot={i}>
+                  {/* ★ loading 은 eager 다. lazy 로 두면 걸음이 넘어가는 순간
+                      **빈 액자**가 뜬다 — 이미 화면 안에 있는 4장이라 미리 받아 둔다. */}
+                  {shots[s.meta.id]?.src ? (
+                    <img src={shots[s.meta.id].src} alt={shots[s.meta.id].alt} loading="eager" decoding="async" />
+                  ) : (
+                    <pre class="shot-term"><code>{shots[s.meta.id]?.term}</code></pre>
+                  )}
+                  <figcaption>{shots[s.meta.id]?.cap}</figcaption>
+                </figure>
+              ))
+            }
+          </div>
+        </div>
+      </div>
     </div>
+
+    {/* 보이지 않는 걸음 표시 — 한 화면 간격으로 스냅이 걸린다 */}
+    {
+      strata.map((_, i) => (
+        <i class="snap" aria-hidden="true" style={`--i:${i}`} />
+      ))
+    }
   </section>
 
   {/*
@@ -182,41 +285,26 @@ const skills = [
     층 이름이 매 페이지 머리에 다시 서므로 어느 층을 보는 중인지 놓치지 않는다.
   */}
   {
-    strata.map((s, si) => (
+    caseList.map((c, ci) => (
       <section
         class="page"
         data-page
-        data-motion={si % 2 === 0 ? 'slide-l' : 'slide-r'}
-        id={si === 0 ? 'work' : undefined}
+        data-motion={ci % 2 === 0 ? 'slide-l' : 'slide-r'}
+        id={ci === 0 ? 'work' : undefined}
       >
-        <div class="wrap">
-          {si === 0 && (
+        <div class="wrap wide">
+          {ci === 0 && (
             <Reveal>
-              <SectionHead
-                num="03"
-                title="사례"
-                sub="층마다 대표 사례만 세웠습니다. 각 카드의 숫자는 추정이 아니라 실측이고, 근거는 상세 문서 안에 있습니다."
-              />
+              <p class="over">사례 — 층마다 대표만, 한 장씩</p>
             </Reveal>
           )}
           <Reveal>
-            <div class="stratum-head">
-              <h3>{s.meta.label}</h3>
-              <span class="en">{s.meta.en}</span>
-              <span class="pos">
-                {si + 1} / {strata.length}
-              </span>
-              <a class="all" href={`/category/${s.meta.id}/`}>
-                {s.rest > 0 ? `이 층 ${s.rest}건 더 보기` : '이 층 전체 보기'}
-              </a>
-            </div>
-          </Reveal>
-          <Reveal>
-            <div class="cards">
-              {s.shown.map((entry) => (
-                <CaseCard entry={entry} />
-              ))}
-            </div>
+            <CasePage
+              entry={c.entry}
+              stratum={c.stratum}
+              pos={`${ci + 1} / ${caseList.length}`}
+              shot={c.shot}
+            />
           </Reveal>
         </div>
       </section>
@@ -384,6 +472,124 @@ const skills = [
     transform: translateX(calc(var(--a, 0) * 16%));
   }
 
+  /* ── 걸음 페이지 — 한 화면 안에서 N 걸음 ────────────────────────
+     섹션은 「층 수 × 한 화면」만큼 길고, 안쪽 그림은 sticky 로 붙잡혀 있다.
+     보이지 않는 앵커(.snap)가 한 화면 간격으로 심겨 있어 **굴릴 때마다 한 걸음**씩 물린다.
+     ──────────────────────────────────────────────────────────── */
+  .steps {
+    position: relative;
+    display: block;
+    /* ★ `.page` 의 `align-content: center` 를 반드시 꺼야 한다.
+       최신 크롬은 **블록 컨테이너에서도 align-content 가 동작**해서, 3,344px 짜리
+       이 섹션의 정중앙(=1,254px 아래)으로 sticky 판을 밀어버린다.
+       그러면 첫 걸음에서 화면이 통째로 빈다(2026-08-16 실측으로 잡음). */
+    align-content: start;
+    padding: 0;
+    min-height: 0;
+    height: calc(var(--steps) * (100svh - var(--header-h)));
+    perspective: none;
+    /* 스냅은 안쪽 앵커가 맡는다 — 섹션 자체가 스냅되면 걸음이 무시된다 */
+    scroll-snap-align: none;
+  }
+  .steps-pin {
+    position: sticky;
+    top: var(--header-h);
+    height: calc(100svh - var(--header-h));
+    display: grid;
+    align-content: center;
+    padding: 3vh 0;
+  }
+  .snap {
+    position: absolute;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    top: calc(var(--i) * (100svh - var(--header-h)));
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  /* 2단으로 펼치는 페이지(사례)는 통이 넓어야 양쪽이 다 읽힌다 */
+  .wrap.wide { max-width: min(1240px, 92vw); }
+
+  /* ★ 이 페이지만 통을 넓게 쓴다. 기본 폭(≈780px)을 둘로 나누면 한 칸이 380px 밖에
+     안 돼서 화면 캡처가 알아볼 수 없게 눌린다(2026-08-16 실측). */
+  .steps .wrap { max-width: min(1240px, 92vw); }
+
+  /* 층 그림 ↔ 그 층의 실물, 나란히 */
+  .stage {
+    display: grid;
+    grid-template-columns: .92fr 1.08fr;
+    gap: clamp(22px, 3vw, 44px);
+    align-items: center;
+    margin-top: 24px;
+  }
+  .shots { position: relative; min-height: 34svh; }
+  .shot {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-content: center;
+    gap: 12px;
+    opacity: 0;
+    transform: translateY(10px) scale(.985);
+    transition: opacity .45s ease, transform .45s ease;
+    pointer-events: none;
+  }
+  /* JS 가 없으면 첫 장이라도 보여야 한다 — 빈 칸은 고장으로 읽힌다 */
+  .shot:first-child { opacity: 1; transform: none; }
+  .shots.js .shot { opacity: 0; transform: translateY(10px) scale(.985); }
+  .shots.js .shot[data-on] { opacity: 1; transform: none; }
+
+  /* ★ `cover` 를 쓰면 안 된다 — 상태표시줄처럼 **가로로 긴 이미지**가 통째로 확대돼
+     글자 조각만 크게 보인다(2026-08-16 실측: "1% 210" 만 대문짝만하게 나왔다).
+     비율이 제각각인 화면 캡처 4장을 한 틀에 넣으려면 `contain` 이 정답이다. */
+  /* 높이를 못 박지 않는다 — 캡처마다 비율이 달라(상태표시줄은 가로로 길고 로그인 화면은
+     거의 정사각) 한 높이에 맞추면 한쪽은 잘리고 한쪽은 빈 액자가 된다. 폭을 채우고 높이는 따라온다. */
+  .shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 44svh;
+    object-fit: contain;
+    background: var(--paper3);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-sm);
+  }
+  .shot figcaption {
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: var(--ink-faint);
+    word-break: keep-all;
+  }
+  .shot-term {
+    margin: 0;
+    padding: 18px 16px;
+    background: var(--paper2);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-sm);
+    overflow-x: auto;
+  }
+  .shot-term code {
+    display: block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11.5px;
+    line-height: 1.8;
+    color: var(--ink-dim);
+    white-space: pre;
+  }
+
+  @media (max-width: 900px) {
+    .stage { grid-template-columns: 1fr; gap: 20px; }
+    .shots { min-height: 30svh; }
+  }
+
+  /* 정지 선호 — 걸음을 없애고 한 화면으로 되돌린다 */
+  @media (prefers-reduced-motion: reduce) {
+    .steps { height: auto; padding: 12vh 0; }
+    .steps-pin { position: static; height: auto; padding: 0; }
+  }
+
   /* 역량 첫 장의 머리말 — 섹션 제목을 크게 세우면 주장과 제목이 둘 다 커져 싸운다 */
   .over {
     font-size: 12px;
@@ -410,7 +616,11 @@ const skills = [
   }
 
   /* 숫자 — 자기 화면을 가진다 */
-  .stats {
+  /* ★ 이 클래스들은 <Reveal> **컴포넌트의 루트**에 붙는다. Astro 스코프 CSS 는
+     남의 컴포넌트 루트에 자기 cid 를 걸지 않으므로 `.stats { }` 는 **한 번도 적용된 적이 없다**
+     (2026-08-16 computed style 실측: display:block). 자식(.stat)만 먹어서 세로로 쌓였다.
+     → 루트 클래스는 :global 로 연다. 자식 선택자는 그대로 둬도 cid 가 붙어 잘 걸린다. */
+  :global(.stats) {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     border-top: 1px solid var(--rule);
@@ -419,7 +629,7 @@ const skills = [
   .stat { padding: 36px 22px 36px 0; }
   .stat:not(:last-child) { border-right: 1px solid var(--rule); }
   .stat:not(:first-child) { padding-left: 22px; }
-  .stats dd {
+  :global(.stats) dd {
     font-family: var(--serif);
     font-size: clamp(30px, 4.6vw, 46px);
     color: var(--accent2);
@@ -427,7 +637,7 @@ const skills = [
     letter-spacing: -.02em;
     font-variant-numeric: tabular-nums;
   }
-  .stats dt { margin-top: 12px; font-size: 13px; color: var(--ink-faint); line-height: 1.55; }
+  :global(.stats) dt { margin-top: 12px; font-size: 13px; color: var(--ink-faint); line-height: 1.55; }
 
   .caps { border-top: 1px solid var(--rule); }
 
@@ -466,7 +676,7 @@ const skills = [
 
   .cards { display: grid; gap: 2px; }
 
-  .skills {
+  :global(.skills) {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 34px;
@@ -486,7 +696,7 @@ const skills = [
   .bg b { color: var(--ink); font-weight: 650; }
 
   /* 두 갈래 — 카드가 아니라 문(門) 처럼 보이게 칸으로 나눈다 */
-  .tracks {
+  :global(.tracks) {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     margin-top: 30px;
@@ -525,7 +735,7 @@ const skills = [
 
   @media (max-width: 720px) {
     .beat { padding: 11vh 0; }
-    .stats { grid-template-columns: repeat(2, 1fr); }
+    :global(.stats) { grid-template-columns: repeat(2, 1fr); }
     .stat { padding: 26px 16px 26px 0; }
     .stat:nth-child(2) { border-right: none; }
     .stat:nth-child(3), .stat:nth-child(4) { border-top: 1px solid var(--rule); }
@@ -636,7 +846,33 @@ const skills = [
         });
 
         dots.forEach((d, i) => d.setAttribute('aria-current', i === best ? 'true' : 'false'));
+        stepSync(headerH, view);
       };
+
+      /* ── 걸음 페이지: 지금 몇 번째 걸음인가 ──
+         섹션이 헤더 아래를 얼마나 지났는지를 "한 화면" 단위로 나눈다.
+         걸음이 바뀔 때만 손대므로(=cur 비교) 매 프레임 DOM 을 건드리지 않는다. */
+      const steps = document.querySelector<HTMLElement>('.steps');
+      const figs = steps ? Array.from(steps.querySelectorAll<HTMLElement>('[data-shot]')) : [];
+      const layerBtns = steps
+        ? Array.from(steps.querySelectorAll<HTMLButtonElement>('[data-toggle]'))
+        : [];
+      const shotBox = steps?.querySelector<HTMLElement>('.shots');
+      if (shotBox && figs.length) shotBox.classList.add('js');
+      let curStep = -1;
+
+      function stepSync(headerH: number, view: number) {
+        if (!steps || !figs.length) return;
+        if (still.matches) return;
+        const n = Number(steps.dataset.steps) || figs.length;
+        const r = steps.getBoundingClientRect();
+        const i = Math.max(0, Math.min(n - 1, Math.round((headerH - r.top) / view)));
+        if (i === curStep) return;
+        curStep = i;
+        figs.forEach((f, k) => f.toggleAttribute('data-on', k === i));
+        // 층 아코디언도 같이 연다 — 그림과 사진이 어긋나면 안 된다
+        layerBtns.forEach((b, k) => b.setAttribute('aria-expanded', k === i ? 'true' : 'false'));
+      }
 
       const onScroll = () => {
         if (ticking) return;

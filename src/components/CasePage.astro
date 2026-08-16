@@ -1,0 +1,217 @@
+---
+/**
+ * 사례 한 건 = 한 페이지.
+ *
+ * 사장 지적(2026-08-16): *"사례 카드도 한 장씩 펼쳐줘."*
+ * 한 화면에 두 장씩 쌓으면 제목만 훑고 지나간다. 한 장에 하나만 두면
+ * 제목 · 평이한 설명 · 실측 수치 · 기간/역할/기술까지 다 펼칠 수 있다.
+ *
+ * ★ 이름은 혼자 두지 않는다 — `tagline` 이 "그게 뭐 하는 물건인지" 평이한 한 줄이고,
+ *   그게 제목 바로 밑에 크게 붙는다. `justswarm` 만 봐서는 아무도 모른다.
+ */
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'cases'>;
+  /** 이 사례가 속한 층 이름 */
+  stratum: string;
+  /** 몇 번째 / 전체 몇 건 */
+  pos: string;
+  /** 곁들일 실물 화면 (없으면 생략) */
+  shot?: { src: string; alt: string };
+}
+
+const { entry, stratum, pos, shot } = Astro.props;
+const d = entry.data;
+const href = `/work/${entry.id}/`;
+
+const statusLabel: Record<string, string> = {
+  live: '운영 중',
+  active: '진행 중',
+  archived: '종료',
+};
+---
+
+<article class="case">
+  <div class="say">
+    <p class="over">
+      <span class="stratum">{stratum}</span>
+      <span class="pos">{pos}</span>
+      <span class={`state ${d.status}`}>{statusLabel[d.status]}</span>
+    </p>
+
+    <h2>{d.title}</h2>
+    <p class="what">{d.tagline}</p>
+
+    {
+      d.metrics.length > 0 && (
+        <dl class="facts">
+          {d.metrics.map((m) => (
+            <div>
+              <dd>{m.value}</dd>
+              <dt>{m.label}</dt>
+            </div>
+          ))}
+        </dl>
+      )
+    }
+  </div>
+
+  <aside class="side">
+    {shot && <img src={shot.src} alt={shot.alt} loading="eager" decoding="async" />}
+
+    <dl class="meta">
+      <div>
+        <dt>기간</dt>
+        <dd>{d.period}</dd>
+      </div>
+      {d.role && (
+        <div>
+          <dt>역할</dt>
+          <dd>{d.role}</dd>
+        </div>
+      )}
+      {d.stack.length > 0 && (
+        <div>
+          <dt>기술</dt>
+          <dd>{d.stack.join(' · ')}</dd>
+        </div>
+      )}
+    </dl>
+
+    <a class="go" href={href}>
+      이 사례 자세히 보기
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M2.5 6.5h8M7 3l3.5 3.5L7 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </aside>
+</article>
+
+<style>
+  .case {
+    display: grid;
+    grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
+    gap: 0 clamp(30px, 4.5vw, 66px);
+    align-items: center;
+  }
+
+  /* ── 왼쪽: 무엇인가 ── */
+  .over {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+    font-size: 12px;
+    letter-spacing: .04em;
+  }
+  .over .stratum { color: var(--accent); font-weight: 650; }
+  .over .pos {
+    font-family: var(--serif);
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .over .state {
+    margin-left: auto;
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 99px;
+    border: 1px solid var(--rule);
+    color: var(--ink-faint);
+  }
+  .over .state.live { color: var(--accent2); border-color: color-mix(in srgb, var(--accent2) 40%, var(--rule)); }
+
+  h2 {
+    font-family: var(--serif);
+    font-size: clamp(26px, 3.2vw, 42px);
+    line-height: 1.24;
+    letter-spacing: -.02em;
+    color: var(--ink);
+    word-break: keep-all;
+  }
+
+  /* ★ 이 한 줄이 이름을 해석해 준다 — 제목 바로 밑, 크게.
+     클래스 이름은 `.tag` 를 쓰면 안 된다 — tokens.css 의 **배지(pill)** 가 같은 이름이라
+     `white-space: nowrap` + 배경색을 물려받아 **한 줄로 화면 밖까지 뻗고 노란 상자가 깔린다**
+     (2026-08-16 실측: whiteSpace nowrap, 가로 스크롤 138px). */
+  .what {
+    margin-top: 20px;
+    font-size: clamp(15px, 1.3vw, 17px);
+    line-height: 1.8;
+    color: var(--ink-dim);
+    max-width: 44ch;
+    word-break: keep-all;
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 34px;
+    margin-top: 30px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule-soft);
+  }
+  .facts dd {
+    font-family: var(--serif);
+    font-size: clamp(23px, 2.5vw, 32px);
+    line-height: 1;
+    color: var(--accent);
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .facts dt {
+    margin-top: 8px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--ink-faint);
+    max-width: 16ch;
+    word-break: keep-all;
+  }
+
+  /* ── 오른쪽: 실물과 제원 ── */
+  .side { display: grid; gap: 18px; align-content: center; }
+
+  .side img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 34svh;
+    object-fit: contain;
+    background: var(--paper3);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-sm);
+  }
+
+  .meta {
+    display: grid;
+    gap: 0;
+    border-top: 1px solid var(--rule-soft);
+  }
+  .meta > div {
+    display: grid;
+    grid-template-columns: 62px 1fr;
+    gap: 14px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .meta dt { font-size: 11.5px; color: var(--ink-faint); letter-spacing: .06em; }
+  .meta dd { font-size: 13.5px; color: var(--ink-dim); line-height: 1.6; word-break: keep-all; }
+
+  .go {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13.5px;
+    font-weight: 650;
+    color: var(--accent);
+    text-decoration: none;
+    transition: gap var(--t-fast);
+  }
+  .go:hover { gap: 11px; }
+
+  @media (max-width: 900px) {
+    .case { grid-template-columns: 1fr; gap: 26px; }
+    .what { max-width: none; }
+    .facts { gap: 10px 22px; margin-top: 22px; padding-top: 18px; }
+    .side img { max-height: 26svh; }
+  }
+</style>
