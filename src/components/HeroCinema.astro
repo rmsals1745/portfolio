@@ -169,7 +169,9 @@ const { next } = Astro.props;
 
   .eyebrow { margin-bottom: 26px; }
   h1 { margin-bottom: 30px; }
-  h1 em { font-style: normal; color: var(--accent); }
+  /* ⚠️ 색을 다시 칠하지 않는다 — tokens.css 의 흐르는 그라데이션(clip:text)이 정본이고,
+     여기서 color 를 주면 그 위를 덮어 결이 죽는다(스코프 규칙이 더 세다). */
+  h1 em { font-style: normal; }
 
   /* 줄 단위로만 움직인다 — 줄 안쪽 텍스트는 손대지 않으니 조판이 깨질 수 없다 */
   .ln { display: block; overflow: hidden; }

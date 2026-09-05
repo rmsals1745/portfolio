@@ -72,9 +72,9 @@ const { num, claim, why, product, productPlain, facts, evidence } = Astro.props;
   }
   h2 {
     font-family: var(--serif);
-    font-size: clamp(27px, 3.6vw, 46px);
-    line-height: 1.28;
-    letter-spacing: -.02em;
+    font-size: clamp(30px, 4.3vw, 56px);
+    line-height: 1.22;
+    letter-spacing: -.025em;
     color: var(--ink);
     word-break: keep-all;
   }
@@ -92,10 +92,23 @@ const { num, claim, why, product, productPlain, facts, evidence } = Astro.props;
 
   /* ── 오른쪽: 근거 ── */
   .proof {
-    border: 1px solid var(--rule);
-    border-radius: var(--r-sm);
-    background: var(--paper2);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--accent2) 16%, var(--rule));
+    border-radius: var(--r-md);
+    /* 평평한 한 색 대신 결이 있는 판 + 발밑 그림자 — 「떠 있는 증거판」 */
+    background: linear-gradient(160deg, #262019, var(--paper2) 58%);
+    box-shadow: 0 24px 60px -28px rgba(0, 0, 0, .55);
     padding: clamp(22px, 2.4vw, 32px);
+  }
+  /* 윗변에만 금빛 실선 — 균일 테두리가 아니라 빛이 닿은 모서리처럼 */
+  .proof::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent2), transparent 70%);
+    opacity: .55;
   }
   .kicker {
     font-size: 11px;

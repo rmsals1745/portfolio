@@ -2,6 +2,7 @@
 import '../styles/tokens.css';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import Feel from '../components/Feel.astro';
 
 interface Props {
   title: string;
@@ -80,6 +81,7 @@ const ogUrl = new URL(ogImage, Astro.site ?? 'https://parkgeunmin.pages.dev');
       <slot />
     </main>
     <SiteFooter />
+    <Feel />
 
     <style is:global>
       /* ── 페이지 단위 스크롤(덱) ──────────────────────────────────

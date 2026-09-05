@@ -58,8 +58,9 @@ const stats = [
  */
 const CASE_SHOT: Record<string, { src: string; alt: string }> = {
   inlifeclick: {
-    src: '/shots/inlife-login.jpg',
-    alt: '인생딸깍 실서비스 진입 화면 — 소셜 로그인과 약관·환불규정·사업자 정보',
+    // 2026-09-05 리뉴얼 실측 캡처로 교체 — 로그인보다 「판다 상담」이 제품을 말한다
+    src: '/shots/inlife-panda-consult.jpg',
+    alt: '인생딸깍 상담 화면 — 딸깍판다가 인터뷰하고 칠판에 상담 진행률이 채워진다',
   },
   'just-design': {
     src: '/shots/justdesign-3variants.jpg',
@@ -83,9 +84,9 @@ const caseList = strata.flatMap((s) =>
  */
 const shots: Record<string, { src?: string; alt?: string; term?: string; cap: string }> = {
   product: {
-    src: '/shots/inlife-login.jpg',
-    alt: '인생딸깍 실서비스 진입 화면 — 소셜 로그인과 약관·환불규정·사업자 정보',
-    cap: '인생딸깍 — 실제로 돈을 받는 화면. 약관 · 청약철회 · 사업자 정보까지 갖춰 놓았습니다.',
+    src: '/shots/inlife-login-renewed.jpg',
+    alt: '인생딸깍 실서비스 진입 화면 — 네이버·카카오·구글 로그인과 약관·환불규정·사업자 정보',
+    cap: '인생딸깍 — 실제로 돈을 받는 화면. 약관 · 청약철회 · 사업자등록 · 통신판매업신고까지 갖춰 놓았습니다.',
   },
   applied: {
     src: '/shots/justdesign-3variants.jpg',
@@ -608,9 +609,9 @@ const skills = [
 
   .beat-lead {
     font-family: var(--serif);
-    font-size: clamp(20px, 2.8vw, 27px);
+    font-size: clamp(22px, 3.3vw, 34px);
     color: var(--ink);
-    letter-spacing: -.01em;
+    letter-spacing: -.015em;
     margin-bottom: 40px;
     max-width: 42ch;
   }
@@ -631,8 +632,12 @@ const skills = [
   .stat:not(:first-child) { padding-left: 22px; }
   :global(.stats) dd {
     font-family: var(--serif);
-    font-size: clamp(30px, 4.6vw, 46px);
-    color: var(--accent2);
+    /* 숫자가 이 화면의 전부다 — 크게(46→64), 금→주황 결을 입힌다 */
+    font-size: clamp(36px, 5.8vw, 64px);
+    background: linear-gradient(115deg, var(--accent2), var(--accent) 85%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
     line-height: 1;
     letter-spacing: -.02em;
     font-variant-numeric: tabular-nums;
@@ -710,7 +715,10 @@ const skills = [
     transition: background var(--t-fast);
   }
   .track + .track { border-left: 1px solid var(--rule); }
-  .track:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+  .track:hover {
+    background: color-mix(in srgb, var(--accent) 5%, transparent);
+    box-shadow: 0 26px 70px -30px rgba(224, 114, 58, .35);
+  }
   .track h4 {
     font-size: 17px;
     font-weight: 700;

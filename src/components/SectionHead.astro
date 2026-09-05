@@ -9,6 +9,7 @@ const { num, title, sub, id } = Astro.props;
 ---
 
 <div class="sec-head" id={id}>
+  {num && <span class="ghost" aria-hidden="true">{num}</span>}
   {num && <span class="sec-num">{num}</span>}
   <h2>{title}</h2>
 </div>
@@ -16,5 +17,27 @@ const { num, title, sub, id } = Astro.props;
 {!sub && <slot name="sub" />}
 
 <style>
-  .sec-head { scroll-margin-top: 84px; }
+  .sec-head { scroll-margin-top: 84px; position: relative; }
+
+  /* 유령 숫자 — 제목 뒤에 크게 깔리는 윤곽선 활자. 잡지 편집 문법.
+     채우지 않고 획만 남겨서(text-stroke) 아무리 커도 글을 가리지 않는다. */
+  .ghost {
+    position: absolute;
+    left: -14px;
+    top: 50%;
+    transform: translateY(-54%);
+    z-index: -1;
+    font-family: var(--serif);
+    font-size: clamp(92px, 14vw, 180px);
+    line-height: 1;
+    letter-spacing: -.04em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(242, 236, 227, .08);
+    user-select: none;
+    pointer-events: none;
+  }
+  /* 윤곽선 미지원 브라우저에선 아예 그리지 않는다 — 통짜 흰 숫자가 뜨면 사고다 */
+  @supports not (-webkit-text-stroke: 1px #000) {
+    .ghost { display: none; }
+  }
 </style>
