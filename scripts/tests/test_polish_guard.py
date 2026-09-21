@@ -93,3 +93,34 @@ class TestNormalize:
     def test_strips_whitespace_and_emphasis(self):
         assert normalize("총 **52 런**을") == normalize("총 52 런을")
         assert normalize('그는 "말했다"') == normalize("그는 말했다")
+
+
+# ==SELF_START_PYTEST_V2==  (justtest_selfstart.py 가 심음)
+# 이 파일은 pytest 가 불러야 도는 계통이다. 예전엔 `python 이파일.py` 로 부르면
+# 아무것도 안 하고 exit 0 이었다 — 초록불만 뜨고 시험은 한 줄도 안 도는 죽은 게이트.
+# 이제 스크립트로 불러도 스스로 pytest 를 부른다.
+# ★레포 뿌리를 sys.path 에 넣는다: `python tests/x.py` 는 **그 파일의 폴더**만 경로에 넣지만
+#   `python -m pytest` 는 **현재 폴더**를 넣는다. 그 차이로 패키지 import 가 깨진다.
+#   ⚠️단, 파일 **맨 위**에서 패키지를 import 하는 시험은 여기 닿기 전에 이미 죽는다
+#     (모듈 본문이 먼저 돈다). 그건 **조용한 통과가 아니라 시끄러운 실패**라 이 장치의 목적 밖이다 —
+#     그런 파일은 `python -m pytest <파일>` 로 부르면 된다.
+if __name__ == "__main__":
+    import os as _os
+    import sys as _sys
+    _d = _os.path.dirname(_os.path.abspath(__file__))
+    while True:
+        if any(_os.path.exists(_os.path.join(_d, _m))
+               for _m in ("pytest.ini", "pyproject.toml", "setup.cfg", "conftest.py", ".git")):
+            break
+        _up = _os.path.dirname(_d)
+        if _up == _d:
+            _d = _os.path.dirname(_os.path.abspath(__file__))
+            break
+        _d = _up
+    if _d not in _sys.path:
+        _sys.path.insert(0, _d)
+    try:
+        import pytest as _pytest
+    except ImportError:
+        _sys.exit("pytest 미설치 — `python -m pip install pytest`. 못 돌린 것이지 통과가 아니다.")
+    _sys.exit(_pytest.main([__file__, "-q", *_sys.argv[1:]]))
