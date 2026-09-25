@@ -3,9 +3,8 @@ const year = new Date().getFullYear();
 ---
 
 {/*
-  id 는 `contact-card` 다 — `#contact` 는 첫 화면의 「함께 일하는 두 가지 방법」 페이지가 가져갔다
-  (2026-08-16). 헤더의 「연락」은 결정 화면으로 보내는 게 맞고, 푸터는 그 바로 뒤에 이어진다.
-  같은 id 를 둘이 쓰면 앵커가 앞엣것으로만 가고 HTML 도 무효가 된다.
+  id 는 `contact-card` — 첫 화면의 연락 색면이 `#contact` 를 가진다. 안쪽 페이지의 푸터는
+  같은 초록 색면으로 마무리한다.
 */}
 <footer id="contact-card">
   <div class="wrap">
@@ -13,7 +12,6 @@ const year = new Date().getFullYear();
       만든 것을 <em>직접 설명할 수 있는</em> 엔지니어를 찾고 계시다면.
     </p>
 
-    {/* 사진은 여기가 제자리다 — 히어로에 두면 밀도가 터지고 숫자판에 잘렸다 */}
     <div class="who">
       <img class="portrait" src="/me/portrait.jpg" alt="박근민" width="104" height="104" loading="lazy" />
       <div>
@@ -35,65 +33,63 @@ const year = new Date().getFullYear();
 
 <style>
   footer {
-    padding: 84px 0 96px;
-    border-top: 1px solid var(--rule);
-    scroll-margin-top: 70px;
+    background: var(--field);
+    color: var(--cream);
+    padding: 84px 0 72px;
+    margin-top: 40px;
+    scroll-margin-top: 20px;
   }
   .call {
-    font-family: var(--serif);
-    font-size: clamp(22px, 3.4vw, 30px);
-    line-height: 1.45;
-    letter-spacing: -.01em;
+    font-size: clamp(24px, 3.6vw, 36px);
+    font-weight: 900;
+    line-height: 1.3;
+    letter-spacing: -.035em;
     max-width: 620px;
-    margin-bottom: 30px;
+    margin-bottom: 34px;
   }
-  .call em { font-style: normal; color: var(--accent); }
+  .call em { font-style: normal; color: var(--brass-soft); }
 
   .who {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 22px;
     flex-wrap: wrap;
     padding-bottom: 30px;
-    border-bottom: 1px solid var(--rule-soft);
   }
-  /* 원형 그대로 (사장 선택 ①) */
   .portrait {
     width: 104px; height: 104px;
     border-radius: 50%;
     object-fit: cover;
     object-position: center 16%;
-    border: 1px solid var(--rule);
-    background: var(--paper2);
+    background: var(--field-2);
     flex: 0 0 auto;
-    transition: transform .4s cubic-bezier(.2,.7,.2,1), border-color .3s;
   }
-  .who:hover .portrait { transform: scale(1.04); border-color: var(--accent); }
-  .nm { color: var(--ink); font-weight: 700; font-size: 16.5px; margin-bottom: 8px; }
-  /* just- 접두가 여기서 나왔다 */
-  .nm .en { font-family: var(--serif); font-weight: 400; letter-spacing: .01em; }
+  .nm { font-weight: 700; font-size: 17px; margin-bottom: 8px; }
+  .nm .en { font-weight: 500; opacity: .75; }
 
   .lines {
     display: flex;
     flex-wrap: wrap;
     gap: 10px 26px;
     align-items: center;
-    font-size: 14.5px;
-    color: var(--ink-faint);
+    font-size: 15px;
+    color: #d8d2c3;
   }
   .lines a {
-    color: var(--ink-dim);
-    text-decoration: none;
-    border-bottom: 1px solid var(--rule);
-    padding-bottom: 2px;
-    transition: color var(--t-fast), border-color var(--t-fast);
+    color: var(--cream);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: var(--brass);
+    text-underline-offset: 5px;
+    transition: color var(--t-fast);
   }
-  .lines a:hover { color: var(--accent); border-color: var(--accent); }
+  .lines a:hover { color: var(--brass-soft); }
 
   .fine {
-    margin-top: 26px;
+    margin-top: 12px;
+    font-family: var(--mono);
     font-size: 12.5px;
     line-height: 1.8;
-    color: var(--ink-faint);
+    color: #bfb9aa;
   }
 </style>

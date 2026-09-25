@@ -2,24 +2,23 @@
 import '../styles/tokens.css';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
-import Feel from '../components/Feel.astro';
 
 interface Props {
   title: string;
   description: string;
   /** og:image 경로 (public 기준). 없으면 기본 스크린샷. */
   ogImage?: string;
-  /** 페이지 단위 스크롤(덱). 첫 화면에서만 쓴다 — 사례 상세는 읽는 문서라 일반 스크롤. */
-  deck?: boolean;
+  /** 첫 화면처럼 자기 표지·연락 색면을 직접 가진 페이지 — 공통 헤더·푸터를 생략한다. */
+  bare?: boolean;
 }
 
-const { title, description, ogImage = '/shots/statusline.png', deck = false } = Astro.props;
+const { title, description, ogImage = '/shots/statusline.png', bare = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://parkgeunmin.pages.dev');
 const ogUrl = new URL(ogImage, Astro.site ?? 'https://parkgeunmin.pages.dev');
 ---
 
 <!doctype html>
-<html lang="ko" class={deck ? 'deck' : undefined}>
+<html lang="ko">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -35,39 +34,24 @@ const ogUrl = new URL(ogImage, Astro.site ?? 'https://parkgeunmin.pages.dev');
     <meta property="og:locale" content="ko_KR" />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <meta name="theme-color" content="#12100e" />
+    <meta name="theme-color" content="#1f3d36" />
 
-    {/*
-      원본 portfolio.html 은 Pretendard 를 font-family 로 "이름만" 불렀고 실제로 로드하지는
-      않았다. 그래서 대부분의 윈도우 기계에서 맑은고딕으로 렌더됐다. 여기서 실제로 싣는다.
-      dynamic-subset = 쓰인 글자만 받아가므로 한글이어도 가볍다.
-    */}
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
-    />
-    {/* 국문 헤드라인용 명조 — 영문은 Georgia 가 받고 한글만 이쪽이 받는다 */}
+    {/* 3-B 시안이 쓰는 그대로 — 본문 Noto Sans KR, 숫자·라벨 IBM Plex Mono */}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap"
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&display=swap"
     />
 
     {/*
-      ★ 백지 방지. 모션은 요소를 숨겼다가 보여주는 방식이라, 스크립트가 죽으면
-        화면이 통째로 비어 버린다. 두 겹으로 막는다:
-        (1) html.js 가 붙어야만 숨김 상태가 적용된다 → JS 꺼진 브라우저는 그냥 다 보인다
-        (2) 2.5초 안에 히어로가 살아나지 않으면 강제로 다 보여준다
-            → 모션이 없는 편이 백지보다 언제나 낫다
+      백지 방지: 사례 카드의 등장 모션은 요소를 숨겼다가 보여주는 방식이라, 스크립트가
+      죽으면 비어 보인다. html.js 가 붙어야만 숨김이 적용되고, 2.5초 뒤에는 강제로 다 보여준다.
     */}
     <script is:inline>
       document.documentElement.classList.add('js');
       setTimeout(function () {
-        if (!document.documentElement.classList.contains('hero-ready')) {
-          document.documentElement.classList.add('motion-failsafe');
-        }
+        document.documentElement.classList.add('motion-failsafe');
       }, 2500);
     </script>
 
@@ -76,66 +60,11 @@ const ogUrl = new URL(ogImage, Astro.site ?? 'https://parkgeunmin.pages.dev');
 
   <body>
     <a href="#main" class="skip">본문으로 건너뛰기</a>
-    <SiteHeader />
+    {!bare && <SiteHeader />}
     <main id="main">
       <slot />
     </main>
-    <SiteFooter />
-    <Feel />
-
-    <style is:global>
-      /* ── 페이지 단위 스크롤(덱) ──────────────────────────────────
-         한 번 굴리면 한 페이지. `scroll-snap-stop: always` 가 "여러 장 훌쩍 넘어감"을 막는다.
-
-         ★ 안전장치 3겹 — 스냅은 잘못 쓰면 **내용을 가둔다**:
-           (1) 정지 선호(reduced-motion) 면 스냅을 끈다
-           (2) 화면이 낮으면(≤640px) 끈다 — 한 페이지가 화면보다 커져 갇히는 구간
-           (3) 페이지는 `height` 가 아니라 `min-height` 라, 내용이 넘치면 그냥 길어진다.
-               잘리는 경우가 생길 수 없다.
-         ────────────────────────────────────────────────────────── */
-      /* ★ `mandatory` 를 쓰면 안 된다 (2026-08-16 실제 증상으로 확인).
-         mandatory 는 **반드시 스냅 지점 위에서만** 멈추게 한다. 그런데 화면보다 긴
-         페이지는 스냅 지점이 맨 위 하나뿐이라, 그 안에서는 멈출 수가 없어
-         브라우저가 **페이지를 통째로 건너뛰어** 다음 지점으로 끌고 간다
-         (= "뭉쳐서 한 번에 넘어감"). proximity 는 가까울 때만 붙잡으므로
-         긴 페이지는 자연스럽게 굴러가고, 짧은 페이지는 그대로 딱 맞는다.
-         `scroll-snap-stop: always` 가 남아 있어 **페이지를 건너뛰지도 않는다.** */
-      html.deck {
-        scroll-snap-type: y proximity;
-        /* ★ 헤더 보정은 **여기 한 곳에서만** 한다.
-           tokens.css 는 앵커 점프용으로 `헤더+26px` 을 주는데, 페이지에도 같은 만큼
-           padding 을 넣으면 이중 보정이 되고, `min-height:100svh` 와 겹쳐
-           **스냅될 때마다 페이지 아래쪽이 화면 밖으로 밀린다** — 그러면 모든 페이지가
-           "화면보다 긴 페이지" 가 되어 뭉쳐 넘어간다(2026-08-16 증상의 진짜 원인). */
-        scroll-padding-top: var(--header-h);
-        /* 네이티브 스냅 애니메이션과 겹치면 끌리는 느낌이 난다.
-           점 클릭 이동은 scrollIntoView 가 따로 smooth 를 지정한다. */
-        scroll-behavior: auto;
-      }
-      /* scroll-behavior: smooth 는 걸지 않는다 — 네이티브 스냅 애니메이션과 겹쳐
-         끌리는 느낌이 난다. 점 클릭 이동은 scrollIntoView 에서 따로 지정한다. */
-      @media (prefers-reduced-motion: reduce) {
-        html.deck { scroll-snap-type: none; scroll-behavior: auto; }
-      }
-      @media (max-height: 640px) {
-        html.deck { scroll-snap-type: none; }
-      }
-
-      /* ★ 전환 연출이 `translateX(±10%)` 로 내용을 옆으로 미는 페이지가 있다(사례 slide-l/r).
-         밀려난 만큼이 문서 폭에 더해져 **가로 스크롤바가 생긴다**(2026-08-16 실측: 2029 vs 1692).
-         `clip` 은 `hidden` 과 달리 스크롤 컨테이너를 새로 만들지 않아 sticky 를 깨지 않는다. */
-      /* ⚠️ `body` 에 걸면 안 먹는다 — 뷰포트 스크롤러는 `html` 이다(실측: body 에 clip 을 줘도
-         가로로 337px 밀렸고, html 에 주니 0 이 됐다). `clip` 은 `hidden` 과 달리
-         스크롤 컨테이너를 새로 만들지 않아 스냅·sticky 를 깨지 않는다. */
-      html.deck { overflow-x: clip; }
-
-      /* ★ 푸터도 스냅 지점이어야 한다. 없으면 mandatory 스냅이 마지막 페이지로
-         계속 되돌려서 **푸터에 영영 못 닿는다**(연락처·사진이 거기 있다). */
-      html.deck > body > footer {
-        scroll-snap-align: start;
-        scroll-snap-stop: normal;
-      }
-    </style>
+    {!bare && <SiteFooter />}
 
     <style>
       .skip {
@@ -143,12 +72,12 @@ const ogUrl = new URL(ogImage, Astro.site ?? 'https://parkgeunmin.pages.dev');
         left: -9999px;
         top: 0;
         z-index: 100;
-        background: var(--accent);
-        color: #fff;
+        background: var(--brass);
+        color: #1a2622;
         padding: 10px 18px;
         border-radius: 0 0 var(--r-sm) 0;
         font-size: 14px;
-        font-weight: 600;
+        font-weight: 700;
         text-decoration: none;
       }
       .skip:focus { left: 0; }

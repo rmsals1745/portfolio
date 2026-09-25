@@ -64,9 +64,10 @@
   color: var(--accent);
 }
 
+/* 인용 — 좌측 색 막대 대신 굵은 초록 윗줄 */
 .prose blockquote {
-  border-left: 2px solid var(--accent);
-  padding: 4px 0 4px 20px;
+  border-top: 4px solid var(--field);
+  padding: 14px 0 0;
   color: var(--ink-dim);
 }
 
@@ -76,9 +77,22 @@
   margin: 2.6em 0;
 }
 
+/* 코드·터미널 패널은 초록 색면 위 크림 글자 — 지면이 밝아졌어도 이 안은 어두운 채로 두고,
+   안쪽에서만 잉크 변수를 뒤집어 기존 규칙이 그대로 읽히게 한다. */
+.prose pre, .term {
+  --ink: #efe8da;
+  --ink-dim: #cfc9ba;
+  --ink-faint: #93a79f;
+  --accent: #d9c29a;
+  --accent2: #d9c29a;
+  --ok: #9ccaa5;
+  --rule: #2f5348;
+  --rule-soft: #2f5348;
+  color: var(--ink-dim);
+}
 .prose pre {
-  background: #0c0a09;
-  border: 1px solid var(--rule);
+  background: #172e28;
+  border: 0;
   border-radius: var(--r-sm);
   padding: 16px 18px;
   overflow-x: auto;
@@ -116,9 +130,8 @@
 /* ── 증거 패널: 실제 실행 기록을 그대로 보여주는 터미널 ── */
 
 .term {
-  background: #0c0a09;
-  border: 1px solid var(--rule);
-  border-radius: 5px;
+  background: #172e28;
+  border-radius: 4px;
   overflow: hidden;
   font-family: var(--mono);
 }
@@ -127,11 +140,10 @@
   align-items: center;
   gap: 8px;
   padding: 9px 14px;
-  background: #171310;
-  border-bottom: 1px solid var(--rule);
+  background: var(--field);
 }
-.term-bar i { width: 9px; height: 9px; border-radius: 50%; background: #3a322c; display: block; }
-.term-bar i:first-child { background: #7a4030; }
+.term-bar i { width: 9px; height: 9px; border-radius: 50%; background: #36604f; display: block; }
+.term-bar i:first-child { background: #b8955c; }
 /* 모노 폰트에 한글이 섞이면 자소가 뭉개진다 — 라벨만 본문 폰트로 되돌린다 */
 .term-bar span {
   margin-left: 8px;
@@ -208,8 +220,7 @@
 .cta-line {
   margin: 22px 0 26px;
   padding: 14px 16px;
-  border-left: 3px solid var(--accent, #b4623a);
-  background: color-mix(in srgb, var(--accent, #b4623a) 7%, transparent);
-  border-radius: 0 8px 8px 0;
+  background: var(--paper3);
+  border-radius: 4px;
 }
 .cta-line a { font-weight: 700; white-space: nowrap; }

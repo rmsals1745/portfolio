@@ -2,15 +2,14 @@
 import { CATEGORIES } from '../content.config';
 
 const path = Astro.url.pathname;
-const isHome = path === '/' || path === '';
 ---
 
+{/* 3-B — 표지와 같은 초록 색면 띠. 안쪽 페이지 전용(첫 화면은 자기 표지 상단을 쓴다). */}
 <header class="bar">
   <div class="wrap-wide inner">
     <a href="/" class="mark" aria-label="박근민 포트폴리오 첫 화면">
       <span class="mark-nm">박근민</span>
       <span class="mark-en">Justin Avery Park</span>
-      <span class="mark-role">AI 인프라 · 에이전트 시스템</span>
     </a>
 
     <nav aria-label="분야">
@@ -27,123 +26,66 @@ const isHome = path === '/' || path === '';
             </li>
           ))
         }
+        <li><a href="/#contact">연락</a></li>
       </ul>
     </nav>
-
-    <a class="cta" href={isHome ? '#contact' : '/#contact'}>연락</a>
   </div>
 </header>
 
 <style>
   .bar {
-    /* 고정. sticky 는 흐름에서 자리를 차지해 아래 요소를 62px 밀어내고,
-       그 경계에서 히어로의 빛이 잘려 직선이 생겼다. */
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    /* 히어로가 sticky 로 붙잡히는 구간에서도 절대 덮이지 않게 넉넉히 위로 */
-    z-index: 100;
-
-    /* ★ backdrop-filter 를 쓰지 않는다.
-       뒤 배경을 흐리게 만들면 그 흐림이 헤더 아래 경계에서 뚝 끊긴다.
-       뒤에 부드러운 빛이 깔려 있으면 그 경계가 **직선으로 도드라진다** —
-       "빛번짐이 잘려 보인다" 의 진짜 원인이었다.
-
-       대신 지면색에서 투명으로 **녹아내리게** 한다. 경계선이 아예 없다.
-       아래 26px 은 사라지는 구간이라 클릭을 막지 않는다. */
-    background: linear-gradient(
-      to bottom,
-      var(--paper) 0%,
-      var(--paper) 62%,
-      rgba(18, 16, 14, .72) 82%,
-      rgba(18, 16, 14, 0) 100%
-    );
-    padding-bottom: 26px;
-    pointer-events: none;
-    /* 스크롤에 따라 변하지 않는다. 그냥 고정. */
+    background: var(--field);
+    color: var(--cream);
   }
-
   .inner {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 28px;
-    height: 62px;
-    pointer-events: auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
   }
-
   .mark {
     text-decoration: none;
     display: flex;
     align-items: baseline;
     gap: 10px;
     flex: 0 0 auto;
+    color: var(--cream);
   }
-  .mark-nm {
-    font-family: var(--serif);
-    font-size: 18px;
-    letter-spacing: -.01em;
-    color: var(--ink);
-  }
-  .mark-en {
-    font-family: var(--serif);
-    font-size: 12.5px;
-    color: var(--ink-dim);
-    letter-spacing: .02em;
-  }
-  .mark-role {
-    font-size: 11.5px;
-    color: var(--ink-faint);
-    letter-spacing: .04em;
-  }
+  .mark-nm { font-size: 17px; font-weight: 700; }
+  .mark-en { font-size: 14px; font-weight: 500; opacity: .75; }
 
   nav { margin-left: auto; overflow-x: auto; scrollbar-width: none; }
   nav::-webkit-scrollbar { display: none; }
   nav ul {
     list-style: none;
     display: flex;
-    gap: 22px;
+    gap: 26px;
     white-space: nowrap;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    letter-spacing: .03em;
   }
   nav a {
-    font-size: 13.5px;
-    color: var(--ink-faint);
+    color: var(--cream);
     text-decoration: none;
+    font-weight: 600;
+    opacity: .8;
     padding: 4px 0;
-    position: relative;
-    transition: color var(--t-fast);
+    transition: opacity var(--t-fast), color var(--t-fast);
   }
-  nav a::after {
-    content: '';
-    position: absolute;
-    left: 0; right: 0; bottom: -2px;
-    height: 1px;
-    background: var(--accent);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform var(--t-fast);
+  nav a:hover { opacity: 1; color: var(--brass-soft); }
+  nav a[aria-current='page'] {
+    opacity: 1;
+    text-decoration: underline;
+    text-decoration-color: var(--brass);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
   }
-  nav a:hover { color: var(--ink); }
-  nav a:hover::after { transform: scaleX(1); }
-  nav a[aria-current='page'] { color: var(--ink); }
-  nav a[aria-current='page']::after { transform: scaleX(1); }
-
-  .cta {
-    flex: 0 0 auto;
-    font-size: 13px;
-    font-weight: 650;
-    color: var(--accent);
-    text-decoration: none;
-    border: 1px solid var(--rule);
-    padding: 6px 14px;
-    border-radius: 99px;
-    transition: border-color var(--t-fast), background var(--t-fast);
-  }
-  .cta:hover { border-color: var(--accent); background: var(--accent-soft); }
 
   @media (max-width: 860px) {
-    .mark-role { display: none; }
     .mark-en { display: none; }
-    .cta { display: none; }
-    .inner { gap: 18px; }
+    .inner { gap: 18px; padding-top: 16px; padding-bottom: 16px; }
+    nav ul { gap: 18px; font-size: 12.5px; }
   }
 </style>
-

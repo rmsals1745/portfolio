@@ -107,17 +107,20 @@ const others = CATEGORIES.filter((c) => c.id !== meta.id);
     color: var(--ink-faint);
     margin-bottom: 14px;
   }
-  .jump { display: flex; flex-wrap: wrap; gap: 9px; }
+  .jump { display: flex; flex-wrap: wrap; gap: 10px 26px; }
   .jump a {
     font-size: 13.5px;
     color: var(--ink-dim);
     text-decoration: none;
-    border: 1px solid var(--rule);
-    padding: 7px 15px;
-    border-radius: 99px;
-    transition: color var(--t-fast), border-color var(--t-fast), background var(--t-fast);
+    font-weight: 700;
+    padding: 4px 0;
+    text-decoration: underline;
+    text-decoration-color: var(--brass);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+    transition: color var(--t-fast);
   }
-  .jump a:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  .jump a:hover { color: var(--accent); }
 
   @media (max-width: 640px) {
     .grid { grid-template-columns: 1fr; }

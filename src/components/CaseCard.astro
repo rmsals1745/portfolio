@@ -60,8 +60,7 @@ const statusLabel: Record<string, string> = {
     padding: 28px 26px 24px;
     border-radius: var(--r-md);
     background: transparent;
-    border: 1px solid transparent;
-    transition: background var(--t-fast), border-color var(--t-fast), transform var(--t-fast);
+    transition: background var(--t-fast), transform var(--t-fast);
   }
 
   /* 스크롤해 들어올 때 한 장씩 올라온다 */
@@ -71,7 +70,7 @@ const statusLabel: Record<string, string> = {
     opacity: 0;
     transform: translateY(18px);
     transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1),
-                background var(--t-fast), border-color var(--t-fast);
+                background var(--t-fast);
   }
   :global(html.js) .card[data-reveal].in {
     opacity: 1;
@@ -83,7 +82,6 @@ const statusLabel: Record<string, string> = {
   .card:hover,
   .card:focus-within {
     background: var(--paper2);
-    border-color: var(--rule);
   }
 
   /* 카드 전체를 링크로 — 겉에 <a> 를 씌우면 내부 링크가 죽으므로 덮개를 쓴다 */
@@ -182,12 +180,11 @@ const statusLabel: Record<string, string> = {
   /* ── tile: 카테고리 페이지의 격자용 */
   .card.tile {
     background: var(--paper2);
-    border-color: var(--rule-soft);
     height: 100%;
     display: flex;
     flex-direction: column;
   }
-  .card.tile:hover { background: var(--paper-lift); border-color: var(--rule); }
+  .card.tile:hover { background: var(--paper3); }
   .card.tile .foot { margin-top: auto; padding-top: 20px; }
   .card.tile .when { margin-left: 0; }
   .card.tile .metrics dd { font-size: 23px; }

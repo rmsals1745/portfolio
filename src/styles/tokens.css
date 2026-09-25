@@ -1,36 +1,44 @@
 /* ============================================================
-   디자인 토큰 — Career/portfolio.html 의 디자인 언어를 계승한다.
-   팔레트·서체 위계·한글 조판 규칙은 그대로 두고, 원본이 갖지 못한
-   것(실제 웹폰트 로드 · 카드 레이어 · 카테고리 축)만 보탠다.
+   디자인 토큰 — 확정 시안 3-B (docs/refs/2026-09-25-시안3B-색면표지.html).
+   서체 위계·한글 조판 규칙은 원본 그대로, 팔레트만 크림·초록·황동으로.
    ============================================================ */
 
+/* 2026-09-25 — 확정 시안 3-B(색면 표지) 팔레트. 크림 바탕 · 짙은 초록 글자 · 황동 포인트.
+   변수 이름은 옛 어두운 판 그대로라 다른 페이지가 값만 바뀌어 따라온다. */
 :root {
-  /* ── 지면 (어두운 종이) */
-  --paper:      #12100e;
-  --paper2:     #1a1714;
-  --paper3:     #221d19;
-  --paper-lift: #262019;  /* 카드 hover — 원본에 없던 레이어 */
+  /* ── 지면 (크림 종이) */
+  --paper:      #f4efe4;
+  --paper2:     #efe8da;
+  --paper3:     #e6dece;
+  --paper-lift: #ebe3d2;  /* 카드 hover */
 
-  /* ── 잉크 */
-  --ink:       #f2ece3;
-  --ink-dim:   #a89d8f;
-  --ink-faint: #6f665b;
+  /* ── 잉크 (초록빛 먹) */
+  --ink:       #1c302b;
+  --ink-dim:   #52645e;
+  --ink-faint: #67766f;
 
-  /* ── 액센트 */
-  --accent:      #e0723a;  /* 주황 — 강조·현재상태 */
-  --accent-soft: rgba(224, 114, 58, .13);
-  --accent2:     #c9a227;  /* 금 — 수치·라벨 */
-  --cool:        #5c9ead;  /* 청 — 보조 분류 */
-  --ok:          #7fb069;
+  /* ── 색면·포인트 */
+  --field:   #1f3d36;   /* 깊은 숲 초록 — 표지·연락 색면 */
+  --field-2: #2b4f46;
+  --field-3: #36604f;
+  --cream:   #efe8da;
+  --brass:      #b8955c;  /* 바랜 황동 — 면·밑줄에만 (글자로 쓰면 대비 부족) */
+  --brass-soft: #d9c29a;  /* 초록 색면 위 글자 */
 
-  --rule:      #2e2823;
-  --rule-soft: #241f1b;
+  --accent:      #2f5a4f;  /* 짙은 초록 — 강조·링크 */
+  --accent-soft: rgba(47, 90, 79, .10);
+  --accent2:     #8a6a35;  /* 크림 위에서 읽히는 황동 — 수치·라벨 */
+  --cool:        #36604f;
+  --ok:          #3f7a52;
+
+  --rule:      #d5cbb6;
+  --rule-soft: #e2d9c5;
 
   /* ── 서체 */
-  --sans: "Pretendard Variable", Pretendard, "Apple SD Gothic Neo",
-          "Malgun Gothic", system-ui, sans-serif;
-  --serif: Georgia, "Times New Roman", "Nanum Myeongjo", serif;
-  --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --sans: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  /* 3-B 는 세리프를 쓰지 않는다 — 옛 변수 이름만 남겨 sans 로 잇는다 */
+  --serif: var(--sans);
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
 
   /* ── 리듬 */
   --header-h: 62px;
@@ -53,16 +61,12 @@ html {
   scroll-padding-top: calc(var(--header-h) + 26px);
 }
 
-/* 헤더가 고정이라 흐름에서 자리를 차지하지 않는다.
-   히어로가 있는 첫 화면은 자기 안에서 헤더 높이를 처리하므로 제외한다. */
-main:not(:has(.hero)) { padding-top: var(--header-h); }
-
 body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 16px;
-  line-height: 1.75;
+  font-size: 17px;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   /* 한국어 어절 단위 줄바꿈 — "짓/고" 처럼 낱말이 쪼개지지 않게.
@@ -71,6 +75,8 @@ body {
   overflow-wrap: anywhere;
   hyphens: none;
 }
+
+::selection { background: var(--brass-soft); color: var(--ink); }
 
 /* 줄바꿈 금지 조각 (숫자+단위 등) */
 .nb { white-space: nowrap; }
@@ -91,40 +97,26 @@ img { max-width: 100%; display: block; }
 /* ── 서체 위계 ─────────────────────────────────────── */
 
 h1 {
-  font-family: var(--serif);
-  /* 2026-09-05 크게 키웠다(64→86). 첫 문장이 화면의 주인이어야 한다. */
+  font-family: var(--sans);
   font-size: clamp(33px, 6.6vw, 86px);
-  line-height: 1.12;
-  font-weight: 400;
-  letter-spacing: -.025em;
+  line-height: 1.1;
+  font-weight: 900;
+  letter-spacing: -.04em;
 }
-/* 강조어는 주황→금으로 흐르는 결. 멎어 있는 주황 한 색보다 눈에 걸린다. */
-h1 em {
-  font-style: normal;
-  background: linear-gradient(100deg, var(--accent) 20%, var(--accent2) 50%, var(--accent) 80%);
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: ink-flow 7s linear infinite;
-}
-@keyframes ink-flow {
-  0%   { background-position: 0% 0; }
-  100% { background-position: -200% 0; }
-}
-@media (prefers-reduced-motion: reduce) { h1 em { animation: none; } }
+h1 em { font-style: normal; color: var(--accent); }
 
 h2 {
-  font-family: var(--serif);
-  font-weight: 400;
+  font-family: var(--sans);
+  font-weight: 900;
   font-size: clamp(25px, 3.2vw, 31px);
-  letter-spacing: -.01em;
+  letter-spacing: -.03em;
 }
 
 .eyebrow {
   font-size: 12px;
-  letter-spacing: .22em;
+  letter-spacing: .12em;
   text-transform: uppercase;
+  font-family: var(--mono);
   color: var(--accent2);
   font-weight: 700;
 }
@@ -168,13 +160,13 @@ section.tight { padding-top: 0; }
   text-transform: uppercase;
   font-weight: 700;
   color: var(--paper);
-  background: var(--accent2);
+  background: var(--field);
   padding: 3px 8px;
   border-radius: 3px;
   white-space: nowrap;
 }
-.tag.live { background: var(--accent); color: #fff; }
-.tag.cool { background: var(--cool); color: #0d1416; }
+.tag.live { background: var(--brass); color: #1a2622; }
+.tag.cool { background: var(--field-3); color: var(--cream); }
 .tag.ghost {
   background: transparent;
   color: var(--ink-faint);
