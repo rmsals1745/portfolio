@@ -1,0 +1,112 @@
+{
+ "leerob.com": {
+  "ok": true,
+  "title": "Lee Robinson",
+  "scrollY": 320
+ },
+ "emilkowal.ski": {
+  "ok": true,
+  "title": "Emil Kowalski",
+  "scrollY": 1350
+ },
+ "paco.me": {
+  "ok": true,
+  "title": "Paco Coursey",
+  "scrollY": 524
+ },
+ "brittanychiang.com": {
+  "ok": true,
+  "title": "Brittany Chiang",
+  "scrollY": 1350
+ },
+ "rauno.me": {
+  "ok": true,
+  "title": "Rauno Freiberg",
+  "scrollY": 1350
+ },
+ "joshwcomeau.com": {
+  "ok": true,
+  "title": "Josh W. Comeau",
+  "scrollY": 1350
+ },
+ "karpathy.ai": {
+  "ok": true,
+  "title": "Andrej Karpathy",
+  "scrollY": 1350
+ },
+ "antfu.me": {
+  "ok": true,
+  "title": "Anthony Fu",
+  "scrollY": 330
+ },
+ "paulstamatiou.com": {
+  "ok": true,
+  "title": "Paul Stamatiou",
+  "scrollY": 1350
+ },
+ "patrickcollison.com": {
+  "ok": true,
+  "title": "Home · Patrick Collison",
+  "scrollY": 0
+ },
+ "samuelkraft.com": {
+  "ok": true,
+  "title": "Samuel Kraft - Design engineer",
+  "scrollY": 1350
+ },
+ "simonwillison.net": {
+  "ok": true,
+  "title": "Simon Willison’s Weblog",
+  "scrollY": 1350
+ },
+ "ciechanow.ski": {
+  "ok": true,
+  "title": "Bartosz Ciechanowski",
+  "scrollY": 1350
+ },
+ "dennissnellenberg.com": {
+  "ok": true,
+  "title": "Dennis Snellenberg • Freelance Designer & Developer",
+  "scrollY": 0
+ },
+ "bruno-simon.com": {
+  "ok": true,
+  "title": "Bruno's",
+  "scrollY": 0
+ },
+ "p5aholic.me": {
+  "ok": true,
+  "title": "Keita Yamada",
+  "scrollY": 0
+ },
+ "cydstumpel.nl": {
+  "ok": true,
+  "title": "Cyd Stumpel | Portfolio Cyd Stumpel",
+  "scrollY": 1350
+ },
+ "olivierlarose.com": {
+  "ok": true,
+  "title": "Olivier Larose - Freelance Front End Developer",
+  "scrollY": 1350
+ },
+ "maggieappleton.com": {
+  "ok": true,
+  "title": "Maggie Appleton",
+  "scrollY": 1350
+ },
+ "raphaelsalaja.com": {
+  "ok": true,
+  "title": "Raphael Salaja",
+  "scrollY": 394
+ },
+ "craigmod.com": {
+  "ok": true,
+  "title": "Craig Mod — Writer + Photographer",
+  "scrollY": 1350
+ },
+ "gwern.net": {
+  "ok": true,
+  "title": "Essays · Gwern.net",
+  "scrollY": 1350
+ }
+}
