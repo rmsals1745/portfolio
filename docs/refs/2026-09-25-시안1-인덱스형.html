@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>박근민 — AI 에이전트 시스템</title>
+<meta name="description" content="AI 에이전트에게 일을 시키고, 그 결과를 믿을 수 있게 만듭니다. 박근민(Justin Avery Park)의 작업 목차.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #fbfaf6;
+    --ink: #1d1c19;
+    --ink-2: #4a4740;
+    --ink-3: #8a857a;
+    --rule: #e4e0d6;
+    --mark: #b8411f;          /* 단 한 곳 — 펼친 줄의 번호 */
+    --serif: "Noto Serif KR", "Apple SD Gothic Neo", serif;
+    --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --col: 640px;
+    --ease: cubic-bezier(.2, .7, .2, 1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.75;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  ::selection { background: #efe3c8; }
+  code { font-family: var(--mono); font-size: .88em; }
+
+  .col { max-width: var(--col); margin: 0 auto; padding: 0 24px; }
+
+  /* ── 머리 ─────────────────────────────── */
+  header.top { padding-top: 88px; }
+  .nm {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 30px;
+    letter-spacing: -.02em;
+    line-height: 1.25;
+  }
+  .nm .en {
+    display: block;
+    font-family: var(--sans);
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: .02em;
+    color: var(--ink-3);
+    margin-top: 6px;
+  }
+  .role { margin-top: 26px; font-size: 16px; color: var(--ink-2); }
+  .lede {
+    margin-top: 22px;
+    font-family: var(--serif);
+    font-size: 21px;
+    font-weight: 400;
+    line-height: 1.65;
+    letter-spacing: -.01em;
+  }
+
+  .hire { margin-top: 34px; }
+  .label {
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    color: var(--ink-3);
+  }
+  .hire ol { list-style: none; margin-top: 10px; counter-reset: h; }
+  .hire li {
+    counter-increment: h;
+    position: relative;
+    padding-left: 30px;
+    color: var(--ink-2);
+    margin-top: 6px;
+  }
+  .hire li::before {
+    content: counter(h, decimal-leading-zero);
+    position: absolute; left: 0; top: .25em;
+    font-family: var(--mono); font-size: 12px; color: var(--ink-3);
+  }
+  .hire li b { color: var(--ink); font-weight: 600; }
+
+  .reach {
+    margin-top: 30px;
+    display: flex; flex-wrap: wrap; gap: 8px 28px;
+    align-items: baseline;
+  }
+  .reach a {
+    font-weight: 500;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 100% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    padding-bottom: 1px;
+    transition: background-size .35s var(--ease), color .2s;
+  }
+  .reach a:hover { background-size: 0 1px; background-position: 100% 100%; }
+  .reach .quiet { color: var(--ink-3); font-size: 14.5px; }
+
+  /* ── 구역 머리 ───────────────────────── */
+  section { margin-top: 112px; }
+  .sec-h {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 14px;
+  }
+  .sec-h h2 {
+    font-family: var(--serif);
+    font-size: 15px; font-weight: 600;
+    letter-spacing: 0;
+  }
+  .sec-h span { font-size: 13px; color: var(--ink-3); }
+
+  /* ── 대표 시스템 = 목차 줄 ────────────── */
+  .toc { list-style: none; }
+  .row { border-top: 1px solid var(--rule); }
+  .row:last-child { border-bottom: 1px solid var(--rule); }
+  .row-btn {
+    all: unset;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    column-gap: 6px;
+    width: 100%;
+    padding: 22px 0 22px;
+    cursor: pointer;
+  }
+  .row-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+  .no {
+    font-family: var(--mono); font-size: 12.5px; color: var(--ink-3);
+    padding-top: .45em;
+    transition: color .25s;
+  }
+  .row.open .no { color: var(--mark); }
+
+  /* 제목 …………… 기간 — 책 목차의 점선 리더 */
+  .line { display: flex; align-items: baseline; gap: 10px; }
+  .t {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 19px;
+    letter-spacing: -.01em;
+    line-height: 1.45;
+    flex: 0 1 auto;
+  }
+  .leader {
+    flex: 1 1 24px;
+    min-width: 24px;
+    align-self: flex-end;
+    margin-bottom: .5em;
+    height: 2px;
+    background-image: radial-gradient(circle, var(--ink-3) .7px, transparent 1px);
+    background-size: 6px 2px;
+    background-repeat: repeat-x;
+    opacity: .7;
+    transition: opacity .3s;
+  }
+  .row-btn:hover .leader { opacity: 1; }
+  .when {
+    font-family: var(--mono); font-size: 12.5px; color: var(--ink-3);
+    white-space: nowrap;
+  }
+  .s {
+    grid-column: 2;
+    margin-top: 4px;
+    color: var(--ink-2);
+    font-size: 15.5px;
+  }
+  .tog {
+    grid-column: 2;
+    margin-top: 8px;
+    font-size: 13px; color: var(--ink-3);
+    transition: color .2s;
+  }
+  .row-btn:hover .tog { color: var(--ink); }
+  .tog::after { content: "펼치기 ↓"; }
+  .row.open .tog::after { content: "접기 ↑"; }
+
+  /* 제자리 펼침 — 높이를 재지 않고 grid 0fr→1fr */
+  .body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .45s var(--ease);
+  }
+  .row.open .body { grid-template-rows: 1fr; }
+  .body > .in { overflow: hidden; }
+  .detail {
+    padding: 4px 0 34px 40px;
+    color: var(--ink-2);
+    font-size: 15.5px;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity .35s .05s, transform .45s var(--ease);
+  }
+  .row.open .detail { opacity: 1; transform: none; }
+  .detail h3 {
+    font-size: 12.5px; font-weight: 500; letter-spacing: .08em;
+    color: var(--ink-3);
+    margin: 26px 0 6px;
+  }
+  .detail h3:first-child { margin-top: 8px; }
+  .detail p + p { margin-top: 10px; }
+  .detail ul { list-style: none; }
+  .detail li { position: relative; padding-left: 16px; margin-top: 8px; }
+  .detail li::before {
+    content: ""; position: absolute; left: 2px; top: .85em;
+    width: 6px; height: 1px; background: var(--ink-3);
+  }
+  .detail b { color: var(--ink); font-weight: 600; }
+  .detail .said {
+    font-family: var(--serif);
+    font-size: 17.5px;
+    line-height: 1.7;
+    color: var(--ink);
+    margin-top: 6px;
+  }
+  .detail .stack {
+    margin-top: 24px;
+    font-family: var(--mono); font-size: 12.5px; color: var(--ink-3);
+    line-height: 1.9;
+  }
+
+  /* ── 나머지 목록 ─────────────────────── */
+  .rest { list-style: none; }
+  .rest li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 20px;
+    padding: 13px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .rest li:last-child { border-bottom: 1px solid var(--rule); }
+  .rest .rt { font-weight: 600; font-size: 15.5px; }
+  .rest .rs { grid-column: 1 / -1; color: var(--ink-2); font-size: 14.5px; margin-top: 2px; }
+  .rest .when { padding-top: .3em; }
+
+  /* ── 알아낸 것 ───────────────────────── */
+  .notes { list-style: none; }
+  .notes li { margin-top: 30px; }
+  .notes li:first-child { margin-top: 6px; }
+  .notes q {
+    display: block;
+    font-family: var(--serif);
+    font-size: 18.5px;
+    line-height: 1.7;
+    letter-spacing: -.01em;
+    quotes: none;
+  }
+  .notes .src { display: block; margin-top: 6px; font-size: 13px; color: var(--ink-3); }
+
+  /* ── 연락 ────────────────────────────── */
+  footer.col { margin-top: 120px; padding-bottom: 96px; }
+  .call {
+    font-family: var(--serif);
+    font-size: 24px;
+    line-height: 1.55;
+    letter-spacing: -.015em;
+    font-weight: 400;
+  }
+  .ways { list-style: none; margin-top: 30px; }
+  .ways li {
+    display: grid; grid-template-columns: 34px 1fr; column-gap: 6px;
+    padding: 16px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .ways li:last-child { border-bottom: 1px solid var(--rule); }
+  .ways .no { padding-top: .3em; }
+  .ways .wt { font-weight: 600; }
+  .ways .ws { grid-column: 2; color: var(--ink-2); font-size: 15px; margin-top: 2px; }
+  .ways a.go {
+    grid-column: 2; margin-top: 8px; justify-self: start;
+    font-weight: 500;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 100% 1px; background-position: 0 100%; background-repeat: no-repeat;
+    transition: background-size .35s var(--ease);
+  }
+  .ways a.go:hover { background-size: 0 1px; background-position: 100% 100%; }
+  .fine { margin-top: 40px; font-size: 13px; color: var(--ink-3); line-height: 1.9; }
+
+  @media (max-width: 560px) {
+    header.top { padding-top: 56px; }
+    .col { padding: 0 20px; }
+    .nm { font-size: 27px; }
+    .lede { font-size: 19px; }
+    section { margin-top: 88px; }
+    .row-btn { grid-template-columns: 28px 1fr; }
+    .line { flex-wrap: wrap; row-gap: 0; }
+    .leader { display: none; }
+    .when { flex-basis: 100%; }
+    .t { font-size: 18px; }
+    .detail { padding-left: 0; }
+    .ways li { grid-template-columns: 28px 1fr; }
+    .call { font-size: 21px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top col">
+  <h1 class="nm">박근민<span class="en">Justin Avery Park</span></h1>
+
+  <p class="role">AI 에이전트 시스템과 그 아래 인프라를 혼자 설계하고, 운영까지 합니다.</p>
+
+  <p class="lede">AI 에이전트에게 일을 시키고,<br>그 결과를 믿을 수 있게 만듭니다.</p>
+
+  <div class="hire">
+    <p class="label">이런 일에 불러 주세요</p>
+    <ol>
+      <li><b>AI 에이전트를 실제 업무에 붙이는 일</b> — 요구사항을 캐내는 것부터 배포 후 운영까지. Forward Deployed Engineer</li>
+      <li><b>여러 LLM을 한 체계로 묶는 설계</b> — 한 곳이 죽어도 멈추지 않고, AI가 자기 결과를 스스로 통과시키지 못하게. Solutions Architect</li>
+      <li><b>꺼져도 도는 자동화 인프라</b> — 스케줄·훅·백업·관측을 한 사람이 감당할 수 있게. AI 인프라 엔지니어링</li>
+    </ol>
+  </div>
+
+  <div class="reach">
+    <a href="mailto:rmsals1745@gmail.com">rmsals1745@gmail.com</a>
+    <a href="https://github.com/rmsals1745" rel="me noopener">GitHub</a>
+    <span class="quiet">인천 · 서울 · 원격 가능</span>
+  </div>
+</header>
+
+<main class="col">
+
+  <section id="work" aria-labelledby="work-h">
+    <div class="sec-h"><h2 id="work-h">대표 시스템</h2><span>줄을 누르면 펼쳐집니다</span></div>
+    <ol class="toc">
+
+      <li class="row" id="justswarm">
+        <button class="row-btn" aria-expanded="false" aria-controls="d1">
+          <span class="no">01</span>
+          <span class="line"><span class="t">justswarm</span><span class="leader" aria-hidden="true"></span><span class="when">2026.04 –</span></span>
+          <span class="s">AI 한 대가 코드를 짜면 다른 회사의 AI가 검사하고, 통과할 때까지 되돌려 보내는 엔진입니다.</span>
+          <span class="tog" aria-hidden="true"></span>
+        </button>
+        <div class="body" id="d1" role="region" aria-label="justswarm 상세"><div class="in"><div class="detail">
+          <h3>왜 만들었나</h3>
+          <p>AI 산출물은 그럴듯하게 틀립니다. 사람이 매번 들여다봐야 한다면 자동화한 의미가 없습니다. 그런데 같은 모델이 만들고 같은 모델이 검수하면, 대개 그냥 통과합니다.</p>
+          <h3>어떻게 막았나</h3>
+          <ul>
+            <li>구현하는 AI와 검수하는 AI를 <b>서로 다른 회사의 모델</b>로 나눴습니다.</li>
+            <li>그 라운드에 결과물을 낸 모델은 <b>검수 후보에서 자동으로 빠집니다.</b> 후보가 다 떨어지면 자동 승인이 아니라 사람에게 넘깁니다.</li>
+            <li>판정은 <code>approve · revise · reject</code> 세 단어로만 받습니다. 형식을 어기면 엔진이 다시 묻습니다 — 애매한 말을 승인으로 읽지 않기 위해서입니다.</li>
+            <li>워커의 자기보고는 믿지 않습니다. <b>실제로 바뀐 코드(diff)만</b> 판정에 씁니다.</li>
+          </ul>
+          <h3>실제로 돌려 보니</h3>
+          <p>2026년 7월 18일부터 8월 9일까지 기록된 52번의 실행 가운데 <b>17번에서 검수 AI가 실제로 수정을 요구했고</b>, 그중 16번은 두 번 이상 고쳐서 다시 냈습니다. 검수가 장식이 아니었다는 기록입니다.</p>
+          <h3>알아낸 것</h3>
+          <p class="said">타입 검사 같은 관문은 워커가 아무 일도 안 해도 통과합니다. 그래서 손대기 전 코드에서도 통과하는 검사를 따로 가려내, 그런 통과는 “아무것도 안 깨졌다”까지만 뜻한다고 검수자에게 알립니다.</p>
+          <p class="stack">Python · Claude Code CLI · GLM · MiMo · DeepSeek · Kimi</p>
+        </div></div></div>
+      </li>
+
+      <li class="row" id="inlifeclick">
+        <button class="row-btn" aria-expanded="false" aria-controls="d2">
+          <span class="no">02</span>
+          <span class="line"><span class="t">인생딸깍</span><span class="leader" aria-hidden="true"></span><span class="when">2026.06 – 운영 중</span></span>
+          <span class="s">AI가 블로그·SNS 글을 대신 써 주는 월 구독 서비스입니다. 결제·환불·약관까지 혼자 만들어 운영하고 있습니다.</span>
+          <span class="tog" aria-hidden="true"></span>
+        </button>
+        <div class="body" id="d2" role="region" aria-label="인생딸깍 상세"><div class="in"><div class="detail">
+          <h3>무엇을 하나</h3>
+          <p>설문지 대신 상담형 에이전트가 마주 앉아 가게와 상품 이야기를 인터뷰합니다. 그 답을 씨앗 삼아 네이버 블로그 원고를 만들고, 인스타그램·쓰레드·X 용 원고는 각 작성창까지 실어 보냅니다. 업종을 가리지 않는 범용 도구입니다.</p>
+          <p>자동발행 기능은 <b>일부러 없앴습니다.</b> 사용자가 통제권을 잃는 자동화는 편리한 게 아니라 불안한 것이었습니다.</p>
+          <h3>돈이 걸린 코드</h3>
+          <ul>
+            <li>결제사가 되돌려 주는 주소가 예상과 다르게 붙어 <b>돈은 빠졌는데 지급은 안 되던</b> 사고가 있었습니다. 지금은 브라우저에 기대지 않고, 서버가 결제 알림의 서명을 확인하고 → 결제 건을 다시 조회하고 → 같은 지급이 두 번 나가지 않게 막는 세 겹으로 결론을 냅니다.</li>
+            <li>상품 가격표를 서버 한 곳으로 모아, 화면과 서버의 가격이 어긋날 수 있는 구조 자체를 없앴습니다.</li>
+            <li>서비스를 멈추지 않은 채 데이터베이스 구조를 <b>40차례</b> 바꿔 왔습니다.</li>
+          </ul>
+          <h3>끝까지 간 것</h3>
+          <p>이용약관 · 개인정보처리방침 · 청약철회와 환불규정 · 사업자등록 · 통신판매업신고까지 갖췄습니다. 시연용이 아니라 결제를 받을 수 있는 형태로 끝냈습니다.</p>
+          <p class="stack">Cloudflare Pages Functions · D1 · React · Capacitor · PortOne V2</p>
+        </div></div></div>
+      </li>
+
+      <li class="row" id="just-design">
+        <button class="row-btn" aria-expanded="false" aria-controls="d3">
+          <span class="no">03</span>
+          <span class="line"><span class="t">JUST DESIGN</span><span class="leader" aria-hidden="true"></span><span class="when">2026.08</span></span>
+          <span class="s">상담지 한 장을 받으면 AI 셋이 방향이 다른 홈페이지 시안을 하나씩 만들고, 또 다른 AI가 기계로 대조해 합격을 가립니다.</span>
+          <span class="tog" aria-hidden="true"></span>
+        </button>
+        <div class="body" id="d3" role="region" aria-label="JUST DESIGN 상세"><div class="in"><div class="detail">
+          <h3>구조</h3>
+          <p>소재 기획 → 제작(세 안을 동시에) → 검수. 에이전트끼리 대화시키지 않고 <b>파일 계약</b>으로만 주고받습니다. 상호·상품·가격·주소는 클라이언트가 적은 그대로 두고 디자인 방향만 바꾸기 때문에, 클라이언트는 내용이 아니라 스타일을 고르게 됩니다.</p>
+          <h3>검수가 실제로 막아낸 것</h3>
+          <p>제작 AI 셋이 모두 지도 지시를 무시하고 CSS와 이모지로 “지도처럼 보이는 것”을 그렸습니다. 눈으로는 통과할 화면이었습니다. 파일이 실제로 무엇을 참조하는지 기계로 대조해 잡았고, 한 번 고친 뒤 <b>9개 검사를 세 안 모두 통과</b>했습니다.</p>
+          <p>그 앞 판에서는 검수 AI가 검사 항목을 스스로 바꿔 짜면서 비밀키 노출 점검을 통째로 빠뜨리고 합격을 냈습니다. 그 뒤로 항목을 번호째 고정했습니다.</p>
+          <h3>알아낸 것</h3>
+          <p class="said">무엇을 잴지를 검수자가 정하게 두면, 검수는 죽은 채로 통과합니다.</p>
+          <p>시안에 들어간 상품 사진 8장은 외부 서비스 없이 로컬 확산모델로 직접 만들었습니다.</p>
+          <p class="stack">멀티에이전트 오케스트레이션 · 파일 계약 · 판정 프로토콜 · ComfyUI</p>
+        </div></div></div>
+      </li>
+
+      <li class="row" id="hermes">
+        <button class="row-btn" aria-expanded="false" aria-controls="d4">
+          <span class="no">04</span>
+          <span class="line"><span class="t">Hermes 상시 런타임</span><span class="leader" aria-hidden="true"></span><span class="when">2026.05 –</span></span>
+          <span class="s">PC가 꺼져 있어도 예약한 일이 굴러가게 하는 런타임입니다. 중앙이 죽어도 각자 돌고, 놓친 일은 켜지는 순간 따라잡습니다.</span>
+          <span class="tog" aria-hidden="true"></span>
+        </button>
+        <div class="body" id="d4" role="region" aria-label="Hermes 상세"><div class="in"><div class="detail">
+          <h3>구조</h3>
+          <ul>
+            <li>에이전트가 필요 없는 반복 작업 <b>14개</b>를 중앙 게이트웨이에서 떼어 운영체제 스케줄러로 내렸습니다. 게이트웨이가 재시작되거나 죽어도 상관없이 돕니다.</li>
+            <li>세션이 시작되면 작업 맥락을 넣고 자동으로 커밋하며, 끝나면 배운 개념을 뽑아 쌓습니다. <b>사람이 기억해야 할 일을 런타임이 대신 기억합니다.</b></li>
+            <li>원격 서버에 워커를 상주시켜, 로컬 기계가 꺼져 있어도 메신저 → 서버 에이전트 → 커밋 → 결재 흐름이 이어집니다.</li>
+            <li>백업은 로컬 · GitHub · 클라우드 세 곳에 둡니다.</li>
+          </ul>
+          <h3>알아낸 것</h3>
+          <p class="said">API가 결제 오류를 뱉을 때 “충전이 부족하다”고 믿고 시간을 버렸습니다. 진짜 원인은 설정 파일마다 남아 있던 낡은 주소였습니다.</p>
+          <p>그 뒤로 흩어진 키를 한 곳으로 모아, 교체할 때 파일 하나만 고치면 되게 바꿨습니다.</p>
+          <p class="stack">Python · Docker · systemd · cron · Windows 작업 스케줄러 · Telegram Bot API</p>
+        </div></div></div>
+      </li>
+
+    </ol>
+  </section>
+
+  <section id="more" aria-labelledby="more-h">
+    <div class="sec-h"><h2 id="more-h">그 밖에 만든 것</h2><span>7개</span></div>
+    <ul class="rest">
+      <li><span class="rt">justlink</span><span class="when">2026.04 –</span><span class="rs">에이전트가 지금 무슨 일을 하는지 한 화면에서 보고, 맡기고, 결재하는 관제판.</span></li>
+      <li><span class="rt">실행 가시성 계층</span><span class="when">2026.08 –</span><span class="rs">지금 어떤 호출이 몇 초째 도는지, 비용이 얼마인지 화면 아래에 늘 띄워 둡니다. 작업 코드는 손대지 않습니다.</span></li>
+      <li><span class="rt">justgraph</span><span class="when">2026.08 –</span><span class="rs">사람의 결재에서 멈춘 워크플로를 며칠 뒤 전혀 다른 프로세스가 그 자리에서 이어 갑니다.</span></li>
+      <li><span class="rt">규제 문구 사전점검 플러그인</span><span class="when">2026.07</span><span class="rs">쇼핑몰·의료 광고 문구가 법에 걸리는지 올리기 전에 잡습니다. 해커톤 출품작, 회귀 테스트 56개 전부 통과.</span></li>
+      <li><span class="rt">juststandby</span><span class="when">2026.07 –</span><span class="rs">처음 보는 컴퓨터에서 명령 한 줄로 개발 환경 전체를 되살립니다. 비밀키는 암호화해 둡니다.</span></li>
+      <li><span class="rt">devtutor</span><span class="when">2026.06 –</span><span class="rs">작업 대화에서 개념을 뽑아 지식 카드로 쌓습니다. 시간이 아니라 세션 시작에 걸어, 꺼져 있던 기계도 놓치지 않습니다.</span></li>
+      <li><span class="rt">로컬 이미지 생성 파이프라인</span><span class="when">2026.06 –</span><span class="rs">시안에 들어갈 사진을 외부 서비스 없이 로컬 추론으로 만듭니다.</span></li>
+    </ul>
+  </section>
+
+  <section id="notes" aria-labelledby="notes-h">
+    <div class="sec-h"><h2 id="notes-h">만들면서 알아낸 것</h2></div>
+    <ul class="notes">
+      <li><q>관문을 통과했다는 사실만으로는 아무것도 증명되지 않습니다.</q><span class="src">justswarm</span></li>
+      <li><q>규칙 기반 검사기의 진짜 위험은 못 잡는 게 아니라, 못 잡으면서 통과 신호를 준다는 것입니다.</q><span class="src">규제 문구 사전점검</span></li>
+      <li><q>여러 세션이 한 저장소를 같이 쓰면 서로의 변경분을 채 갑니다. 겹치는 작업은 격리하는 수밖에 없었습니다.</q><span class="src">justlink</span></li>
+      <li><q>기계가 대부분 꺼져 있는 환경에서, 시간에 건 예약은 조용히 실행되지 않습니다.</q><span class="src">devtutor</span></li>
+    </ul>
+  </section>
+
+</main>
+
+<footer class="col" id="contact">
+  <p class="call">만든 것을 직접 설명할 수 있는 엔지니어를 찾고 계시다면.</p>
+  <ul class="ways">
+    <li>
+      <span class="no">A</span>
+      <span class="wt">프로젝트를 맡기고 싶습니다</span>
+      <span class="ws">AI 자동화 · 에이전트 파이프라인 · 결제 붙은 서비스를 기획부터 배포까지. 요구사항이 아직 문장이 아니어도 됩니다 — 캐내는 것부터가 제 일입니다.</span>
+      <a class="go" href="mailto:rmsals1745@gmail.com?subject=%5B%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%20%EC%9D%98%EB%A2%B0%5D%20">의뢰 메일 쓰기 →</a>
+    </li>
+    <li>
+      <span class="no">B</span>
+      <span class="wt">채용을 검토하고 있습니다</span>
+      <span class="ws">AI 인프라 · 에이전트 시스템 · 풀스택. 이력서와 상세 근거는 요청 주시면 보내 드립니다.</span>
+      <a class="go" href="mailto:rmsals1745@gmail.com?subject=%5B%EC%B1%84%EC%9A%A9%20%EB%AC%B8%EC%9D%98%5D%20">채용 문의 메일 쓰기 →</a>
+    </li>
+  </ul>
+  <p class="fine">rmsals1745@gmail.com · github.com/rmsals1745 · 인천 · 서울 (수도권) · 원격 가능<br>수치는 로컬 git과 실행 기록을 직접 잰 값입니다.</p>
+</footer>
+
+<script>
+  document.querySelectorAll('.row-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var row = btn.closest('.row');
+      var open = !row.classList.contains('open');
+      row.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+  // 주소에 #justswarm 같은 앵커가 있으면 그 줄을 펼친 채로 연다
+  (function () {
+    var id = location.hash.slice(1);
+    var row = id && document.getElementById(id);
+    if (row && row.classList.contains('row')) row.querySelector('.row-btn').click();
+  })();
+</script>
+</body>
+</html>

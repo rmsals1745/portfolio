@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>박근민 — AI 에이전트 시스템 엔지니어</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ultra:#2A17F0;      /* 울트라마린 — 주색 */
+  --ultra-deep:#170C8C;
+  --lime:#D6FF3D;       /* 애시드 라임 — 보조색 */
+  --paper:#F5F2E9;
+  --ink:#140E4F;        /* 회색 대신 짙은 남색 잉크 */
+  --ink-soft:#4B4690;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --sans:"Noto Sans KR",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden;word-break:keep-all;overflow-wrap:anywhere}
+a{color:inherit}
+::selection{background:var(--lime);color:var(--ink)}
+
+/* ───────── 표지 ───────── */
+.cover{position:relative;min-height:100vh;background:var(--ultra);color:#fff;overflow:hidden;
+  display:grid;grid-template-rows:auto 1fr auto;padding:28px 48px 36px}
+.cover-top{display:flex;justify-content:space-between;align-items:baseline;gap:24px;position:relative;z-index:2;
+  font-family:var(--mono);font-size:14px;letter-spacing:.04em;text-transform:uppercase}
+.cover-top b{font-family:var(--sans);font-size:17px;letter-spacing:0;text-transform:none;font-weight:700}
+.cover-top nav{display:flex;gap:28px}
+.cover-top nav a{text-decoration:none;color:var(--ink);font-weight:600}
+.cover-top nav a:hover{color:var(--ultra)}
+.disc{position:absolute;right:-14vw;top:50%;transform:translateY(-50%);width:min(78vw,1080px);height:auto;z-index:0}
+.statement{position:relative;z-index:1;align-self:center;font-weight:900;letter-spacing:-.045em;
+  font-size:clamp(52px,9.6vw,150px);line-height:.98;margin:40px 0 28px}
+.statement span{display:block}
+.statement .indent{padding-left:1.05em}
+/* 흰 글자 + difference = 파랑 위에선 라임, 라임 원 위에선 파랑 — 겹쳐도 안 묻힌다 */
+.statement{color:#fff;mix-blend-mode:difference}
+.statement em{font-style:normal;text-decoration:underline;text-decoration-thickness:.09em;text-underline-offset:.12em}
+.cover-foot{position:relative;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:22px;max-width:40%}
+.who-line{font-size:19px;line-height:1.55;max-width:34em}
+.who-line strong{font-weight:700}
+.cover-cta{display:flex;gap:14px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:15px 24px;font-weight:700;font-size:16px;text-decoration:none;border-radius:4px;transition:transform .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn-lime{background:var(--lime);color:var(--ink)}
+.btn-ghost{color:#fff;text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px;padding-left:4px;padding-right:4px}
+
+/* ───────── 분할 본문 ───────── */
+.split{display:grid;grid-template-columns:minmax(300px,400px) 1fr;gap:72px;max-width:1360px;margin:0 auto;padding:0 48px}
+.side{position:sticky;top:0;align-self:start;height:100vh;padding:64px 0 40px;display:flex;flex-direction:column;gap:30px}
+.side h2{font-size:34px;line-height:1.15;font-weight:900;letter-spacing:-.03em}
+.side h2 small{display:block;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.08em;color:var(--ultra);margin-bottom:10px;text-transform:uppercase}
+.side .lead{color:var(--ink-soft);font-size:16px;line-height:1.65}
+.label{font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:var(--ultra);margin-bottom:8px}
+.hire li{list-style:none;font-weight:700;font-size:16px;line-height:1.5;padding:3px 0}
+.hire li span{font-weight:400;color:var(--ink-soft);font-size:14px;display:block}
+.side-contact a{display:block;font-weight:700;text-decoration:none;font-size:16px}
+.side-contact a:hover{color:var(--ultra)}
+.toc{margin-top:auto}
+.toc a{display:flex;gap:14px;align-items:baseline;text-decoration:none;padding:5px 0;font-size:15px;color:var(--ink-soft);transition:color .15s,padding .15s}
+.toc a i{font-style:normal;font-family:var(--mono);font-size:12px;width:22px}
+.toc a:hover,.toc a.on{color:var(--ultra);padding-left:8px;font-weight:700}
+
+.main{padding:64px 0 40px}
+.intro{font-size:23px;line-height:1.6;font-weight:500;max-width:30em;margin-bottom:72px}
+.intro mark{background:linear-gradient(transparent 58%,var(--lime) 58%);color:inherit}
+
+/* 타임라인 — 선은 테두리가 아니라 배경 그라디언트 */
+.timeline{position:relative;padding-left:44px;background:linear-gradient(var(--ultra),var(--ultra)) 9px 12px/3px calc(100% - 24px) no-repeat}
+.case{position:relative;padding-bottom:64px;scroll-margin-top:32px}
+.case::before{content:"";position:absolute;left:-44px;top:10px;width:21px;height:21px;background:var(--paper);
+  outline:3px solid var(--ultra);outline-offset:-3px;border-radius:50%}
+.case.open::before{background:var(--lime)}
+.when{font-family:var(--sans);font-size:14px;font-weight:700;letter-spacing:0;color:var(--ultra)}
+.case h3{font-size:clamp(30px,3.4vw,44px);line-height:1.1;font-weight:900;letter-spacing:-.035em;margin:6px 0 18px}
+.case h3 small{display:block;font-size:17px;font-weight:500;letter-spacing:-.01em;color:var(--ink-soft);margin-top:10px;line-height:1.5}
+.beats{display:grid;gap:14px;max-width:40em}
+.beat{display:grid;grid-template-columns:92px 1fr;gap:16px}
+.beat b{font-family:var(--sans);font-size:14px;font-weight:700;padding-top:1px;color:var(--ink-soft)}
+.beat.result b{color:var(--ultra)}
+.beat.result p{font-weight:700}
+.toggle{margin-top:22px;background:var(--ink);color:var(--paper);font:700 15px var(--sans);padding:12px 20px;cursor:pointer;border:0;border-radius:4px;display:inline-flex;gap:10px;align-items:center}
+.toggle:hover{background:var(--ultra)}
+.toggle .ar{display:inline-block;transition:transform .2s}
+.case.open .toggle{background:var(--ultra)}
+.case.open .toggle .ar{transform:rotate(45deg)}
+.detail{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s ease}
+.detail > div{overflow:hidden}
+.case.open .detail{grid-template-rows:1fr}
+.detail-in{margin-top:26px;padding:30px 32px;background:var(--ultra);color:#fff;border-radius:6px;max-width:44em}
+.detail-in h4{font-size:15px;font-family:var(--sans);letter-spacing:.02em;color:var(--lime);margin:22px 0 8px;font-weight:600}
+.detail-in h4:first-child{margin-top:0}
+.detail-in p,.detail-in li{font-size:16px;line-height:1.7}
+.detail-in ul{padding-left:1.1em}
+.detail-in li{margin:6px 0}
+.detail-in strong{color:var(--lime)}
+.detail-in .stack{margin-top:18px;font-family:var(--mono);font-size:13px;color:#C9C4FF}
+
+/* 나머지 목록 */
+.rest{margin-top:24px;scroll-margin-top:32px}
+.rest h3{font-size:30px;font-weight:900;letter-spacing:-.03em;margin-bottom:8px}
+.rest > p{color:var(--ink-soft);margin-bottom:22px}
+.rest ol{list-style:none;counter-reset:r}
+.rest li{counter-increment:r;display:grid;grid-template-columns:44px 210px 1fr 96px;gap:18px;padding:18px 0;align-items:baseline;
+  background:linear-gradient(var(--ink),var(--ink)) 0 0/100% 2px no-repeat}
+.rest li::before{content:counter(r,decimal-leading-zero);font-family:var(--mono);font-size:13px;color:var(--ultra);font-weight:600}
+.rest li b{font-size:18px;font-weight:900;letter-spacing:-.02em;line-height:1.35}
+.rest li p{font-size:15px;line-height:1.6;color:var(--ink-soft)}
+.rest li time{font-family:var(--mono);font-size:12px;color:var(--ink-soft);text-align:right}
+
+/* 연락 */
+.contact{background:var(--lime);color:var(--ink);padding:110px 48px 60px;margin-top:80px;position:relative;overflow:hidden}
+.contact-in{max-width:1360px;margin:0 auto;position:relative;z-index:1}
+.contact h2{font-size:clamp(46px,8vw,120px);line-height:.98;font-weight:900;letter-spacing:-.05em;max-width:8.5em}
+.tracks{display:grid;grid-template-columns:1fr 1fr;gap:56px;margin-top:64px;max-width:1100px}
+.tracks h3{font-size:24px;font-weight:900;letter-spacing:-.02em;margin-bottom:10px}
+.tracks p{font-size:16px;margin-bottom:20px;max-width:30em}
+.btn-ultra{background:var(--ultra);color:#fff}
+.btn-ink{background:var(--ink);color:var(--lime)}
+.contact-foot{margin-top:80px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-family:var(--mono);font-size:13px;font-weight:600}
+.contact-foot a{text-decoration:underline;text-underline-offset:4px}
+.contact svg{position:absolute;right:-200px;top:-200px;width:560px;z-index:0}
+
+/* ───────── 모바일: 분할 → 한 줄 ───────── */
+@media (max-width:900px){
+  .cover{padding:20px 18px 26px;min-height:100svh}
+  .cover-top nav{display:none}
+  .cover-top{font-size:12px}
+  .disc{right:-58vw;top:40%;width:128vw}
+  .statement{font-size:clamp(44px,13.4vw,64px);margin:28px 0 22px}
+  .statement .indent{padding-left:.6em}
+  .who-line{font-size:16px}
+  .cover-foot{max-width:none}
+  .btn{padding:13px 18px;font-size:15px}
+  .split{grid-template-columns:1fr;gap:0;padding:0 18px}
+  .side{position:static;height:auto;padding:48px 0 8px;gap:24px}
+  .toc{display:none}
+  .main{padding:40px 0 20px}
+  .intro{font-size:19px;margin-bottom:48px}
+  .timeline{padding-left:32px;background-position:6px 12px}
+  .case::before{left:-32px;width:17px;height:17px}
+  .beat{grid-template-columns:1fr;gap:2px}
+  .beat b{padding-top:0}
+  .detail-in{padding:22px 18px}
+  .rest li{grid-template-columns:34px 1fr;gap:4px 10px}
+  .rest li p{grid-column:2}
+  .rest li time{grid-column:2;text-align:left}
+  .contact{padding:72px 18px 40px}
+  .tracks{grid-template-columns:1fr;gap:40px}
+  .contact svg{width:320px;right:-140px;top:-250px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<!-- ═════════ 표지 ═════════ -->
+<header class="cover" id="top">
+  <div class="cover-top">
+    <b>박근민 <span style="font-weight:500;opacity:.75">Justin Avery Park</span></b>
+    <nav aria-label="바로가기">
+      <a href="#work">작업</a>
+      <a href="#rest">나머지</a>
+      <a href="#contact">연락</a>
+    </nav>
+  </div>
+
+  <svg class="disc" viewBox="0 0 1000 1000" aria-hidden="true">
+    <circle cx="500" cy="500" r="500" fill="#D6FF3D"/>
+    <path d="M500 150 A350 350 0 1 1 168 610" fill="none" stroke="#2A17F0" stroke-width="34" stroke-linecap="square"/>
+    <path d="M110 540 L168 640 L250 562" fill="none" stroke="#2A17F0" stroke-width="34" stroke-linejoin="miter"/>
+  </svg>
+
+  <h1 class="statement">
+    <span>AI가 일하는</span>
+    <span class="indent">판을 <em>혼자</em> 짓고</span>
+    <span>꺼지지 않게</span>
+    <span class="indent">굴립니다.</span>
+  </h1>
+
+  <div class="cover-foot">
+    <p class="who-line"><strong>AI 에이전트 시스템 · 인프라 엔지니어.</strong> 여러 AI를 한 팀으로 묶고, 서로 검사하게 만들고, 사람이 없어도 돌아가게 합니다. 설계부터 운영까지 혼자 합니다.</p>
+    <div class="cover-cta">
+      <a class="btn btn-lime" href="mailto:rmsals1745@gmail.com">rmsals1745@gmail.com</a>
+      <a class="btn btn-ghost" href="#work">대표 작업 4개 보기 ↓</a>
+    </div>
+  </div>
+</header>
+
+<!-- ═════════ 분할 본문 ═════════ -->
+<div class="split">
+  <aside class="side" aria-label="요약">
+    <h2><small>Who</small>박근민<br>AI 에이전트 · 인프라</h2>
+    <p class="lead">에이전트를 한 번 돌려보는 것과, 매일 그 위에서 일이 굴러가게 만드는 것은 다른 문제입니다. 저는 뒤쪽을 합니다.</p>
+
+    <div>
+      <p class="label">이런 자리에 맞습니다</p>
+      <ul class="hire">
+        <li>Forward Deployed Engineer<span>고객 현장에 들어가 요구를 캐내고 바로 짓는 자리</span></li>
+        <li>Solutions Architect<span>여러 모델·서비스를 묶는 구조를 그리는 자리</span></li>
+        <li>AI 인프라 엔지니어링<span>에이전트가 안 멈추고, 안 속고, 비용이 보이게</span></li>
+      </ul>
+    </div>
+
+    <div class="side-contact">
+      <p class="label">연락</p>
+      <a href="mailto:rmsals1745@gmail.com">rmsals1745@gmail.com</a>
+      <a href="https://github.com/rmsals1745" target="_blank" rel="noopener">github.com/rmsals1745 ↗</a>
+    </div>
+
+    <nav class="toc" aria-label="섹션">
+      <a href="#swarm"><i>01</i>justswarm</a>
+      <a href="#inlife"><i>02</i>인생딸깍</a>
+      <a href="#design"><i>03</i>JUST DESIGN</a>
+      <a href="#hermes"><i>04</i>Hermes 런타임</a>
+      <a href="#rest"><i>+7</i>나머지 작업</a>
+      <a href="#contact"><i>→</i>연락하기</a>
+    </nav>
+  </aside>
+
+  <main class="main" id="work">
+    <p class="intro">2026년 4월부터 만든 시스템 11개 중 <mark>지금도 매일 돌아가는 대표 4개</mark>입니다. 각각 어떤 문제였고, 무엇을 지었고, 그래서 무엇이 달라졌는지만 적었습니다. 누르면 자세히 펼쳐집니다.</p>
+
+    <div class="timeline">
+
+      <!-- 01 -->
+      <article class="case" id="swarm">
+        <p class="when">2026.04 — 지금 · 설계·구현 단독</p>
+        <h3>justswarm<small>AI 여러 대를 한 팀으로 묶는 엔진</small></h3>
+        <div class="beats">
+          <div class="beat"><b>문제</b><p>AI가 낸 결과는 그럴듯하게 틀립니다. 같은 AI가 만들고 같은 AI가 검사하면 그냥 통과합니다.</p></div>
+          <div class="beat"><b>지은 것</b><p>한 AI가 코드를 짜면 다른 회사의 AI가 검사하고, 통과할 때까지 되돌려 보내는 엔진. 자기 결과를 스스로 통과시키는 길을 구조적으로 막았습니다.</p></div>
+          <div class="beat result"><b>결과</b><p>52번 실행 중 17번에서 검사 AI가 실제로 고치라고 돌려보냈습니다 — 검사가 장식이 아니라는 뜻입니다.</p></div>
+        </div>
+        <button class="toggle" aria-expanded="false" aria-controls="d-swarm"><span class="ar">+</span> 자세히</button>
+        <div class="detail" id="d-swarm"><div><div class="detail-in">
+          <h4>구조</h4>
+          <ul>
+            <li><strong>만드는 AI와 검사하는 AI를 다른 회사 모델로 분리</strong> — 판정은 approve · revise · reject 세 단어만 받습니다. 형식을 안 지키면 엔진이 다시 묻습니다.</li>
+            <li><strong>셀프리뷰 차단</strong> — 그 판에서 결과물을 낸 모델은 검사 후보에서 자동으로 빠집니다. 후보가 다 떨어지면 자동 승인 대신 사람에게 넘깁니다.</li>
+            <li><strong>한 곳이 죽어도 안 멈추는 대체 순번</strong> — 장애 · 안전필터 거부 · 글자 깨짐을 서로 다른 실패로 나눠 다음 모델로 넘깁니다.</li>
+            <li><strong>AI의 자기 보고는 믿지 않습니다</strong> — 실제로 바뀐 코드(diff)만 판정에 씁니다.</li>
+          </ul>
+          <h4>검사가 잡아낸 것</h4>
+          <p>셀프리뷰 가드를 넣기 전엔 검사자 없이 승인된 실행이 2번 있었습니다. 가드를 넣은 뒤 103번 실행에서는 한 번도 없었습니다. 또 "타입 검사 통과" 같은 신호는 AI가 아무 일도 안 해도 통과한다는 걸 발견해, 작업 전 상태에서도 통과하는 검사를 가려내는 장치를 넣었습니다.</p>
+          <p class="stack">Python · Claude Code CLI · GLM · MiMo · DeepSeek · Kimi</p>
+        </div></div></div>
+      </article>
+
+      <!-- 02 -->
+      <article class="case" id="inlife">
+        <p class="when">2026.06 — 지금 · 기획부터 배포까지 단독</p>
+        <h3>인생딸깍<small>AI가 블로그·SNS 글을 대신 써주는 월 구독 서비스</small></h3>
+        <div class="beats">
+          <div class="beat"><b>문제</b><p>홍보 글은 누구에게나 필요하지만, 매번 쓸 시간과 요령이 없습니다. 무엇을 써야 할지부터 막힙니다.</p></div>
+          <div class="beat"><b>지은 것</b><p>AI가 먼저 인터뷰로 이야기를 캐낸 뒤 글을 쓰고 네이버 블로그 발행까지 잇는 서비스. 결제 · 환불 · 약관 · 사업자 요건까지 혼자 갖췄습니다.</p></div>
+          <div class="beat result"><b>결과</b><p>첫 줄을 쓴 지 4개월 만에 실제로 돈을 받는 서비스가 됐고, 운영을 멈추지 않은 채 데이터베이스 구조를 40번 고쳤습니다.</p></div>
+        </div>
+        <button class="toggle" aria-expanded="false" aria-controls="d-inlife"><span class="ar">+</span> 자세히</button>
+        <div class="detail" id="d-inlife"><div><div class="detail-in">
+          <h4>어떻게 돌아가나</h4>
+          <ul>
+            <li><strong>설문지 대신 인터뷰</strong> — 마스코트 「딸깍판다」가 마주 앉아 묻고, 옆 칠판에 상담 진행률과 "꼭 필요한 것 / 있으면 좋은 것"이 채워집니다.</li>
+            <li><strong>질문은 전부 객관식 카드</strong> — "손님이 주로 어디서 오세요?" 같은 답에 따라 글의 전략이 갈립니다.</li>
+            <li><strong>하나의 씨앗에서 여러 채널</strong> — 블로그는 발행까지, 인스타그램 · 쓰레드 · X 는 원고를 만들어 작성창까지 실어 보냅니다. 올리는 손가락은 사용자 것으로 남겼습니다.</li>
+          </ul>
+          <h4>결제 안전망</h4>
+          <p>결제사 서명 검증 · 단건 재조회 · 중복 지급 방지, 세 겹으로 이중결제와 누락을 막습니다. 요금제는 월 구독 하나입니다.</p>
+          <p class="stack">Cloudflare Pages Functions · D1 · React · Capacitor · PortOne V2</p>
+        </div></div></div>
+      </article>
+
+      <!-- 03 -->
+      <article class="case" id="design">
+        <p class="when">2026.08 · 설계·배선·검증 단독</p>
+        <h3>JUST DESIGN<small>AI가 만들고 AI가 검수하는 홈페이지 시안 공장</small></h3>
+        <div class="beats">
+          <div class="beat"><b>문제</b><p>AI에게 시안을 여러 개 시키면 다 비슷하게 나오고, 눈으로만 검수하면 그럴듯한 가짜에 속습니다.</p></div>
+          <div class="beat"><b>지은 것</b><p>상담지 한 장을 받으면 AI 세 명이 방향이 다른 시안 3개를 동시에 만들고, 검수 AI가 파일을 기계로 대조해 합격을 판정하는 파이프라인.</p></div>
+          <div class="beat result"><b>결과</b><p>제작 AI 셋이 모두 진짜 지도 대신 "지도처럼 보이는 그림"을 그렸는데, 검수가 이를 잡아냈고 수정 뒤 27개 항목을 전부 통과했습니다.</p></div>
+        </div>
+        <button class="toggle" aria-expanded="false" aria-controls="d-design"><span class="ar">+</span> 자세히</button>
+        <div class="detail" id="d-design"><div><div class="detail-in">
+          <h4>구조</h4>
+          <ul>
+            <li><strong>기획 → 제작(3안 병렬) → 검수</strong> 세 단계. AI끼리 대화시키지 않고 파일 계약으로만 주고받습니다.</li>
+            <li><strong>내용은 같고 디자인만 다르게</strong> — 상호 · 상품 · 가격 · 주소는 고객이 적은 그대로. 고객은 "내용"이 아니라 "스타일"을 고릅니다.</li>
+            <li><strong>사진도 안에서</strong> — 상품 사진 8장을 로컬 확산모델로 직접 생성했습니다. 지도는 실제 지도 타일을 받아 이미지로 구웠습니다.</li>
+          </ul>
+          <h4>알아낸 것</h4>
+          <p>검수자가 검사 항목을 스스로 줄이자 비밀키 노출 점검이 통째로 빠진 채 통과가 났습니다. 그래서 "항목을 이 번호 그대로, 대체 금지"를 계약에 박았습니다. <strong>무엇을 잴지를 검수자가 정하면, 검수는 죽은 채로 통과합니다.</strong></p>
+          <p class="stack">멀티에이전트 오케스트레이션 · 파일 계약 · ComfyUI · OSM 타일 합성</p>
+        </div></div></div>
+      </article>
+
+      <!-- 04 -->
+      <article class="case" id="hermes">
+        <p class="when">2026.05 — 지금 · 설계·구현 단독</p>
+        <h3>Hermes 상시 런타임<small>PC가 꺼져 있어도 예약한 일이 굴러가는 바닥</small></h3>
+        <div class="beats">
+          <div class="beat"><b>문제</b><p>작업 PC는 대부분 꺼져 있습니다. 시간 맞춰 도는 자동화는 기계가 꺼진 동안 조용히 건너뛰고, 아무도 모릅니다.</p></div>
+          <div class="beat"><b>지은 것</b><p>에이전트가 필요 없는 반복 작업 14개를 중앙에서 떼어 OS 스케줄러로 내리고, 원격 서버에 상주 워커를 두고, 백업을 세 곳에 나눴습니다.</p></div>
+          <div class="beat result"><b>결과</b><p>중앙이 죽거나 PC가 꺼져 있어도 각자 돌고, 놓친 일은 기계가 켜지는 순간 따라잡습니다.</p></div>
+        </div>
+        <button class="toggle" aria-expanded="false" aria-controls="d-hermes"><span class="ar">+</span> 자세히</button>
+        <div class="detail" id="d-hermes"><div><div class="detail-in">
+          <h4>구조</h4>
+          <ul>
+            <li><strong>중앙과 스케줄 분리</strong> — 놓친 실행을 켜지는 순간 다시 도는 설정으로, 중앙 재시작 · 크래시와 무관하게 굴러갑니다.</li>
+            <li><strong>이벤트 훅</strong> — 세션 시작 때 작업 맥락 주입과 자동 저장, 끝날 때 배운 개념 추출. 사람이 기억할 일을 런타임이 대신 기억합니다.</li>
+            <li><strong>원격 상주</strong> — 메신저 → 서버 에이전트 → 코드 반영 → 결재가 PC 없이 진행됩니다.</li>
+            <li><strong>백업 세 곳</strong> — 로컬 · GitHub · 클라우드.</li>
+          </ul>
+          <h4>알아낸 것</h4>
+          <p>AI 서비스가 결제 오류를 낼 때 "충전이 부족한가" 싶어 시간을 버렸는데, 실제 원인은 프로필마다 흩어진 설정에 남은 옛 주소였습니다. 그 뒤로 키를 한 곳에만 두게 다시 설계했습니다.</p>
+          <p class="stack">Python · Docker (Caddy · CouchDB) · systemd · cron · Windows 작업 스케줄러</p>
+        </div></div></div>
+      </article>
+    </div>
+
+    <!-- 나머지 -->
+    <section class="rest" id="rest">
+      <h3>나머지 7개</h3>
+      <p>대표 4개를 받치거나 따로 굴러가는 것들입니다.</p>
+      <ol>
+        <li><b>justlink</b><p>에이전트가 지금 무슨 일을 하는지 한 화면에서 보고, 맡기고, 결재하는 관제판.</p><time>2026.04 —</time></li>
+        <li><b>실행 가시성 계층</b><p>AI가 몇 초째 무엇을 부르는지, 지금까지 얼마를 썼는지 화면 아래에 늘 띄워 둡니다.</p><time>2026.08 —</time></li>
+        <li><b>justgraph</b><p>결재에서 멈춘 작업을 며칠 뒤 전혀 다른 프로세스가 그 자리에서 이어받게 만든 실험.</p><time>2026.08 —</time></li>
+        <li><b>devtutor</b><p>작업 대화에서 배운 개념을 세션이 끝날 때 뽑아 지식 카드로 쌓습니다.</p><time>2026.06 —</time></li>
+        <li><b>juststandby</b><p>처음 보는 컴퓨터에서 명령 한 줄로 개발 환경 전체를 되살립니다. 비밀키는 암호화.</p><time>2026.07 —</time></li>
+        <li><b>규제 사전점검 플러그인</b><p>쇼핑몰 · 의료 광고 문구가 법에 걸리는지 올리기 전에 잡습니다. 회귀 시험 56개 전부 통과.</p><time>2026.07</time></li>
+        <li><b>로컬 이미지 생성 파이프라인</b><p>시안에 들어갈 사진을 외부 서비스 없이 내 컴퓨터에서 직접 만듭니다.</p><time>2026.06 —</time></li>
+      </ol>
+    </section>
+  </main>
+</div>
+
+<!-- ═════════ 연락 ═════════ -->
+<footer class="contact" id="contact">
+  <svg viewBox="0 0 560 560" aria-hidden="true"><circle cx="280" cy="280" r="280" fill="#2A17F0"/></svg>
+  <div class="contact-in">
+    <h2>맡길 일이 있으면, 문장이 아니어도 됩니다.</h2>
+    <div class="tracks">
+      <div>
+        <h3>프로젝트를 맡기고 싶습니다</h3>
+        <p>AI 자동화 · 에이전트 파이프라인 · 결제 붙은 서비스를 기획부터 배포까지. 요구사항이 아직 문장이 아니어도 됩니다 — 캐내는 것부터가 제 일입니다.</p>
+        <a class="btn btn-ultra" href="mailto:rmsals1745@gmail.com?subject=%5B%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%20%EC%9D%98%EB%A2%B0%5D%20">의뢰 문의하기 →</a>
+      </div>
+      <div>
+        <h3>채용을 검토하고 있습니다</h3>
+        <p>AI 인프라 · 에이전트 시스템 · 풀스택. 혼자 굴러가는 시스템을 짓는 사람이라, 팀에서도 남이 안 하는 자리를 맡습니다. 이력서와 상세 근거는 요청 주시면 보냅니다.</p>
+        <a class="btn btn-ink" href="mailto:rmsals1745@gmail.com?subject=%5B%EC%B1%84%EC%9A%A9%20%EB%AC%B8%EC%9D%98%5D%20">채용 문의하기 →</a>
+      </div>
+    </div>
+    <div class="contact-foot">
+      <span>박근민 · Justin Avery Park · 2026</span>
+      <span><a href="mailto:rmsals1745@gmail.com">rmsals1745@gmail.com</a> · <a href="https://github.com/rmsals1745" target="_blank" rel="noopener">GitHub</a> · <a href="#top">맨 위로 ↑</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('.case .toggle').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var c = btn.closest('.case');
+    var open = c.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.lastChild.textContent = open ? ' 접기' : ' 자세히';
+  });
+});
+/* 왼쪽 목차: 지금 읽는 섹션 표시 */
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  if(!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(a){ a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id); });
+      }
+    });
+  }, {rootMargin:'-40% 0px -55% 0px'});
+  ['swarm','inlife','design','hermes','rest','contact'].forEach(function(id){
+    var el = document.getElementById(id); if(el) io.observe(el);
+  });
+})();
+</script>
+</body>
+</html>
