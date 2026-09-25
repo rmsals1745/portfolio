@@ -448,21 +448,22 @@ const mail = (subject: string) => `mailto:${EMAIL}?subject=${encodeURIComponent(
   .when { font-size: 14px; font-weight: 700; color: var(--accent); }
 
   /* 케이스 헤더 & 썸네일 레이아웃 */
+  /* 썸네일은 제목 아래 본문 폭 그대로 — 작게 두면 무엇인지 안 보인다(사장 2026-09-25 「인생딸깍 뭔지 보여주자」) */
   .case-header {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 28px;
-    margin-bottom: 18px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+    margin-bottom: 22px;
   }
   .case-meta { flex: 1 1 auto; }
   .case h3 { font-size: clamp(28px, 3vw, 40px); line-height: 1.12; font-weight: 900; letter-spacing: -.035em; margin: 6px 0 0; }
   .case h3 small { display: block; font-size: 17px; font-weight: 500; letter-spacing: -.01em; color: var(--ink-dim); margin-top: 10px; line-height: 1.5; }
 
   .case-thumb {
-    flex: 0 0 200px;
-    width: 200px;
-    height: 125px;
+    width: 100%;
+    max-width: 640px;
+    aspect-ratio: 16 / 10;
     border-radius: 6px;
     overflow: hidden;
     background: #efe8da;
@@ -559,10 +560,8 @@ const mail = (subject: string) => `mailto:${EMAIL}?subject=${encodeURIComponent(
       gap: 16px;
     }
     .case-thumb {
-      flex: none;
       width: 100%;
-      max-width: 280px;
-      height: 160px;
+      max-width: none;
     }
     .beat { grid-template-columns: 1fr; gap: 2px; }
     .beat b { padding-top: 0; }
